@@ -6,7 +6,7 @@ CC=gcc
 CFLAGS= -g -Wall -Wextra -Werror
 
 SRCS=		./main.c \
-			./srcs/*.c
+#			./srcs/*.c
 
 OBJS= $(SRCS:%.c=%.o)
 
@@ -28,7 +28,7 @@ libft.a:
 	$(CC) $(CFLAGS) -I $(INCLUDEDIR) -c $< -o $@
 
 clean:
-	$(MAKE) clean -C ./libc/libft
+	$(MAKE) clean -C ./libs/libft
 	rm $(OBJS)
 
 fclean: clean
