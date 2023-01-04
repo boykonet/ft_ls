@@ -59,6 +59,8 @@ SRCS_BONUS =	./srcs/ft_lstnew.c \
 				./srcs/ft_lstiter.c \
 				./srcs/ft_lstmap.c
 
+HEADERS = 		./libft.h
+
 OBJS = $(SRCS:%.c=%.o)
 
 OBJS_BONUS = $(SRCS_BONUS:%.c=%.o)
@@ -75,14 +77,14 @@ CFLAGS = -Wall -Wextra -Werror -I $(INCLUDEDIR)
 
 all: $(NAME)
 
-$(NAME): $(PROG_OBJS)
+$(NAME): $(PROG_OBJS) $(HEADERS)
 	ar rc $(NAME) $(PROG_OBJS)
 
-%.o: %.c
+%.o: %.c $(HEADERS)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f $(OBJS) $(OBJS_BONUS)
+	rm -f $(PROG_OBJS)
 
 fclean: clean
 	rm -f $(NAME)

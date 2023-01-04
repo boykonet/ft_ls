@@ -1,0 +1,15 @@
+This is 2 arguments, but the second one is incorrect (the flags should be before arguments)
+ls libs -R
+ls: -R: No such file or directory
+libs:
+libft
+
+like this, only all arguments are correct
+ls libs srcs utils
+libs:
+libft
+
+srcs:
+
+utils:
+

@@ -5,7 +5,7 @@ CC=gcc
 
 CFLAGS= -g -Wall -Wextra -Werror
 
-SRCS=		./main.c \
+SRCS=		./main.c
 #			./srcs/*.c
 
 OBJS= $(SRCS:%.c=%.o)

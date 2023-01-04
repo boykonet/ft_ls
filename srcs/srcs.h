@@ -74,7 +74,6 @@
 ** strerror
 */
 
-# include "./libs/libft/libft.h"
-
+# include "../libs/libft/libft.h"
 
 #endif
