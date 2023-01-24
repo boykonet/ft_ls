@@ -1,5 +1,6 @@
-#include "srcs/srcs.h"
-#include "utils/utils.h"
+#include "headers/srcs.h"
+#include "headers/utils.h"
+#include "headers/ls.h"
 
 /*
 ** -a      Include directory entries whose names begin with a dot (.).
@@ -11,108 +12,27 @@
 ** -t      Sort by time modified (most recently modified first) before sorting the operands by lexicographical order.
 */
 
-
-#define MAX_COUNT_FLAGS_PER_COMMAND 5
-#define
-
-typedef struct s_ls
-{
-	char	*flags;
-	char 	**folders;
-} t_ls;
-
-int alloc_to(void **ptr, int size);
-
-int	init_ls(t_ls *ls)
-{
-	if (!alloc_to((void**)&ls->flags, MAX_COUNT_FLAGS_PER_COMMAND))
-		return (-1);
-	ls->folders = NULL;
-	return (0);
-}
-
-void	clear_ls(t_ls *ls)
-{
-	free(ls->flags);
-	free_double_array(ls->folders);
-}
-
-//void	freels(t_list *ls)
-//{
-//
-//}
-
-//char	**folders(char **argv)
-//{
-//}
-
-//void logic()
-//{
-//
-//}
-
-void	add_flag(char **flags, char new_flag)
-{
-	int i;
-	char *p;
-
-	i = 0;
-	p = ft_strchr(*flags, new_flag);
-	if (!p)
-		return ;
-
-}
-
-int alloc_to(void **ptr, int size)
-{
-	*ptr = malloc(size * sizeof(void*));
-	if (!*ptr)
-		return (-1);
-	return (0);
-}
-
-int	parse(t_ls *ln, char **argv)
-{
-	int	counter;
-
-	counter = 1;
-	while (argv[counter])
-	{
-		char	*params;
-		int		i;
-
-		i = 0;
-		params = argv[counter];
-		if (params[i++] == '-')
-		{
-			while (params[i] != '\0')
-				add_flag((char **)&((*ln).flags), params[i++]);
-		}
-		else
-		{
-			break ;
-		}
-	}
-	if (!alloc_to((void**)(*ln).folders, len_double_array(&argv[counter])))
-	{
-		return (-1);
-	}
-	return (0);
-}
-
 int main(int argc, char **argv)
 {
-	t_ls ls;
-	int	err;
+	t_ls	ls;
+	int		err;
+	char	*emessage;
 
-	err = 0;
-	err = init_ls(&ls);
-	if (!err && argc == 1)
+	if (argc == 1)
 	{
-		write(STDOUT, "\n", 1);
+		write(CSTDOUT, "\n", 1);
 		return (0);
 	}
-
+	err = 0;
+	err = init_ls(&ls);
+	if (!err)
+		return err_printer_and_cleaner(&ls, "Error: create ls struct");
+	err = parse(&ls, argv);
+	if (!err)
+		return err_printer_and_cleaner(&ls, "Error: parse input data");
+	err = execute(&ls, &emessage);
+	if (!err)
+		return err_printer_and_cleaner(&ls, emessage);
 	clear_ls(&ls);
-    return (err);
+    return (0);
 }

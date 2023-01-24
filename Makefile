@@ -5,13 +5,15 @@ CC=gcc
 
 CFLAGS= -g -Wall -Wextra -Werror
 
-SRCS=		./main.c
-#			./srcs/*.c
+SRCS=		./main.c \
+			./srcs/*.c \
+			./utils/*.c
 
 OBJS= $(SRCS:%.c=%.o)
 
 HEADERS =	./headers/srcs.h \
-			./headers/utils.h
+			./headers/utils.h \
+			./headers/ls.h
 
 INCLUDEDIR= ./
 

@@ -13,6 +13,8 @@
 #ifndef FT_LS_H
 # define FT_LS_H
 
+# define MAX_COUNT_FLAGS_PER_COMMAND 5
+
 # include <unistd.h>
 /*
 ** write
@@ -75,5 +77,18 @@
 */
 
 # include "../libs/libft/libft.h"
+
+
+typedef struct	s_ls
+{
+	char	*flags;
+	char	**folders;
+} t_ls;
+
+int				parse(t_ls *ln, char **argv);
+int				init_ls(t_ls *ls);
+void			clear_ls(t_ls *ls);
+int				execute(t_ls *ls, char **message);
+
 
 #endif

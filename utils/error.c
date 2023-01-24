@@ -1,7 +1,10 @@
 #include "utils.h"
 
-void	print_error(char *error)
+int	err_printer_and_cleaner(t_ls *ls, char *message)
 {
-	write(STDOUT, "Error: ", 7);
-	write(STDOUT, error, ft_strlen(error));
+	write(stderr, message, ft_strlen(message));
+	write(stderr, "\n", 1);
+	clear_ls(ls);
+	return (-1);
 }
+

@@ -1,28 +1,29 @@
 #include "utils.h"
 
-int len_double_array(char **darray)
+int len_double_char_array(char **darr)
 {
 	int len;
 
 	len = 0;
-	if (darray == NULL)
+	if (darr == NULL)
 		return (0);
-	while (darray[len] != NULL)
+	while (darr[len] != NULL)
 		len++;
 	return len;
 }
 
-void	free_double_array(char **array)
+void	free_double_char_array(char **arr)
 {
 	int alen;
 
-	alen = len_double_array(array);
+	alen = len_double_array(arr);
 	if (alen == 0)
 		return ;
 	while (--alen >= 0)
 	{
-		if (array[alen] != NULL)
-			free(array[alen]);
+		if (arr[alen] != NULL)
+			free(arr[alen]);
 	}
-	free(array);
+	free(arr);
 }
+
