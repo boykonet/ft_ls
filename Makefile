@@ -6,8 +6,12 @@ CC=gcc
 CFLAGS= -g -Wall -Wextra -Werror
 
 SRCS=		./main.c \
-			./srcs/*.c \
-			./utils/*.c
+			./srcs/execute.c \
+			./srcs/ls_functions.c \
+			./srcs/parse.c \
+			./utils/alloc_function.c \
+			./utils/double_array_utils.c \
+			./utils/error.c
 
 OBJS= $(SRCS:%.c=%.o)
 
@@ -23,7 +27,7 @@ $(NAME): $(OBJS) libft.a
 	$(CC) $(CFLAGS) -I $(INCLUDEDIR) $^ -o $@
 
 libft.a:
-	$(MAKE) bonus -C ./libs/libft CC=$(CC)
+	$(MAKE) -C ./libs/libft CC=$(CC)
 	cp ./libs/libft/libft.a .
 
 %.o: %.c $(HEADERS)

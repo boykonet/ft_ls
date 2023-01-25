@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "../ls.h"
 
 int len_double_char_array(char **darr)
 {
@@ -16,7 +16,7 @@ void	free_double_char_array(char **arr)
 {
 	int alen;
 
-	alen = len_double_array(arr);
+	alen = len_double_char_array(arr);
 	if (alen == 0)
 		return ;
 	while (--alen >= 0)

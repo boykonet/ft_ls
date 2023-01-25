@@ -1,4 +1,4 @@
-#include "srcs.h"
+#include "../ls.h"
 
 int	init_ls(t_ls *ls)
 {
@@ -12,7 +12,7 @@ void	clear_ls(t_ls *ls)
 {
 	if (ls->flags)
 		free(ls->flags);
-	if (ls->flders)
-		free_double_array(ls->folders);
+	if (ls->folders)
+		free_double_char_array(ls->folders);
 }
 

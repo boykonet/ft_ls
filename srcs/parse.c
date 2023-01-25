@@ -1,4 +1,4 @@
-#include "srcs.h"
+#include "../ls.h"
 
 
 static void	add_flag(char **flags, char new_flag)
@@ -23,22 +23,22 @@ static void	add_flag(char **flags, char new_flag)
 
 int	parse(t_ls *ln, char **argv)
 {
-	char	**params;
+	char	*param;
 	int		counter;
 	int		i;
 	size_t	largv;
 
 	counter = 1;
-	params = NULL;
+	param = NULL;
 	largv = 0;
 	while (argv[counter])
 	{
 		i = 0;
-		params = argv[counter];
-		if (params[i++] == '-')
+		param = argv[counter];
+		if (param[i++] == '-')
 		{
-			while (params[i] != '\0')
-				add_flag((char**)&(ln->flags), params[i++]);
+			while (param[i] != '\0')
+				add_flag((char**)&(ln->flags), param[i++]);
 		}
 		else
 			break ;
@@ -50,7 +50,7 @@ int	parse(t_ls *ln, char **argv)
 	while (argv[counter])
 	{
 		largv = ft_strlen(argv[counter]);
-		if (!alloca_to((void**)&(ln->folders[i]), largv))
+		if (!alloc_to((void**)&(ln->folders[i]), largv))
 		{
 			free_double_char_array(ln->folders);
 			return (-1);

@@ -1,6 +1,4 @@
-#include "headers/srcs.h"
-#include "headers/utils.h"
-#include "headers/ls.h"
+#include "ls.h"
 
 /*
 ** -a      Include directory entries whose names begin with a dot (.).

@@ -47,9 +47,8 @@ SRCS =			./srcs/ft_memset.c \
 				./srcs/ft_putchar_fd.c \
 				./srcs/ft_putstr_fd.c \
 				./srcs/ft_putendl_fd.c \
-				./srcs/ft_putnbr_fd.c
-
-SRCS_BONUS =	./srcs/ft_lstnew.c \
+				./srcs/ft_putnbr_fd.c \
+				./srcs/ft_lstnew.c \
 				./srcs/ft_lstadd_front.c \
 				./srcs/ft_lstsize.c \
 				./srcs/ft_lstlast.c \
@@ -63,28 +62,20 @@ HEADERS = 		./libft.h
 
 OBJS = $(SRCS:%.c=%.o)
 
-OBJS_BONUS = $(SRCS_BONUS:%.c=%.o)
-
-ifdef WITH_BONUS
-PROG_OBJS = $(OBJS) $(OBJS_BONUS)
-else
-PROG_OBJS = $(OBJS)
-endif
-
 INCLUDEDIR = ./
 
 CFLAGS = -Wall -Wextra -Werror -I $(INCLUDEDIR)
 
 all: $(NAME)
 
-$(NAME): $(PROG_OBJS) $(HEADERS)
-	ar rc $(NAME) $(PROG_OBJS)
+$(NAME): $(OBJS) $(HEADERS)
+	ar rc $(NAME) $(OBJS)
 
 %.o: %.c $(HEADERS)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f $(PROG_OBJS)
+	rm -f $(OBJS)
 
 fclean: clean
 	rm -f $(NAME)
@@ -93,7 +84,4 @@ re:
 	$(MAKE) fclean
 	$(MAKE) all
 
-bonus:
-	$(MAKE) WITH_BONUS=1 all
-
-.PHONY: all clean fclean re bonus
+.PHONY: all clean fclean re

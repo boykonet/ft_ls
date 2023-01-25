@@ -4,7 +4,7 @@
 # define CSTDOUT 1
 # define CSTDERR 2
 
-# include "./srcs/srcs.h"
-# include "./utils/utils.h"
+# include "srcs/srcs.h"
+# include "utils/utils.h"
 
 #endif

@@ -78,7 +78,6 @@
 
 # include "../libs/libft/libft.h"
 
-
 typedef struct	s_ls
 {
 	char	*flags;
