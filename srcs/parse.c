@@ -21,41 +21,49 @@ static void	add_flag(char **flags, char new_flag)
 	*flags[i] = new_flag;
 }
 
-int	parse(t_ls *ln, char **argv)
+int	create_and_copy_folders(char ***dest, char **srcs)
+{
+	int		i;
+	char	*value;
+
+	i = 0;
+	while (srcs[i]) {
+		value = ft_strdup(srcs[i]);
+		if (!value)
+			return (-1);
+		*dest[i++] = value;
+	}
+	return (0);
+}
+
+int	parse(t_ls *ls, int argc, char **argv)
 {
 	char	*param;
 	int		counter;
 	int		i;
-	size_t	largv;
 
 	counter = 1;
-	param = NULL;
-	largv = 0;
-	while (argv[counter])
+	if (argc > 1)
 	{
-		i = 0;
-		param = argv[counter];
-		if (param[i++] == '-')
+		while (argv[counter])
 		{
-			while (param[i] != '\0')
-				add_flag((char**)&(ln->flags), param[i++]);
+			i = 0;
+			param = argv[counter];
+			if (param[i++] == '-')
+			{
+				while (param[i] != '\0')
+					add_flag((char **) &(ls->flags), param[i++]);
+			} else
+				break;
+			counter++;
 		}
-		else
-			break ;
-		counter++;
-	}
-	if (!alloc_to((void**)ln->folders, len_double_char_array(&argv[counter])))
-		return (-1);
-	i = 0;
-	while (argv[counter])
-	{
-		largv = ft_strlen(argv[counter]);
-		if (!alloc_to((void**)&(ln->folders[i]), largv))
+		if (!alloc_to((void **)ls->folders, len_double_char_array(&argv[counter])))
+			return (-1);
+		if (create_and_copy_folders(&ls->folders, &argv[counter]) == -1)
 		{
-			free_double_char_array(ln->folders);
+			free_double_char_array(ls->folders);
 			return (-1);
 		}
-		ft_memcpy(ln->folders[i++], argv[counter++], largv);
 	}
 	return (0);
 }

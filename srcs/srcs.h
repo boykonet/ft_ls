@@ -84,7 +84,7 @@ typedef struct	s_ls
 	char	**folders;
 } t_ls;
 
-int				parse(t_ls *ln, char **argv);
+int				parse(t_ls *ls, int argc, char **argv);
 int				init_ls(t_ls *ls);
 void			clear_ls(t_ls *ls);
 int				execute(t_ls *ls, char **message);

@@ -22,8 +22,12 @@ void	free_double_char_array(char **arr)
 	while (--alen >= 0)
 	{
 		if (arr[alen] != NULL)
+		{
 			free(arr[alen]);
+			arr[alen] = NULL;
+		}
 	}
 	free(arr);
+	arr = NULL;
 }
 

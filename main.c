@@ -16,18 +16,14 @@ int main(int argc, char **argv)
 	int		err;
 	char	*emessage;
 
-	if (argc == 1)
-	{
-		write(CSTDOUT, "\n", 1);
-		return (0);
-	}
-	err = 0;
 	err = init_ls(&ls);
+	write(1, "init\n", 5);
 	if (!err)
-		return err_printer_and_cleaner(&ls, "Error: create ls struct");
-	err = parse(&ls, argv);
+		return err_printer_and_cleaner(&ls, "ls: error create ls struct");
+	err = parse(&ls, argc, argv);
+	write(1, "parse\n", 6);
 	if (!err)
-		return err_printer_and_cleaner(&ls, "Error: parse input data");
+		return err_printer_and_cleaner(&ls, "ls: error parse input data");
 	err = execute(&ls, &emessage);
 	if (!err)
 		return err_printer_and_cleaner(&ls, emessage);
