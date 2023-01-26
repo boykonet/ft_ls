@@ -3,7 +3,7 @@
 int	init_ls(t_ls *ls)
 {
 	ls->folders = NULL;
-	if (!alloc_to((void**)&ls->flags, MAX_COUNT_FLAGS_PER_COMMAND))
+	if (alloc_to((void**)&ls->flags, MAX_COUNT_FLAGS_PER_COMMAND) == -1)
 		return (-1);
 	return (0);
 }

@@ -57,7 +57,7 @@ int	parse(t_ls *ls, int argc, char **argv)
 				break;
 			counter++;
 		}
-		if (!alloc_to((void **)ls->folders, len_double_char_array(&argv[counter])))
+		if (alloc_to((void **)ls->folders, len_double_char_array(&argv[counter])) == -1)
 			return (-1);
 		if (create_and_copy_folders(&ls->folders, &argv[counter]) == -1)
 		{
