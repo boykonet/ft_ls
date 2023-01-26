@@ -8,7 +8,7 @@
 
 int		len_double_char_array(char **darr);
 void	free_double_char_array(char **arr);
-int		alloc_to(void **ptr, int size);
 int		err_printer_and_cleaner(t_ls *ls, char *message);
+void	**calloca_to_2d(size_t size);
 
 #endif

@@ -4,7 +4,7 @@
 # define FLAG_NOT_SUPPORT_1 "ls: illegal option -- "
 # define FLAG_NOT_SUPPORT_2 "\nusage: ls [-Ralrt] [file ...]"
 
-static int	flag_not_support(char **emessage, char flag)
+static char	*flag_not_support(char flag)
 {
 	size_t	cbytes;
 	char	*ptr;
@@ -12,19 +12,14 @@ static int	flag_not_support(char **emessage, char flag)
 	size_t	lfns2;
 	
 	cbytes = 0;
-	ptr = NULL;
 	lfns1 = ft_strlen(FLAG_NOT_SUPPORT_1);
 	lfns2 = ft_strlen(FLAG_NOT_SUPPORT_2);
-	if (alloc_to((void**)emessage, lfns1 + 1 + lfns2) == -1)
-	{
-		*emessage = ft_strdup(MALLOC_ERROR);
-		return (-1);
-	}
-	ptr = *emessage;
-	cbytes += ft_strlcpy(&ptr[0], FLAG_NOT_SUPPORT_1, lfns1);
-	cbytes += ft_strlcpy(&ptr[cbytes - 1], (char*)&flag, 1);
-	cbytes += ft_strlcpy(&ptr[cbytes - 1], FLAG_NOT_SUPPORT_2, lfns2);
-	return (-1);
+	ptr = ft_calloc(sizeof(char), lfns1 + 1 + lfns2 + 1);
+	if (ptr == NULL)
+		return ft_strdup(MALLOC_ERROR);
+	cbytes += ft_strlcpy(&ptr[cbytes], FLAG_NOT_SUPPORT_1, lfns1);
+	cbytes += ft_strlcpy(&ptr[cbytes], flag, 1);
+	return (ptr);
 }
 
 int	handle_recursive_flag(int a)
@@ -60,7 +55,7 @@ int	execute(t_ls *ls, char **emessage)
 	char	flag;
 	int		i, counter;
 	char	flags[MAX_COUNT_FLAGS_PER_COMMAND] = { 'R', 'a', 'l', 'r', 't' };
-	f		func[5] = { &handle_recursive_flag, &handle_a_flag, &handle_l_flag, &handle_r_flag, &handle_t_flag };
+	f		func[MAX_COUNT_FLAGS_PER_COMMAND] = { &handle_recursive_flag, &handle_a_flag, &handle_l_flag, &handle_r_flag, &handle_t_flag };
 
 	i = 0;
 	while (1)
@@ -77,7 +72,7 @@ int	execute(t_ls *ls, char **emessage)
 			counter++;
 		}
 		if (counter == MAX_COUNT_FLAGS_PER_COMMAND)
-			return flag_not_support(emessage, flag);
+			return flag_not_support(flag);
 		i++;
 		if (i >= MAX_COUNT_FLAGS_PER_COMMAND)
 			break ;
