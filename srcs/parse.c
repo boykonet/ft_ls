@@ -1,5 +1,10 @@
 #include "../ls.h"
 
+//static int	is_flag_support(char *sflags, char flag)
+//{
+//
+//
+//}
 
 static void	add_flag(char **flags, char new_flag)
 {

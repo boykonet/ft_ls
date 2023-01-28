@@ -10,23 +10,34 @@
 ** -t      Sort by time modified (most recently modified first) before sorting the operands by lexicographical order.
 */
 
-int main(int argc, char **argv)
+
+/*
+** reserved codes:
+** -1 - malloc error
+**  0 - OK
+**  33...126 - flag not supported
+*/
+int main(/*int argc, char **argv*/)
 {
 	t_ls	ls;
 	int		err;
-	char	*emessage;
+//	int		exitcode;
 
+//	exitcode = 0;
 	err = init_ls(&ls);
-	write(1, "init\n", 5);
-	if (err == -1)
-		return err_printer_and_cleaner(&ls, "ls: error create ls struct");
-	err = parse(&ls, argc, argv);
-	write(1, "parse\n", 6);
-	if (err == -1)
-		return err_printer_and_cleaner(&ls, "ls: error parse input data");
-	err = execute(&ls, &emessage);
-	if (err == -1)
-		return err_printer_and_cleaner(&ls, emessage);
-	clear_ls(&ls);
-    return (0);
+	printf("%s\n", ls.sflags);
+	ls.func[0](1);
+	ls.func[1](1);
+	ls.func[2](1);
+	ls.func[3](1);
+	ls.func[4](1);
+//	err = 0;
+////	write(1, "init\n", 5);
+//	err_printer_and_cleaner(&ls, err, 1);
+//	err = parse(&ls, argc, argv);
+////	write(1, "parse\n", 6);
+//	err_printer_and_cleaner(&ls, err, 1);
+//	err = execute(&ls);
+//	err_printer_and_cleaner(&ls, err, exitcode);
+	return (0);
 }

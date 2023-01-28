@@ -9,6 +9,7 @@ SRCS=		./main.c \
 			./srcs/execute.c \
 			./srcs/ls_functions.c \
 			./srcs/parse.c \
+			./utils/calloca_to_2d.c \
 			./utils/double_array_utils.c \
 			./utils/error.c
 

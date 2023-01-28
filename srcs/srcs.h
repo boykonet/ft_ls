@@ -78,16 +78,25 @@
 
 # include "../libs/libft/libft.h"
 
+typedef int (*f) (int);
+
 typedef struct	s_ls
 {
 	char	*flags;
 	char	**folders;
+	char 	sflags[MAX_COUNT_FLAGS_PER_COMMAND];// = {'R', 'a', 'l', 'r', 't'};
+	f 		func[MAX_COUNT_FLAGS_PER_COMMAND];// = {&handle_recursive_flag, &handle_a_flag, &handle_l_flag, &handle_r_flag, &handle_t_flag};
 } t_ls;
 
 int				parse(t_ls *ls, int argc, char **argv);
 int				init_ls(t_ls *ls);
 void			clear_ls(t_ls *ls);
-int				execute(t_ls *ls, char **message);
+int				execute(t_ls *ls);
+int	handle_recursive_flag(int a);
+int	handle_a_flag(int a);
+int	handle_l_flag(int a);
+int	handle_r_flag(int a);
+int	handle_t_flag(int a);
 
 
 #endif
