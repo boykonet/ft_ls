@@ -1,10 +1,17 @@
 #include "../ls.h"
 
-//static int	is_flag_support(char *sflags, char flag)
-//{
-//
-//
-//}
+static int	is_flag_support(char *sflags, char flag)
+{
+	int i;
+
+	i = 0;
+	while (i < MAX_COUNT_FLAGS_PER_COMMAND)
+	{
+		if (sflags[i++] == flag)
+			return (1);
+	}
+	return (0);
+}
 
 static void	add_flag(char **flags, char new_flag)
 {
@@ -56,8 +63,11 @@ int	parse(t_ls *ls, int argc, char **argv)
 			param = argv[counter];
 			if (param[i] == '-')
 			{
+				i++;
 				while (param[i] != '\0')
 				{
+					if (is_flag_support(ls->sflags, param[i]) == 0)
+						return (param[i]);
 					add_flag(&ls->flags, param[i]);
 					i++;
 				}

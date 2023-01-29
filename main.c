@@ -17,27 +17,22 @@
 **  0 - OK
 **  33...126 - flag not supported
 */
-int main(/*int argc, char **argv*/)
+int main(int argc, char **argv)
 {
 	t_ls	ls;
 	int		err;
-//	int		exitcode;
+	int		exitcode;
 
-//	exitcode = 0;
+	exitcode = 0;
 	err = init_ls(&ls);
-	printf("%s\n", ls.sflags);
-	ls.func[0](1);
-	ls.func[1](1);
-	ls.func[2](1);
-	ls.func[3](1);
-	ls.func[4](1);
-//	err = 0;
-////	write(1, "init\n", 5);
-//	err_printer_and_cleaner(&ls, err, 1);
-//	err = parse(&ls, argc, argv);
-////	write(1, "parse\n", 6);
-//	err_printer_and_cleaner(&ls, err, 1);
-//	err = execute(&ls);
-//	err_printer_and_cleaner(&ls, err, exitcode);
+	write(1, "init\n", 5);
+	err_printer_and_cleaner(&ls, err, 1);
+	err = parse(&ls, argc, argv);
+	write(1, "parse\n", 6);
+	printf("errcode %d %c\n", err, err + '0');
+	err_printer_and_cleaner(&ls, err, 1);
+	err = execute(&ls);
+	write(1, "execute\n", 8);
+	err_printer_and_cleaner(&ls, err, exitcode);
 	return (0);
 }
