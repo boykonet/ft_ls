@@ -3,7 +3,7 @@
 int	init_ls(t_ls *ls)
 {
 	ls->folders = NULL;
-	ls->flags = malloc(sizeof(char) * MAX_COUNT_FLAGS_PER_COMMAND);
+	ls->flags = ft_calloc(MAX_COUNT_FLAGS_PER_COMMAND + 1, sizeof(char));
 	if (ls->flags == NULL)
 		return (-1);
 	ft_memcpy(ls->sflags, "Ralrt", MAX_COUNT_FLAGS_PER_COMMAND);

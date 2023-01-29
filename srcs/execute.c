@@ -31,7 +31,19 @@ int	handle_t_flag(int a)
 	return (a);
 }
 
-//typedef int (*f) (int);
+int is_recursive_flag(const char *flags)
+{
+	int i;
+
+	i = 0;
+	while (flags[i])
+	{
+		if (flags[i] == 'R')
+			return (1);
+		i++;
+	}
+	return (0);
+}
 
 /*
 ** -1 - malloc error
@@ -41,11 +53,10 @@ int	handle_t_flag(int a)
 int	execute(t_ls *ls)
 {
 	char	flag;
-	int		i, counter;
-//	char	flags[MAX_COUNT_FLAGS_PER_COMMAND] = { 'R', 'a', 'l', 'r', 't' };
-//	f		func[MAX_COUNT_FLAGS_PER_COMMAND] = { &handle_recursive_flag, &handle_a_flag, &handle_l_flag, &handle_r_flag, &handle_t_flag };
+	int		i, counter, is_recursive;
 
 	i = 0;
+	is_recursive = is_recursive_flag(ls->flags);
 	while (1)
 	{
 		flag = ls->flags[i];
@@ -53,10 +64,10 @@ int	execute(t_ls *ls)
 		counter = 0;
 		while (counter < MAX_COUNT_FLAGS_PER_COMMAND)
 		{
-			if (ls->sflags[counter] == ls->flags[i])
-			{
-				printf("flag - %c, result %d", flag, ls->func[counter](counter));
-			}
+//			if (ls->sflags[counter] == ls->flags[i])
+//			{
+//				printf("flag - %c, result %d", flag, ls->func[counter](counter));
+//			}
 			counter++;
 		}
 		if (counter == MAX_COUNT_FLAGS_PER_COMMAND)

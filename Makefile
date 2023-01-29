@@ -6,6 +6,7 @@ CC=gcc
 CFLAGS= -g -Wall -Wextra -Werror
 
 SRCS=		./main.c \
+			./srcs/dir.c \
 			./srcs/execute.c \
 			./srcs/ls_functions.c \
 			./srcs/parse.c \
