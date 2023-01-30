@@ -98,7 +98,8 @@ int				handle_l_flag(int a);
 int				handle_r_flag(int a);
 int				handle_t_flag(int a);
 
-t_list *dir(char *d);
+t_list	*dir(char *d);
+t_list	*clstat(char **dfiles);
 
 
 #endif

@@ -55,10 +55,12 @@
 // -----------------------
 
 
-
+ // test dir function
 int main(int argc, char **argv)
 {
-	t_list *l;
+	t_list *l, *d;
+	size_t count_elements;
+	char **elems;
 
 	if (argc <= 1)
 	{
@@ -66,14 +68,76 @@ int main(int argc, char **argv)
 		return (0);
 	}
 
-	printf("FIRST\n");
 	printf("argument [%s]\n", argv[1]);
 	l = dir(argv[1]);
-	printf("SECOND\n");
+
+	count_elements = ft_lstsize(l);
+
+	elems = (char**)calloca_to_2d(count_elements);
+	if (elems == NULL)
+	{
+		printf("MALLOC ERROR");
+		return (-1);
+	}
+
+	char *dirpath = ft_strjoin(argv[1], "/");
+
+	size_t i = 0;
 	while (l != NULL)
 	{
-		printf("name [%s]\n", ((struct dirent*)(l->content))->d_name);
+		char *fname = ((struct dirent*)(l->content))->d_name;
+		if (ft_memcmp(fname, ".", ft_strlen(fname)) == 0
+		|| ft_memcmp(fname, "..", ft_strlen(fname)) == 0)
+		{
+			l = l->next;
+			continue ;
+		}
+		elems[i] = ft_strjoin(dirpath, fname);
+//		printf("ELEMS[i] = [%s]\n", elems[i]);
+//		printf("len elems [%d]\n", len_double_char_array(elems));
+		if (elems[i] == NULL)
+		{
+			free_double_char_array(elems);
+			printf("MALLOC ERROR");
+			return (-1);
+		}
+		printf("name [%s]\n", fname);
 		l = l->next;
+		i++;
 	}
+
+	free(dirpath);
+
+	printf("LEN DFILE [%D]\n", len_double_char_array(elems));
+
+	d = clstat(elems);
+	if (d == NULL)
+		return (1);
+
+	while (d != NULL)
+	{
+		gid_t gid = ((struct stat*)(d->content))->st_gid;
+		uid_t uid = ((struct stat*)(d->content))->st_uid;
+
+		struct group *grp;
+
+		if ((grp = getgrgid(gid)) != NULL)
+		{
+			printf("[%8.8s]\n", grp->gr_name);
+		}
+
+		struct passwd *pwd;
+
+		if ((pwd = getpwuid(uid)) != NULL)
+		{
+			printf("[%-8.8s]\n", pwd->pw_name);
+		}
+
+		printf("gid [%u]\n", gid);
+		d = d->next;
+	}
+
 	return (0);
 }
+
+
