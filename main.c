@@ -17,24 +17,24 @@
 **  0 - OK
 **  32...126 - flag not supported
 */
-//int main(int argc, char **argv)
-//{
-//	t_ls	ls;
-//	int		err;
-//	int		exitcode;
-//
-//	exitcode = 0;
-//	err = init_ls(&ls);
-//	write(1, "init\n", 5);
-//	err_printer_and_cleaner(&ls, err, 1);
-//	err = parse(&ls, argc, argv);
-//	write(1, "parse\n", 6);
-////	err_printer_and_cleaner(&ls, err, 1);
-////	err = execute(&ls);
-////	write(1, "execute\n", 8);
-////	err_printer_and_cleaner(&ls, err, exitcode);
-//	return (0);
-//}
+int main(int argc, char **argv)
+{
+	t_ls	ls;
+	int		err;
+	int		exitcode;
+
+	exitcode = 0;
+	err = init_ls(&ls);
+	write(1, "init\n", 5);
+	err_printer_and_cleaner(&ls, err, 1);
+	err = parse(&ls, argc, argv);
+	write(1, "parse\n", 6);
+	err_printer_and_cleaner(&ls, err, 1);
+	err = execute(&ls);
+	write(1, "execute\n", 8);
+	err_printer_and_cleaner(&ls, err, exitcode);
+	return (0);
+}
 
 // -----------------------
 //	printf("flag [- %c]\n", ls.flags[0]);
@@ -53,24 +53,6 @@
 //		i++;
 //	}
 // -----------------------
-
-char *get_user(uid_t uid)
-{
-	struct passwd *pwd;
-
-	if ((pwd = getpwuid(uid)) == NULL)
-		return (NULL);
-	return (pwd->pw_name);
-}
-
-char *get_group(gid_t gid)
-{
-	struct group *grp;
-
-	if ((grp = getgrgid(gid)) == NULL)
-		return (NULL);
-	return (grp->gr_name);
-}
 
 // // test dir function
 //int main(int argc, char **argv)
@@ -230,46 +212,31 @@ char *get_group(gid_t gid)
 //	return (0);
 //}
 
-char	*creadlink(char *link)
-{
-	char	*file;
 
-	file = ft_calloc(100, sizeof(char));
-	if (file == NULL)
-	{
-		perror("malloc");
-		return (NULL);
-	}
-	if (readlink(link, file, sizeof(file)) < 0)
-	{
-		perror("readlink");
-		return (NULL);
-	}
-	return (file);
-}
-
-int main(int argc, char **argv)
-{
-	if (argc <= 0)
-	{
-		printf("NOT ARGUMENT STUPID\n");
-		return (1);
-	}
-
-	char *filename = creadlink(argv[1]);
-	printf("readlink returned [%s] for [%s]\n", filename, argv[1]);
-
-//	if (readlink(argv[1], buf, sizeof(buf)) < 0)
+//int main(int argc, char **argv)
+//{
+//	if (argc <= 0)
 //	{
-//		perror("readlink");
+//		printf("NOT ARGUMENT STUPID\n");
 //		return (1);
 //	}
-//	else
-//	{
-//		printf("readlink returned [%s] for [%s]\n", buf, argv[1]);
-//	}
-	return (0);
-}
+//
+//	char *filename = creadlink(argv[1]);
+//	printf("readlink returned [%s] for [%s]\n", filename, argv[1]);
+//
+////	if (readlink(argv[1], buf, sizeof(buf)) < 0)
+////	{
+////		perror("readlink");
+////		return (1);
+////	}
+////	else
+////	{
+////		printf("readlink returned [%s] for [%s]\n", buf, argv[1]);
+////	}
+//	return (0);
+//}
+
+
 
 
 

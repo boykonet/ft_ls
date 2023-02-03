@@ -8,9 +8,11 @@ CFLAGS= -g -Wall -Wextra -Werror
 SRCS=		./main.c \
 			./srcs/dir.c \
 			./srcs/execute.c \
+			./srcs/get_file_info.c \
 			./srcs/ls_functions.c \
 			./srcs/lstat.c \
 			./srcs/parse.c \
+			./srcs/readlink.c \
 			./utils/calloca_to_2d.c \
 			./utils/double_array_utils.c \
 			./utils/error.c

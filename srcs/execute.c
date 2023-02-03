@@ -1,34 +1,43 @@
 #include "../ls.h"
 
-int	handle_recursive_flag(int a)
+int	handle_recursive_flag(void *p)
 {
-	printf("handle_recursive_flag\n");
-	return (a);
+	t_ls *ls = (t_ls*)p;
+	int i = 0;
+	while (i < len_double_char_array(ls->folders))
+	{
+		printf("handle_recursive_flag %s\n", ls->folders[i]);
+	}
+	return (0);
 }
 
 
-int	handle_a_flag(int a)
+int	handle_a_flag(void *p)
 {
-	printf("handle_a_flag\n");
-	return (a);
+	t_ls *ls = (t_ls*)p;
+	printf("handle_a_flag %s\n", ls->flags);
+	return (0);
 }
 
-int	handle_l_flag(int a)
+int	handle_l_flag(void *p)
 {
-	printf("handle_l_flag\n");
-	return (a);
+	t_ls *ls = (t_ls*)p;
+	printf("handle_l_flag %s\n", ls->flags);
+	return (0);
 }
 
-int	handle_r_flag(int a)
+int	handle_r_flag(void *p)
 {
-	printf("handle_r_flag\n");
-	return (a);
+	t_ls *ls = (t_ls*)p;
+	printf("handle_r_flag %s\n", ls->flags);
+	return (0);
 }
 
-int	handle_t_flag(int a)
+int	handle_t_flag(void *p)
 {
-	printf("handle_t_flag\n");
-	return (a);
+	t_ls *ls = (t_ls*)p;
+	printf("handle_t_flag %s\n", ls->flags);
+	return (0);
 }
 
 int is_recursive_flag(const char *flags)
@@ -39,9 +48,26 @@ int is_recursive_flag(const char *flags)
 	while (flags[i])
 	{
 		if (flags[i] == 'R')
+		{
+			// TODO: remove this flag
 			return (1);
+		}
 		i++;
 	}
+	return (0);
+}
+
+//int	remove_flag(char **flags)
+//{
+//
+//}
+
+int	if_not_dirs_or_dot(char *dir)
+{
+	if (dir == NULL)
+		return (1);
+	if (ft_strncmp(dir, ".", ft_strlen(dir)) == 0)
+		return (1);
 	return (0);
 }
 
@@ -53,29 +79,39 @@ int is_recursive_flag(const char *flags)
 int	execute(t_ls *ls)
 {
 	char	flag;
-	int		i, counter, is_recursive;
+	int		i, is_recursive;
+	t_list	*rs;
 
 	i = 0;
 	is_recursive = is_recursive_flag(ls->flags);
-	while (1)
+	while (is_recursive && i < MAX_COUNT_FLAGS_PER_COMMAND)
 	{
-		flag = ls->flags[i];
-
-		counter = 0;
-		while (counter < MAX_COUNT_FLAGS_PER_COMMAND)
+		if (is_recursive)
 		{
-//			if (ls->sflags[counter] == ls->flags[i])
-//			{
-//				printf("flag - %c, result %d", flag, ls->func[counter](counter));
-//			}
-			counter++;
+			flag = 'R';
+			is_recursive = 0;
 		}
-		if (counter == MAX_COUNT_FLAGS_PER_COMMAND)
-			return (flag);
+		else
+			flag = ls->flags[i++];
+
+		int j = 0;
+		while (j < MAX_COUNT_FLAGS_PER_COMMAND)
+		{
+			if (ls->sflags[j] == flag)
+				ls->func[j]((void*)ls);
+			j++;
+		}
+		// TODO: remove after test
 		i++;
-		if (i >= MAX_COUNT_FLAGS_PER_COMMAND)
-			break ;
 	}
 	return (0);
 }
+
+
+/*
+ *                . -> . -> | -> . -> . -> . -> . -> . -> . -> . -> |
+ *                          . -> . -> | -> . -> |                   . -> |
+ *                                    . -> .    . -> . -> .
+ *
+ */
 
