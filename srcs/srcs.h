@@ -13,7 +13,8 @@
 #ifndef FT_LS_H
 # define FT_LS_H
 
-# define MAX_COUNT_FLAGS_PER_COMMAND 5
+# define MAX_FLAGS		5
+# define CONST_FLAGS	"Ralrt"
 
 # include <unistd.h>
 /*
@@ -84,9 +85,9 @@ typedef int (*f) (void*);
 typedef struct	s_ls
 {
 	char	*flags;
-	char	**folders;
-	char 	sflags[MAX_COUNT_FLAGS_PER_COMMAND + 1];
-	f 		func[MAX_COUNT_FLAGS_PER_COMMAND + 1];
+	char	**files;
+//	char 	sflags[MAX_FLAGS + 1];
+//	f 		func[MAX_FLAGS + 1];
 } t_ls;
 
 typedef struct s_iresource

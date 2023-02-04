@@ -47,9 +47,9 @@ int main(int argc, char **argv)
 //		i++;
 //	}
 //	i = 0;
-//	while (ls.folders[i] != NULL) {
+//	while (ls.files[i] != NULL) {
 //		printf("HEY AGAIN\n");
-//		printf("folder [-%s]\n", ls.folders[i]);
+//		printf("folder [-%s]\n", ls.files[i]);
 //		i++;
 //	}
 // -----------------------

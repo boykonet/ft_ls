@@ -5,7 +5,7 @@ static int	is_flag_support(const char *sflags, char flag)
 	int i;
 
 	i = 0;
-	while (i < MAX_COUNT_FLAGS_PER_COMMAND)
+	while (i < MAX_FLAGS)
 	{
 		if (sflags[i++] == flag)
 			return (1);
@@ -24,7 +24,7 @@ static void	add_flag(char **flags, char new_flag)
 			return ;
 		i++;
 	}
-	if (i == MAX_COUNT_FLAGS_PER_COMMAND)
+	if (i == MAX_FLAGS)
 		return ;
 	*flags[i] = new_flag;
 }
@@ -72,12 +72,12 @@ int	parse(t_ls *ls, int argc, char **argv)
 			counter++;
 		}
 		// Allocates memory for an array of pointers
-		ls->folders = (char**)calloca_to_2d(len_double_char_array(&argv[counter]) + 1);
-		if (ls->folders == NULL)
+		ls->files = (char**)calloca_to_2d(len_double_char_array(&argv[counter]) + 1);
+		if (ls->files == NULL)
 			return (-1);
-		if (copy_folders(&ls->folders, &argv[counter]) == -1)
+		if (copy_folders(&ls->files, &argv[counter]) == -1)
 		{
-			free_double_char_array(ls->folders);
+			free_double_char_array(ls->files);
 			return (-1);
 		}
 	}
