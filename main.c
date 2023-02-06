@@ -17,7 +17,7 @@
 **  0 - OK
 **  32...126 - flag not supported
 */
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **env)
 {
 	t_ls	ls;
 	int		err;
@@ -27,12 +27,16 @@ int main(int argc, char **argv)
 	err = init_ls(&ls);
 	write(1, "init\n", 5);
 	err_printer_and_cleaner(&ls, err, 1);
-	err = parse(&ls, argc, argv);
+	err = parse(&ls, argc, argv, env);
 	write(1, "parse\n", 6);
 	err_printer_and_cleaner(&ls, err, 1);
-	err = execute(&ls);
-	write(1, "execute\n", 8);
-	err_printer_and_cleaner(&ls, err, exitcode);
+	for (int i = 0; i < len_double_char_array(ls.files); i++)
+	{
+		printf("[%s]\n", ls.files[i]);
+	}
+//	err = execute(&ls);
+//	write(1, "execute\n", 8);
+//	err_printer_and_cleaner(&ls, err, exitcode);
 	return (0);
 }
 
@@ -236,8 +240,31 @@ int main(int argc, char **argv)
 //	return (0);
 //}
 
+//int main(int argc, char **argv)
+//{
+//	if (argc <= 1)
+//	{
+//		return (1);
+//	}
+//	t_list *l = dir(argv[1]);
+//
+//	int i = 0;
+//	while (i < ft_lstsize(l))
+//	{
+//		printf("[%s]\n", ((struct dirent*)(l->content))->d_name);
+//		i++;
+//	}
+//}
 
 
+//int main(int argc, char **argv, char **env)
+//{
+//	if (argc > 1 || len_double_char_array(argv) > 1)
+//		return (1);
+//	char *s = find_env(env, "PWD");
+//	printf("[%s]\n", s);
+//	free(s);
+//}
 
 
 

@@ -29,14 +29,17 @@ static void	add_flag(char **flags, char new_flag)
 	*flags[i] = new_flag;
 }
 
-int	copy_folders(char ***dest, char **srcs)
+int	copy_folders(char ***dest, char **srcs, char **env)
 {
 	int		i;
 	char	*value;
 
 	i = 0;
 	while (srcs[i]) {
-		value = ft_strdup(srcs[i]);
+		if (!ft_strncmp(srcs[i], ".", ft_strlen(srcs[i])))
+			value = find_env(env, "PWD");
+		else
+			value = ft_strdup(srcs[i]);
 		if (!value)
 			return (-1);
 		*dest[i++] = value;
@@ -44,7 +47,28 @@ int	copy_folders(char ***dest, char **srcs)
 	return (0);
 }
 
-int	parse(t_ls *ls, int argc, char **argv)
+char	*find_env(char **env, char *name)
+{
+	int i, len;
+
+	i = 0;
+	len = len_double_char_array(env);
+	while (i < len)
+	{
+		char *s = ft_strnstr(env[i], name, ft_strlen(name));
+		if (&env[i][0] == &s[0])
+		{
+			s = ft_strchr(s, '=');
+			if (*(s + 1) == '\0')
+				return (NULL);
+			return (ft_strdup(s + 1));
+		}
+		i++;
+	}
+	return (NULL);
+}
+
+int	parse(t_ls *ls, int argc, char **argv, char **env)
 {
 	char	*param;
 	int		counter;
@@ -62,7 +86,7 @@ int	parse(t_ls *ls, int argc, char **argv)
 				i++;
 				while (param[i] != '\0')
 				{
-					if (is_flag_support(ls->sflags, param[i]) == 0)
+					if (is_flag_support(CONST_FLAGS, param[i]) == 0)
 						return (param[i]);
 					add_flag(&ls->flags, param[i]);
 					i++;
@@ -75,7 +99,19 @@ int	parse(t_ls *ls, int argc, char **argv)
 		ls->files = (char**)calloca_to_2d(len_double_char_array(&argv[counter]) + 1);
 		if (ls->files == NULL)
 			return (-1);
-		if (copy_folders(&ls->files, &argv[counter]) == -1)
+		if (copy_folders(&ls->files, &argv[counter], env) == -1)
+		{
+			free_double_char_array(ls->files);
+			return (-1);
+		}
+	}
+	else
+	{
+		ls->files = (char**)calloca_to_2d(1 + 1);
+		if (ls->files == NULL)
+			return (-1);
+		ls->files[0] = find_env(env, "PWD");
+		if (ls->files[0] == NULL)
 		{
 			free_double_char_array(ls->files);
 			return (-1);

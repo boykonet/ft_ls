@@ -107,7 +107,7 @@ typedef struct s_resource
 	struct s_file	*child;
 } t_resource;
 
-int				parse(t_ls *ls, int argc, char **argv);
+int				parse(t_ls *ls, int argc, char **argv, char **envp);
 int				init_ls(t_ls *ls);
 void			clear_ls(t_ls *ls);
 int				execute(t_ls *ls);
@@ -122,6 +122,8 @@ t_list	*clstat(char **dfiles);
 char	*creadlink(char *link);
 char *get_user(uid_t uid);
 char *get_group(gid_t gid);
+
+char	*find_env(char **env, char *name);
 
 
 #endif

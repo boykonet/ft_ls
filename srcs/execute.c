@@ -80,13 +80,15 @@ void	del_recursive_flag(char **flags)
 //	return (0);
 //}
 
-t_resource *recursive(const char *folder)
+t_list *recursive(const char *folder)
 {
+	printf("recursive [%s]\n", folder);
 	return (NULL);
 }
 
-t_resource *regular(const char *folder)
+t_list *regular(const char *folder)
 {
+	printf("regular [%s]\n", folder);
 	return (NULL);
 }
 
@@ -97,7 +99,7 @@ t_resource *regular(const char *folder)
 */
 int	e(char *flags, const char *folder)
 {
-	t_resource	*res;
+	t_list		*res;
 	char		flag;
 	size_t		i, flen;
 	f			func[MAX_FLAGS] = {&handle_recursive_flag, &handle_a_flag, &handle_l_flag, &handle_r_flag, &handle_t_flag};
