@@ -30,10 +30,6 @@ int main(int argc, char **argv, char **env)
 	err = parse(&ls, argc, argv, env);
 	write(1, "parse\n", 6);
 	err_printer_and_cleaner(&ls, err, 1);
-	for (int i = 0; i < len_double_char_array(ls.files); i++)
-	{
-		printf("[%s]\n", ls.files[i]);
-	}
 //	err = execute(&ls);
 //	write(1, "execute\n", 8);
 //	err_printer_and_cleaner(&ls, err, exitcode);

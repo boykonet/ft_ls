@@ -74,7 +74,16 @@
 # include <stdio.h>
 /*
 ** perror
+*/
+
+#include <string.h>
+/*
 ** strerror
+*/
+
+#include <errno.h>
+/*
+** errno
 */
 
 # include "../libs/libft/libft.h"
@@ -82,10 +91,16 @@
 
 typedef int (*f) (void*);
 
+typedef struct s_file
+{
+	char *filename;
+	char *path;
+} t_file;
+
 typedef struct	s_ls
 {
 	char	*flags;
-	char	**files;
+	t_list	*files;
 //	char 	sflags[MAX_FLAGS + 1];
 //	f 		func[MAX_FLAGS + 1];
 } t_ls;
@@ -117,13 +132,17 @@ int				handle_l_flag(void *p);
 int				handle_r_flag(void *p);
 int				handle_t_flag(void *p);
 
-t_list	*dir(char *d);
+char *dir(t_list **l, char *dirname);
 t_list	*clstat(char **dfiles);
 char	*creadlink(char *link);
 char *get_user(uid_t uid);
 char *get_group(gid_t gid);
 
 char	*find_env(char **env, char *name);
+
+void	lexicography_sort(char ***array);
+
+void	del_file_struct(void *file);
 
 
 #endif

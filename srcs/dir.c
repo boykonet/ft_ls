@@ -1,35 +1,31 @@
 #include "../ls.h"
 
-t_list *dir(char *d)
+char *dir(t_list **l, char *dirname)
 {
-	t_list			*l, *ptr;
+	t_list			*ptr;
 	DIR				*pdir;
 	struct dirent	*pDirent;
 
 
 	// open directory
-	pdir = opendir(d);
+	pdir = opendir(dirname);
 	if (pdir == NULL)
-	{
-		printf("can't open directory %s", d);
-		return (NULL);
-	}
+		return strerror(errno);
 
 	// read directory and write to the t_list struct
 	pDirent = readdir(pdir);
-	l = NULL;
 	if (pDirent == NULL)
 	{
 		closedir(pdir);
-		return (NULL);
+		return strerror(errno);
 	}
-	l = ft_lstnew((void*)pDirent);
-	ptr = l;
+	*l = ft_lstnew((void*)pDirent);
+	ptr = *l;
 	while ((pDirent = readdir(pdir)) != NULL)
 	{
 		ptr->next = ft_lstnew((void*)pDirent);
 		ptr = ptr->next;
 	}
 	closedir(pdir);
-	return (l);
+	return strerror(errno);
 }

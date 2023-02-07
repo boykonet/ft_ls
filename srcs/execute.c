@@ -129,9 +129,9 @@ int	e(char *flags, const char *folder)
 int	execute(t_ls *ls)
 {
 	size_t	i, flen;
-	int	err;
+//	int	err;
 
-	flen = len_double_char_array(ls->files);
+	flen = ft_lstsize(ls->files);
 	if (flen == 0)
 	{
 		e(ls->flags, ".");
@@ -141,11 +141,11 @@ int	execute(t_ls *ls)
 		i = 0;
 		while (i < flen)
 		{
-			err = e(ls->flags, ls->files[i]);
-			if (!err)
-			{
-				;
-			}
+//			err = e(ls->flags, ls->files[i]);
+//			if (!err)
+//			{
+//				;
+//			}
 			i++;
 		}
 
