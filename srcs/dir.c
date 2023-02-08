@@ -27,5 +27,5 @@ char *dir(t_list **l, char *dirname)
 		ptr = ptr->next;
 	}
 	closedir(pdir);
-	return strerror(errno);
+	return "";
 }

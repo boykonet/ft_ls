@@ -29,117 +29,95 @@ static void	add_flag(char **flags, char new_flag)
 	*flags[i] = new_flag;
 }
 
-void	del_file_struct(void *file)
+//void	del_file_struct(void *file)
+//{
+//	t_file *f = (t_file*)file;
+//
+//	if (f->filename)
+//	{
+//		free(f->filename);
+//		f->filename = NULL;
+//	}
+//
+//	if (f->path)
+//	{
+//		free(f->path);
+//		f->path = NULL;
+//	}
+//}
+
+//char	*get_path(char *haystack, char **env)
+//{
+//	char	*path;
+//
+//	if (!ft_strncmp(haystack, ".", ft_strlen(haystack)))
+//		path = find_env(env, "PWD");
+//	else
+//		path = ft_strdup(haystack);
+//	return (path);
+//}
+
+char	**copy_folders(char **srcs)
 {
-	t_file *f = (t_file*)file;
-
-	if (f->filename)
-	{
-		free(f->filename);
-		f->filename = NULL;
-	}
-
-	if (f->path)
-	{
-		free(f->path);
-		f->path = NULL;
-	}
-}
-
-char	*get_path(char *haystack, char **env)
-{
-	char	*path;
-
-	if (!ft_strncmp(haystack, ".", ft_strlen(haystack)))
-		path = find_env(env, "PWD");
-	else
-		path = ft_strdup(haystack);
-	return (path);
-}
-
-int	copy_folders(t_list **files, char **srcs, char **env)
-{
-	t_list	*ptr;
-	t_file	*new;
+	char	**arr;
 	int		i;
-
-	if (files == NULL || !len_double_char_array(srcs))
-		return (-1);
-
-	new = ft_calloc(1, sizeof(t_file));
-	if (!new)
-		return (-1);
-
-	new->filename = ft_strdup(srcs[0]);
-	new->path = get_path(srcs[0], env);
-	if (!new->filename || !new->path)
-	{
-		del_file_struct(new);
-		free(new);
-		return (-1);
-	}
-
-	*files = ft_lstnew(new);
-	ptr = *files;
-	i = 1;
-	while (srcs[i]) {
-		new = ft_calloc(1, sizeof(t_file));
-		if (!new)
-		{
-			ft_lstclear(files, del_file_struct);
-			return (-1);
-		}
-
-		new->filename = ft_strdup(srcs[i]);
-		new->path = get_path(srcs[i], env);
-		if (!new->filename || !new->path)
-		{
-			del_file_struct(new);
-			free(new);
-			ft_lstclear(files, del_file_struct);
-			return (-1);
-		}
-		ptr->next = ft_lstnew(new);
-		ptr = ptr->next;
-		i++;
-	}
-	return (0);
-}
-
-char	*find_env(char **env, char *name)
-{
-	int i, len;
+	size_t	len;
 
 	i = 0;
-	len = len_double_char_array(env);
-	while (i < len)
-	{
-		char *s = ft_strnstr(env[i], name, ft_strlen(name));
-		if (&env[i][0] == &s[0])
+	len = len_double_char_array((const char**)srcs);
+	arr = ft_calloc(len, sizeof(char*));
+	if (!arr)
+		return (NULL);
+	while (srcs[i]) {
+		arr[i] = ft_strdup(srcs[i]);
+		if (!arr[i])
 		{
-			s = ft_strchr(s, '=');
-			if (*(s + 1) == '\0')
-				return (NULL);
-			return (ft_strdup(s + 1));
+			free_double_char_array(arr);
+			return (NULL);
 		}
 		i++;
 	}
-	return (NULL);
+	return (arr);
 }
 
-int	parse(t_ls *ls, int argc, char **argv, char **env)
+//char	*find_env(char **env, char *name)
+//{
+//	int i, len;
+//
+//	i = 0;
+//	len = len_double_char_array(env);
+//	while (i < len)
+//	{
+//		char *s = ft_strnstr(env[i], name, ft_strlen(name));
+//		if (&env[i][0] == &s[0])
+//		{
+//			s = ft_strchr(s, '=');
+//			if (*(s + 1) == '\0')
+//				return (NULL);
+//			return (ft_strdup(s + 1));
+//		}
+//		i++;
+//	}
+//	return (NULL);
+//}
+
+//void	parse_flags(t_list *ls, char ***argv)
+//{
+//
+//}
+
+int	parse(t_ls *ls, int argc, char **argv)
 {
 	char	*param;
-	int		counter;
 	size_t	i;
 
-	counter = 1;
 	if (argc > 1)
 	{
-		while (argv[counter])
+		argv += 1;
+		while (*argv)
 		{
 			i = 0;
-			param = argv[counter];
+			param = *argv;
 			if (param[i] == '-')
 			{
 				i++;
@@ -152,14 +130,12 @@ int	parse(t_ls *ls, int argc, char **argv, char **env)
 				}
 			} else
 				break ;
-			counter++;
+			argv++;
 		}
 		// Allocates memory for an array of pointers
-		if (copy_folders(&ls->files, &argv[counter], env) == -1)
-		{
-//			free_double_char_array(ls->files);
+		ls->files = copy_folders(argv);
+		if (!ls->files)
 			return (-1);
-		}
 	}
 	else
 	{

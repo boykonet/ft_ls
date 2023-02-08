@@ -6,7 +6,7 @@ t_list	*clstat(char **dfiles)
 	struct stat sb;
 	t_list	*l, *ptr;
 
-	if (len_double_char_array(dfiles) == 0)
+	if (len_double_char_array((const char**)dfiles) == 0)
 		return (NULL);
 
 	if (lstat(dfiles[0], &sb) == -1)
@@ -17,7 +17,7 @@ t_list	*clstat(char **dfiles)
 	l = ft_lstnew((void*)&sb);
 	ptr = l;
 	i = 1;
-	while (i < len_double_char_array(dfiles))
+	while (i < len_double_char_array((const char**)dfiles))
 	{
 		if (lstat(dfiles[i], &sb) == -1)
 		{

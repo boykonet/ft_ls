@@ -131,7 +131,7 @@ int	execute(t_ls *ls)
 	size_t	i, flen;
 //	int	err;
 
-	flen = ft_lstsize(ls->files);
+	flen = len_double_char_array((const char**)ls->files);
 	if (flen == 0)
 	{
 		e(ls->flags, ".");

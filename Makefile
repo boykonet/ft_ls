@@ -13,6 +13,7 @@ SRCS=		./main.c \
 			./srcs/lstat.c \
 			./srcs/parse.c \
 			./srcs/readlink.c \
+			./srcs/sort.c \
 			./utils/calloca_to_2d.c \
 			./utils/double_array_utils.c \
 			./utils/error.c

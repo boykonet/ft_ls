@@ -1,6 +1,6 @@
 #include "../ls.h"
 
-int len_double_char_array(char **darr)
+int len_double_char_array(const char **darr)
 {
 	int len;
 
@@ -16,7 +16,7 @@ void	free_double_char_array(char **arr)
 {
 	int alen;
 
-	alen = len_double_char_array(arr);
+	alen = len_double_char_array((const char**)arr);
 	if (alen == 0)
 		return ;
 	while (--alen >= 0)

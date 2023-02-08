@@ -91,16 +91,10 @@
 
 typedef int (*f) (void*);
 
-typedef struct s_file
-{
-	char *filename;
-	char *path;
-} t_file;
-
 typedef struct	s_ls
 {
 	char	*flags;
-	t_list	*files;
+	char	**files;
 //	char 	sflags[MAX_FLAGS + 1];
 //	f 		func[MAX_FLAGS + 1];
 } t_ls;
@@ -122,7 +116,7 @@ typedef struct s_resource
 	struct s_file	*child;
 } t_resource;
 
-int				parse(t_ls *ls, int argc, char **argv, char **envp);
+int				parse(t_ls *ls, int argc, char **argv);
 int				init_ls(t_ls *ls);
 void			clear_ls(t_ls *ls);
 int				execute(t_ls *ls);
@@ -142,7 +136,7 @@ char	*find_env(char **env, char *name);
 
 void	lexicography_sort(char ***array);
 
-void	del_file_struct(void *file);
+//void	del_file_struct(void *file);
 
 
 #endif

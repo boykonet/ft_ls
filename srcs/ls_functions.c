@@ -16,6 +16,6 @@ void	clear_ls(t_ls *ls)
 	if (ls->flags)
 		free(ls->flags);
 	if (ls->files)
-		ft_lstclear(&ls->files, del_file_struct);
+		free_double_char_array(ls->files);
 }
 

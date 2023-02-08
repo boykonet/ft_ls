@@ -17,7 +17,7 @@
 **  0 - OK
 **  32...126 - flag not supported
 */
-int main(int argc, char **argv, char **env)
+int main(int argc, char **argv)
 {
 	t_ls	ls;
 	int		err;
@@ -27,9 +27,16 @@ int main(int argc, char **argv, char **env)
 	err = init_ls(&ls);
 	write(1, "init\n", 5);
 	err_printer_and_cleaner(&ls, err, 1);
-	err = parse(&ls, argc, argv, env);
+	err = parse(&ls, argc, argv);
 	write(1, "parse\n", 6);
 	err_printer_and_cleaner(&ls, err, 1);
+	lexicography_sort(&ls.files);
+	int i = 0;
+	while (ls.files[i])
+	{
+		printf("filename [%s]\n", ls.files[i]);
+		i++;
+	}
 //	err = execute(&ls);
 //	write(1, "execute\n", 8);
 //	err_printer_and_cleaner(&ls, err, exitcode);
@@ -236,19 +243,18 @@ int main(int argc, char **argv, char **env)
 //	return (0);
 //}
 
-//int main(int argc, char **argv)
+//int main()
 //{
-//	if (argc <= 1)
-//	{
-//		return (1);
-//	}
-//	t_list *l = dir(argv[1]);
+//	t_list *l;
 //
-//	int i = 0;
-//	while (i < ft_lstsize(l))
+//	char *err = dir(&l, ".");
+//	if (*err != '\0')
+//		printf("ERROR [%s]\n", err);
+//
+//	while (l)
 //	{
-//		printf("[%s]\n", ((struct dirent*)(l->content))->d_name);
-//		i++;
+//		printf("{%s}\n", ((struct dirent*)(l->content))->d_name);
+//		l = l->next;
 //	}
 //}
 
