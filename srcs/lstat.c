@@ -1,32 +1,34 @@
 #include "../ls.h"
 
-t_list	*clstat(char **dfiles)
+int	clstat(t_list **l, char **dfiles)
 {
-	int i;
-	struct stat sb;
-	t_list	*l, *ptr;
+	struct stat	sb;
+	t_list		*ptr;
+	int			i;
 
-	if (len_double_char_array((const char**)dfiles) == 0)
-		return (NULL);
+	if (l == NULL || dfiles == NULL || len_double_char_array((const char**)dfiles) == 0)
+	{
+		// TODO: error
+		return (-1);
+	}
 
 	if (lstat(dfiles[0], &sb) == -1)
-	{
-		perror("lstat");
-		return (NULL);
-	}
-	l = ft_lstnew((void*)&sb);
-	ptr = l;
+//		return (strerror(errno));
+		return (-1);
+	*l = ft_lstnew((void*)&sb);
+	ptr = *l;
 	i = 1;
 	while (i < len_double_char_array((const char**)dfiles))
 	{
 		if (lstat(dfiles[i], &sb) == -1)
 		{
-			perror("lstat");
-			return (NULL);
+			ft_lstclear(l, NULL);
+			return (-1);
+//			return (strerror(errno));
 		}
 		ptr->next = ft_lstnew((void*)&sb);
 		ptr = ptr->next;
 		i++;
 	}
-	return (l);
+	return (0);
 }

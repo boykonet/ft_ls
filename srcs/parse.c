@@ -101,37 +101,59 @@ char	**copy_folders(char **srcs)
 //	return (NULL);
 //}
 
-//void	parse_flags(t_list *ls, char ***argv)
-//{
-//
-//}
+int	parse_flags(t_ls *ls, char ***argv)
+{
+	char	*param;
+
+	while (*(*argv))
+	{
+		param = *(*argv);
+		if (*param == '-')
+		{
+			param++;
+			while (*param != '\0')
+			{
+				if (!is_flag_support(CONST_FLAGS, *param))
+				{
+
+					return (-1);
+				}
+				add_flag(&ls->flags, *param);
+				param++;
+			}
+		} else
+			break ;
+		(*argv)++;
+	}
+	return (0);
+}
 
 int	parse(t_ls *ls, int argc, char **argv)
 {
-	char	*param;
-	size_t	i;
+//	char	*param;
+//	size_t	i;
 
 	if (argc > 1)
 	{
 		argv += 1;
-		while (*argv)
-		{
-			i = 0;
-			param = *argv;
-			if (param[i] == '-')
-			{
-				i++;
-				while (param[i] != '\0')
-				{
-					if (is_flag_support(CONST_FLAGS, param[i]) == 0)
-						return (param[i]);
-					add_flag(&ls->flags, param[i]);
-					i++;
-				}
-			} else
-				break ;
-			argv++;
-		}
+//		while (*argv)
+//		{
+////			i = 0;
+////			param = *argv;
+////			if (param[i] == '-')
+////			{
+////				i++;
+////				while (param[i] != '\0')
+////				{
+////					if (is_flag_support(CONST_FLAGS, param[i]) == 0)
+////						return (param[i]);
+////					add_flag(&ls->flags, param[i]);
+////					i++;
+////				}
+////			} else
+////				break ;
+////			argv++;
+//		}
 		// Allocates memory for an array of pointers
 		ls->files = copy_folders(argv);
 		if (!ls->files)

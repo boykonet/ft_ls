@@ -16,13 +16,12 @@ SRCS=		./main.c \
 			./srcs/sort.c \
 			./utils/calloca_to_2d.c \
 			./utils/double_array_utils.c \
-			./utils/error.c
+			./utils/error.c \
+			./utils/printer.c
 
 OBJS= $(SRCS:%.c=%.o)
 
-HEADERS =	./headers/srcs.h \
-			./headers/utils.h \
-			./headers/ls.h
+HEADERS =	./ls.h
 
 INCLUDEDIR= ./
 

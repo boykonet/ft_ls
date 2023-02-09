@@ -11,6 +11,27 @@
 */
 
 
+void	initialization(t_ls *ls)
+{
+	int err;
+
+	err = init_ls(ls);
+	cleaner(ls, err);
+}
+
+void	parsing(t_ls *ls, int argc, char **argv)
+{
+	int err;
+
+	err = parse(ls, argc, argv);
+	cleaner(ls, err);
+}
+
+void	execution()
+{
+
+}
+
 /*
 ** reserved codes:
 ** -1 - malloc error
@@ -20,17 +41,14 @@
 int main(int argc, char **argv)
 {
 	t_ls	ls;
-	int		err;
-	int		exitcode;
 
-	exitcode = 0;
-	err = init_ls(&ls);
+	initialization(&ls);
 	write(1, "init\n", 5);
-	err_printer_and_cleaner(&ls, err, 1);
-	err = parse(&ls, argc, argv);
+
+	parsing(&ls, argc, argv);
 	write(1, "parse\n", 6);
-	err_printer_and_cleaner(&ls, err, 1);
-	lexicography_sort(&ls.files);
+
+//	lexicography_sort(&ls.files);
 	int i = 0;
 	while (ls.files[i])
 	{
