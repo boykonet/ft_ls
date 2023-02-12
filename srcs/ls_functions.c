@@ -20,10 +20,6 @@ void	clear_ls(t_ls *ls)
 		ls->flags[i++] = '\0';
 	if (ls->files)
 		free_double_char_array(ls->files);
-	if (ls->err)
-	{
-		clear_err(ls->err);
-		ls->err = NULL;
-	}
+	clear_err(&ls->err);
 }
 

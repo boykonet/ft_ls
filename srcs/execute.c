@@ -80,15 +80,15 @@ void	del_recursive_flag(char **flags)
 //	return (0);
 //}
 
-t_list *recursive(const char *folder)
-{
-	printf("recursive [%s]\n", folder);
-	return (NULL);
-}
-
 t_list *regular(const char *folder)
 {
 	printf("regular [%s]\n", folder);
+	return (NULL);
+}
+
+t_list *recursive(const char *folder)
+{
+	printf("recursive [%s]\n", folder);
 	return (NULL);
 }
 
@@ -105,10 +105,10 @@ int	e(char *flags, const char *folder)
 	f			func[MAX_FLAGS] = {&handle_recursive_flag, &handle_a_flag, &handle_l_flag, &handle_r_flag, &handle_t_flag};
 
 	i = 0;
-	if (is_recursive_flag(flags))
-		res = recursive(folder);
-	else
+	if (!is_recursive_flag(flags))
 		res = regular(folder);
+//	else
+//		res = regular(folder);
 	del_recursive_flag(&flags);
 	flen = ft_strlen(flags);
 	while (i < flen)
@@ -132,23 +132,15 @@ int	execute(t_ls *ls)
 //	int	err;
 
 	flen = len_double_char_array((const char**)ls->files);
-	if (flen == 0)
+	i = 0;
+	while (i < flen)
 	{
-		e(ls->flags, ".");
-	}
-	else
-	{
-		i = 0;
-		while (i < flen)
-		{
-//			err = e(ls->flags, ls->files[i]);
-//			if (!err)
-//			{
-//				;
-//			}
-			i++;
-		}
-
+//		err = e(ls->flags, ls->files[i]);
+//		if (!err)
+//		{
+//			;
+//		}
+		i++;
 	}
 	return (0);
 }

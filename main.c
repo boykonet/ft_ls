@@ -18,15 +18,13 @@ void	initialization(t_ls *ls)
 
 void	parsing(t_ls *ls, int argc, char **argv)
 {
-	int err;
-
-	err = parse(ls, argc, argv);
-	cleaner(ls, err);
+	if (parse(ls, argc, argv) == -1)
+		print_error_message_and_exit(ls);
 }
 
-void	execution()
+void	execution(t_ls *ls)
 {
-
+	execute(ls);
 }
 
 /*

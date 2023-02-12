@@ -125,7 +125,7 @@ typedef struct s_resource
 } t_resource;
 
 int				parse(t_ls *ls, int argc, char **argv);
-int 			init_ls(t_ls *ls);
+void 			init_ls(t_ls *ls);
 void			clear_ls(t_ls *ls);
 int				execute(t_ls *ls);
 int				handle_recursive_flag(void *p);
@@ -154,8 +154,17 @@ int				eprinter(char *s);
 
 void	init_err(t_err *err);
 void	clear_err(t_err *err);
+int		flag_not_support_error(t_err *err, char flag);
 
-void	del_pattern(void *node);
+t_pattern	*new_pattern(char *pattern, char *replacement);
+void		clear_pattern(t_pattern *pattern);
+void		del_pattern(void *node);
+
+t_list	*find_last_elem(t_list **head);
+t_list	*add_pattern(t_list **head, char *pattern, char *replacement);
+char	*replace_pattern(char *str, t_list *patterns);
+
+void	print_error_message_and_exit(t_ls *ls);
 
 
 #endif

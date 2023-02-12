@@ -16,7 +16,9 @@ SRCS=		./main.c \
 			./srcs/sort.c \
 			./utils/calloca_to_2d.c \
 			./utils/double_array_utils.c \
+			./utils/err_struct.c \
 			./utils/error.c \
+			./utils/pattern.c \
 			./utils/printer.c
 
 OBJS= $(SRCS:%.c=%.o)

@@ -11,17 +11,25 @@ static void	bubble(char **first, char **second)
 
 void	lexicography_sort(char ***array)
 {
-	int i, j;
-	int len = len_double_char_array((const char**)*array);
+	char	**ptr;
+	int		i, j;
+	int		len;
 
+	if (!array || !*array)
+		return ;
+
+	ptr = *array;
+	len = len_double_char_array((const char**)ptr);
 	i = 0;
 	while (i < len)
 	{
 		j = i + 1;
 		while (j < len)
 		{
-			if (ft_strncmp(*array[i], *array[j], ft_strlen(*array[i]) > ft_strlen(*array[j]) ? ft_strlen(*array[i]) : ft_strlen(*array[j])) > 0)
-				bubble(array[i], array[j]);
+			size_t	isize = ft_strlen(ptr[i]);
+			size_t	jsize = ft_strlen(ptr[j]);
+			if (ft_strncmp(ptr[i], ptr[j], isize > jsize ? isize : jsize) > 0)
+				bubble(&ptr[i], &ptr[j]);
 			j++;
 		}
 		i++;
