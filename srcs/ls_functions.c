@@ -1,22 +1,29 @@
 #include "../ls.h"
 
-int	init_ls(t_ls *ls)
+void	init_ls(t_ls *ls)
 {
-	ls->files = NULL;
-	ls->flags = ft_calloc(MAX_FLAGS + 1, sizeof(char));
-	if (ls->flags == NULL)
-		return eprinter(MALLOC_ERROR);
-	return (0);
+	int	i;
 
-//	ft_memcpy(ls->sflags, "Ralrt", MAX_FLAGS);
-//	ft_memcpy(ls->func, (f[MAX_FLAGS]){&handle_recursive_flag, &handle_a_flag, &handle_l_flag, &handle_r_flag, &handle_t_flag}, sizeof(void*) * MAX_FLAGS);
+	i = 0;
+	while (i < MAX_FLAGS + 1)
+		ls->flags[i++] = '\0';
+	ls->files = NULL;
+	init_err(&ls->err);
 }
 
 void	clear_ls(t_ls *ls)
 {
-	if (ls->flags)
-		free(ls->flags);
+	int	i;
+
+	i = 0;
+	while (i < MAX_FLAGS + 1)
+		ls->flags[i++] = '\0';
 	if (ls->files)
 		free_double_char_array(ls->files);
+	if (ls->err)
+	{
+		clear_err(ls->err);
+		ls->err = NULL;
+	}
 }
 

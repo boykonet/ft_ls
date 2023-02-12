@@ -13,7 +13,7 @@ static int	is_flag_support(const char *sflags, char flag)
 	return (0);
 }
 
-static void	add_flag(char **flags, char new_flag)
+static void	add_flag(char flags[MAX_FLAGS + 1], char new_flag)
 {
 	int i;
 
@@ -28,23 +28,6 @@ static void	add_flag(char **flags, char new_flag)
 		return ;
 	*flags[i] = new_flag;
 }
-
-//void	del_file_struct(void *file)
-//{
-//	t_file *f = (t_file*)file;
-//
-//	if (f->filename)
-//	{
-//		free(f->filename);
-//		f->filename = NULL;
-//	}
-//
-//	if (f->path)
-//	{
-//		free(f->path);
-//		f->path = NULL;
-//	}
-//}
 
 //char	*get_path(char *haystack, char **env)
 //{
@@ -103,11 +86,13 @@ char	**copy_folders(char **srcs)
 
 int	parse_flags(t_ls *ls, char ***argv)
 {
+	char	**p;
 	char	*param;
 
-	while (*(*argv))
+	p = *argv;
+	while (p)
 	{
-		param = *(*argv);
+		param = *p;
 		if (*param == '-')
 		{
 			param++;
@@ -115,16 +100,17 @@ int	parse_flags(t_ls *ls, char ***argv)
 			{
 				if (!is_flag_support(CONST_FLAGS, *param))
 				{
-
+					flag_not_support_error(&ls->err);
 					return (-1);
 				}
-				add_flag(&ls->flags, *param);
+				add_flag(ls->flags, *param);
 				param++;
 			}
 		} else
 			break ;
-		(*argv)++;
+		p++;
 	}
+	*argv = p;
 	return (0);
 }
 
@@ -136,6 +122,7 @@ int	parse(t_ls *ls, int argc, char **argv)
 	if (argc > 1)
 	{
 		argv += 1;
+		parse_flags(ls, &argv);
 //		while (*argv)
 //		{
 ////			i = 0;

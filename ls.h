@@ -84,12 +84,27 @@
 
 typedef int		(*f) (void*);
 
+typedef struct s_pattern
+{
+	char	*pattern;
+	char	*replacement;
+} t_pattern;
+
+typedef struct	s_err
+{
+	t_list	*patterns;
+	char	*message;
+	int		exitcode;
+
+} t_err;
+
 typedef struct	s_ls
 {
-	char	*flags;
+	char	flags[MAX_FLAGS + 1];
 	char	**files;
 //	char 	sflags[MAX_FLAGS + 1];
 //	f 		func[MAX_FLAGS + 1];
+	t_err	err;
 } t_ls;
 
 typedef struct s_iresource
@@ -136,6 +151,11 @@ void			free_double_char_array(char **arr);
 void			cleaner(t_ls *ls, int exitcode);
 void			**calloca_to_2d(size_t size);
 int				eprinter(char *s);
+
+void	init_err(t_err *err);
+void	clear_err(t_err *err);
+
+void	del_pattern(void *node);
 
 
 #endif

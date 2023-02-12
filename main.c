@@ -13,10 +13,7 @@
 
 void	initialization(t_ls *ls)
 {
-	int err;
-
-	err = init_ls(ls);
-	cleaner(ls, err);
+	init_ls(ls);
 }
 
 void	parsing(t_ls *ls, int argc, char **argv)
@@ -48,7 +45,7 @@ int main(int argc, char **argv)
 	parsing(&ls, argc, argv);
 	write(1, "parse\n", 6);
 
-//	lexicography_sort(&ls.files);
+	lexicography_sort(&ls.files);
 	int i = 0;
 	while (ls.files[i])
 	{
