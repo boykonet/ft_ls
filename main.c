@@ -39,6 +39,7 @@ void	**crealloc(void **data, size_t size)
 	size_t	count;
 
 	count = 0;
+	p = data;
 	while (p)
 	{
 		count++;
