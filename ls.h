@@ -7,7 +7,7 @@
 
 # define FLAG_NOT_SUPPORT	"ls: illegal option -- {{flag}}\nusage: ls [-Ralrt] [file ...]\n"
 # define UNSUPPORTED_ASCII	"ls: unsupported symbol: only ascii printable characters\n"
-# define MALLOC_ERROR		"malloc error\n"
+# define MALLOC_ERROR		"ls: malloc error\n"
 
 # include <unistd.h>
 /*
@@ -100,10 +100,10 @@ typedef struct	s_err
 
 typedef struct	s_ls
 {
-	char	flags[MAX_FLAGS + 1];
+	char	*flags;
+	char	**filenames;
 	char	**files;
-//	char 	sflags[MAX_FLAGS + 1];
-//	f 		func[MAX_FLAGS + 1];
+	char	**dirs;
 	t_err	err;
 } t_ls;
 
@@ -124,7 +124,8 @@ typedef struct s_resource
 	struct s_file	*child;
 } t_resource;
 
-int				parse(t_ls *ls, int argc, char **argv);
+char			*parse_flags(char ***data, t_err *err);
+char 			**parse_filenames(char ***data, t_err *err);
 void 			init_ls(t_ls *ls);
 void			clear_ls(t_ls *ls);
 int				execute(t_ls *ls);
@@ -134,7 +135,8 @@ int				handle_l_flag(void *p);
 int				handle_r_flag(void *p);
 int				handle_t_flag(void *p);
 
-char			*dir(t_list **l, char *dirname);
+int				dir(t_list **l, char *dirname, t_err *err);
+int				if_dir_or_file(char *filename);
 int				clstat(t_list **l, char **dfiles);
 char			*creadlink(char *link);
 char			*get_user(uid_t uid);
@@ -155,6 +157,7 @@ int				eprinter(char *s);
 void	init_err(t_err *err);
 void	clear_err(t_err *err);
 int		flag_not_support_error(t_err *err, char flag);
+int		malloc_error(t_err *err);
 
 t_pattern	*new_pattern(char *pattern, char *replacement);
 void		clear_pattern(t_pattern *pattern);

@@ -1,6 +1,21 @@
 #include "../ls.h"
 
-char *dir(t_list **l, char *dirname)
+int		if_dir_or_file(char *filename)
+{
+	if (opendir(filename) == NULL)
+	{
+		if (errno == ENOTDIR)
+			return (1);
+		return (-1);
+	}
+	return (0);
+}
+
+
+// Returns 0 if not error
+// -1 if error and write error message to err variable
+// 1 if not directory
+int		dir(t_list **l, char *dirname, t_err *err)
 {
 	t_list			*ptr;
 	DIR				*pdir;
@@ -10,14 +25,20 @@ char *dir(t_list **l, char *dirname)
 	// open directory
 	pdir = opendir(dirname);
 	if (pdir == NULL)
-		return strerror(errno);
+	{
+		err->message = strerror(errno);
+		err->exitcode = 1;
+		return (-1);
+	}
 
 	// read directory and write to the t_list struct
 	pDirent = readdir(pdir);
 	if (pDirent == NULL)
 	{
 		closedir(pdir);
-		return strerror(errno);
+		err->message = strerror(errno);
+		err->exitcode = 1;
+		return (-1);
 	}
 	*l = ft_lstnew((void*)pDirent);
 	ptr = *l;
@@ -27,5 +48,11 @@ char *dir(t_list **l, char *dirname)
 		ptr = ptr->next;
 	}
 	closedir(pdir);
-	return "";
+	if (pDirent == NULL && errno)
+	{
+		err->message = strerror(errno);
+		err->exitcode = 1;
+		return (-1);
+	}
+	return (0);
 }

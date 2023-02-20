@@ -131,11 +131,11 @@ int	execute(t_ls *ls)
 	size_t	i, flen;
 //	int	err;
 
-	flen = len_double_char_array((const char**)ls->files);
+	flen = len_double_char_array((const char**)ls->dirs);
 	i = 0;
 	while (i < flen)
 	{
-//		err = e(ls->flags, ls->files[i]);
+//		err = e(ls->flags, ls->dirs[i]);
 //		if (!err)
 //		{
 //			;

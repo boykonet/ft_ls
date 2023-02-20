@@ -58,6 +58,16 @@ int	flag_not_support_error(t_err *err, char flag)
 	return (0);
 }
 
+// Returns 0 if success, else -1
+int	malloc_error(t_err *err)
+{
+	err->message = ft_strdup(MALLOC_ERROR);
+	if (!err->message)
+		return (-1);
+	err->exitcode = 1;
+	return (0);
+}
+
 char	*replace_pattern(char *str, t_list *patterns)
 {
 	t_list	*poh;

@@ -1,37 +1,5 @@
 #include "../ls.h"
 
-//char	*get_path(char *haystack, char **env)
-//{
-//	char	*path;
-//
-//	if (!ft_strncmp(haystack, ".", ft_strlen(haystack)))
-//		path = find_env(env, "PWD");
-//	else
-//		path = ft_strdup(haystack);
-//	return (path);
-//}
-
-//char	*find_env(char **env, char *name)
-//{
-//	int i, len;
-//
-//	i = 0;
-//	len = len_double_char_array(env);
-//	while (i < len)
-//	{
-//		char *s = ft_strnstr(env[i], name, ft_strlen(name));
-//		if (&env[i][0] == &s[0])
-//		{
-//			s = ft_strchr(s, '=');
-//			if (*(s + 1) == '\0')
-//				return (NULL);
-//			return (ft_strdup(s + 1));
-//		}
-//		i++;
-//	}
-//	return (NULL);
-//}
-
 static int	is_flag_support(const char *sflags, char flag)
 {
 	int i;
@@ -61,7 +29,7 @@ static void	add_flag(char flags[MAX_FLAGS + 1], char new_flag)
 	flags[i] = new_flag;
 }
 
-char	**copy_folders(char **srcs)
+char	**copy_filenames(char **srcs)
 {
 	char	**arr;
 	int		i;
@@ -90,15 +58,21 @@ void	print_malloc_error_and_exit(int errcode)
 	exit(errcode);
 }
 
-int	parse_flags(t_ls *ls, char ***argv)
+char	*parse_flags(char ***data, t_err *err)
 {
-	char	**p;
 	char	*param;
+	char 	*flags;
 
-	p = *argv;
-	while (p)
+	flags = ft_calloc(MAX_FLAGS + 1, sizeof(char));
+	if (!flags)
 	{
-		param = *p;
+		if (malloc_error(err) == -1)
+			print_malloc_error_and_exit(1);
+		return (NULL);
+	}
+	while (*data)
+	{
+		param = **data;
 		if (*param == '-')
 		{
 			param++;
@@ -106,40 +80,43 @@ int	parse_flags(t_ls *ls, char ***argv)
 			{
 				if (!is_flag_support(CONST_FLAGS, *param))
 				{
-					if (flag_not_support_error(&ls->err, *param) == -1)
+					if (flag_not_support_error(err, *param) == -1)
 						print_malloc_error_and_exit(1);
-					return (-1);
+					return (NULL);
 				}
-				add_flag(ls->flags, *param);
+				add_flag(flags, *param);
 				param++;
 			}
 		} else
 			break ;
-		p++;
+		(*data)++;
 	}
-	*argv = p;
-	return (0);
+	return (flags);
 }
 
-int	parse(t_ls *ls, int argc, char **argv)
+char	**copy_files_info(char **data, t_err *err)
 {
+	char	**filenames;
+
+	filenames = copy_filenames(data);
+	if (!filenames)
+	{
+		if (malloc_error(err) == -1)
+			print_malloc_error_and_exit(1);
+		return (NULL);
+	}
+	return (filenames);
+}
+
+char	**parse_filenames(char ***data, t_err *err)
+{
+	char	**filenames;
 	char	*base_dirs[2] = {".", NULL};
 
-	if (argc > 1)
-	{
-		argv += 1;
-		if (parse_flags(ls, &argv) == -1)
-			return (-1);
-		// Allocates memory for an array of pointers
-		ls->files = copy_folders(argv);
-		if (!ls->files)
-			return (-1);
-	}
+	// If no filenames, returns NULL in each case
+	if (len_double_char_array((const char**)(*data)) > 0)
+		filenames = copy_files_info(*data, err);
 	else
-	{
-		ls->files = copy_folders(base_dirs);
-		if (!ls->files)
-			return (-1);
-	}
-	return (0);
+		filenames = copy_files_info(base_dirs, err);
+	return (filenames);
 }

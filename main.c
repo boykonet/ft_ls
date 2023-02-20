@@ -5,7 +5,7 @@
 ** -l      (The lowercase letter ``ell''.)  List in long format.  (See below.)  If the output is to a terminal, a total sum for all the file sizes
 **         is output on a line before the long listing.
 ** -R      Recursively list subdirectories encountered.
-** -r      Reverse the order of the sort to get reverse lexicographical order or the oldest entries first (or largest files last, if combined with
+** -r      Reverse the order of the sort to get reverse lexicographical order or the oldest entries first (or largest dirs last, if combined with
 **         sort by size
 ** -t      Sort by time modified (most recently modified first) before sorting the operands by lexicographical order.
 */
@@ -16,15 +16,73 @@ void	initialization(t_ls *ls)
 	init_ls(ls);
 }
 
-void	parsing(t_ls *ls, int argc, char **argv)
+void	parsing(t_ls *ls, char **data)
 {
-	if (parse(ls, argc, argv) == -1)
+	data += 1;
+	ls->flags = parse_flags(&data, &ls->err);
+	if (!ls->flags)
+		print_error_message_and_exit(ls);
+	ls->filenames = parse_filenames(&data, &ls->err);
+	if (!ls->filenames)
 		print_error_message_and_exit(ls);
 }
 
 void	execution(t_ls *ls)
 {
 	execute(ls);
+}
+
+void	**crealloc(void **data, size_t size)
+{
+	void	**p;
+	void	**res;
+	size_t	count;
+
+	count = 0;
+	while (p)
+	{
+		count++;
+		p++;
+	}
+	res = calloca_to_2d(size + 1);
+	if (!res)
+	{
+		return (NULL);
+	}
+}
+
+void	**add_file()
+{
+
+}
+
+void	sort_files_and_dirs(char **filenames, char ***files, char ***dirs)
+{
+	char	**p;
+	int		err;
+
+	if (!files || !dirs)
+		return ;
+	if (!filenames)
+		return ;
+	p = filenames;
+	while (p)
+	{
+		err = if_dir_or_file(*p);
+		if (err == 0)
+		{
+			ft_strdup(*p);
+		}
+		else if (err == 1)
+		{
+
+		}
+		else
+		{
+
+		}
+		p++;
+	}
 }
 
 /*
@@ -37,17 +95,18 @@ int main(int argc, char **argv)
 {
 	t_ls	ls;
 
+	(void)argc;
 	initialization(&ls);
 	write(1, "init\n", 5);
 
-	parsing(&ls, argc, argv);
+	parsing(&ls, argv);
 	write(1, "parse\n", 6);
 
-	lexicography_sort(&ls.files);
+	lexicography_sort(&ls.dirs);
 	int i = 0;
-	while (ls.files[i])
+	while (ls.dirs[i])
 	{
-		printf("filename [%s]\n", ls.files[i]);
+		printf("filename [%s]\n", ls.dirs[i]);
 		i++;
 	}
 //	err = execute(&ls);
@@ -67,9 +126,9 @@ int main(int argc, char **argv)
 //		i++;
 //	}
 //	i = 0;
-//	while (ls.files[i] != NULL) {
+//	while (ls.dirs[i] != NULL) {
 //		printf("HEY AGAIN\n");
-//		printf("folder [-%s]\n", ls.files[i]);
+//		printf("folder [-%s]\n", ls.dirs[i]);
 //		i++;
 //	}
 // -----------------------
