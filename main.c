@@ -23,8 +23,8 @@ int		add_value_to_2array(char ***data, const char *value)
 	char	**res;
 	size_t	size;
 
-	if (!data)
-		return (-2);
+	if (!data || !value)
+		return (-1);
 	p = *data;
 	size = len_2_pointer_array((const void**)p);
 	res = (char**)calloca_to_2d(size + 1 + 1);
@@ -48,13 +48,13 @@ int		add_value_to_2array(char ***data, const char *value)
 	return (0);
 }
 
-int		sort_filenames(char **filenames, char ***files, char ***dirs)
+int		separate_filenames(char **filenames, char ***files, char ***dirs)
 {
 	char	**p;
 	int		err;
 
 	if (!files || !dirs || !filenames)
-		return (-2);
+		return (-1);
 	p = filenames;
 	while (p)
 	{
@@ -76,57 +76,34 @@ int		sort_filenames(char **filenames, char ***files, char ***dirs)
 	return (0);
 }
 
-// sww - something went wrong
-// amessage - additional message
-int		sww(t_err *err, char *amessage)
+void	malloc_error()
 {
-	ft_memcpy(err->message, SWW, ft_strlen(SWW));
-	err->exitcode = 1;
-	int errcode = add_pattern(&err->patterns, "{{message}}", amessage);
-	if (errcode != 0)
-	{
-		clear_err(err);
-		return (-1);
-	}
-	return (0);
+	write(CSTDERR, ERR_HEADER, ft_strlen(ERR_HEADER));
+	write(CSTDERR, MALLOC_ERROR, ft_strlen(MALLOC_ERROR));
+	write(CSTDERR, "\n", 1);
 }
 
-int		handle_error_codes(int errcode, t_err *err)
+void	check_error(t_ls *ls, int errcode)
 {
-	if (!errcode)
-		return (0);
-	else if (errcode == -1)
-	{
-		if (sww(err, MALLOC_ERROR) == -1)
-			return (-1);
-	}
-	else if (errcode == -2)
-	{
-		if (sww(err, NULL_PARAMETER) == -1)
-			return (-1);
-	}
-	return (0);
-}
-
-int		separate_filenames(char **filenames, char ***files, char ***dirs, t_err *err)
-{
-	int errcode = sort_filenames(filenames, files, dirs);
-	return (handle_error_codes(errcode, err));
+	if (!errcode && !ls->err->exitcode)
+		return ;
+	if (errcode == -1)
+		malloc_error();
+	print_error_message(ls->err);
+	cleaner(ls, ls->err.exitcode);
 }
 
 void	parsing(t_ls *ls, char **data)
 {
-	data += 1;
-	ls->flags = parse_flags(&data, &ls->err);
-	if (!ls->flags)
-		print_error_message_and_exit(ls);
-	ls->filenames = parse_filenames(&data, &ls->err);
-	if (!ls->filenames)
-		print_error_message_and_exit(ls);
-	int errcode = sort_filenames(ls->filenames, &ls->files, &ls->dirs);
-	if (errcode != 0)
-		handle_error_codes(errcode, &ls->err);
+	int		errcode;
 
+	data += 1;
+	errcode = parse_flags(&data, ls->flags, &ls->err);
+	check_error(ls, errcode);
+	errcode = parse_filenames(data, &ls->filenames, &ls->err);
+	check_error(ls, errcode);
+	errcode = separate_filenames(ls->filenames, &ls->files, &ls->dirs);
+	check_error(ls, errcode);
 }
 
 void	execution(t_ls *ls)

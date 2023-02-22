@@ -29,13 +29,14 @@ static void	add_flag(char flags[MAX_FLAGS + 1], char new_flag)
 	flags[i] = new_flag;
 }
 
-char	**copy_filenames(char **srcs)
+static char	**copy(char **srcs)
 {
-	char	**arr;
 	int		i;
 	size_t	len;
 
 	i = 0;
+	if (!srcs)
+		return (NULL);
 	len = len_2_pointer_array((const void**)srcs);
 	arr = (char**)calloca_to_2d(len + 1);
 	if (!arr)
@@ -52,24 +53,10 @@ char	**copy_filenames(char **srcs)
 	return (arr);
 }
 
-// void	print_malloc_error_and_exit(int errcode)
-// {
-// 	write(CSTDERR, MALLOC_ERROR, ft_strlen(MALLOC_ERROR));
-// 	exit(errcode);
-// }
-
-char	*parse_flags(char ***data, t_err *err)
+int		parse_flags(char ***data, char *flags, t_err *err)
 {
 	char	*param;
-	char 	*flags;
 
-	flags = ft_calloc(MAX_FLAGS + 1, sizeof(char));
-	if (!flags)
-	{
-		if (malloc_error(err) == -1)
-			print_malloc_error_and_exit(1);
-		return (NULL);
-	}
 	while (*data)
 	{
 		param = **data;
@@ -79,11 +66,7 @@ char	*parse_flags(char ***data, t_err *err)
 			while (*param != '\0')
 			{
 				if (!is_flag_support(CONST_FLAGS, *param))
-				{
-					if (flag_not_support_error(err, *param) == -1)
-						print_malloc_error_and_exit(1);
-					return (NULL);
-				}
+					return (flag_not_support_error(err, *param));
 				add_flag(flags, *param);
 				param++;
 			}
@@ -91,32 +74,28 @@ char	*parse_flags(char ***data, t_err *err)
 			break ;
 		(*data)++;
 	}
-	return (flags);
+	return (0);
 }
 
-char	**copy_files_info(char **data, t_err *err)
-{
-	char	**filenames;
-
-	filenames = copy_filenames(data);
-	if (!filenames)
-	{
-		if (malloc_error(err) == -1)
-			print_malloc_error_and_exit(1);
-		return (NULL);
-	}
-	return (filenames);
-}
-
-char	**parse_filenames(char ***data, t_err *err)
+static char	**copy_filenames(char **data)
 {
 	char	**filenames;
 	char	*base_dirs[2] = {".", NULL};
 
 	// If no filenames, returns NULL in each case
-	if (len_2_pointer_array((const void**)(*data)) > 0)
-		filenames = copy_files_info(*data, err);
+	if (len_2_pointer_array((const void**)data) > 0)
+		filenames = copy(data);
 	else
-		filenames = copy_files_info(base_dirs, err);
+		filenames = copy(base_dirs);
 	return (filenames);
+}
+
+int		parse_filenames(char **data, char ***filenames, t_err *err)
+{
+	if (!filenames)
+		return (-1);
+	*filenames = copy_filenames(data);
+	if (!(*filenames))
+		return (sww(err, MALLOC_ERROR));
+	return (0);
 }

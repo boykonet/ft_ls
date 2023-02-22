@@ -11,7 +11,6 @@
 
 # define ERR_HEADER			"ls: "
 # define MALLOC_ERROR		"malloc error"
-# define NULL_PARAMETER		"null parameter"
 
 # include <unistd.h>
 /*
@@ -104,7 +103,7 @@ typedef struct	s_err
 
 typedef struct	s_ls
 {
-	char	*flags;
+	char	flags[MAX_FLAGS + 1];
 	char	**filenames;
 	char	**files;
 	char	**dirs;
@@ -128,8 +127,8 @@ typedef struct s_resource
 	struct s_file	*child;
 } t_resource;
 
-char			*parse_flags(char ***data, t_err *err);
-char 			**parse_filenames(char ***data, t_err *err);
+int				parse_flags(char ***data, char *flags, t_err *err);
+int				parse_filenames(char **data, char ***filenames, t_err *err);
 void 			init_ls(t_ls *ls);
 void			clear_ls(t_ls *ls);
 int				execute(t_ls *ls);
@@ -161,7 +160,7 @@ int				eprinter(char *s);
 void	init_err(t_err *err);
 void	clear_err(t_err *err);
 int		flag_not_support_error(t_err *err, char flag);
-int		malloc_error(t_err *err);
+//int		malloc_error(t_err *err);
 
 t_pattern	*new_pattern(char *pattern, char *replacement);
 void		clear_pattern(t_pattern *pattern);
@@ -171,9 +170,10 @@ t_list	*find_last_elem(t_list **head);
 int	add_pattern(t_list **head, char *pattern, char *replacement);
 void		replace_pattern(char *dest, const char *src, t_list *patterns);
 
-void	print_error_message_and_exit(t_ls *ls);
-void	print_malloc_error_and_exit(int errcode);
+void	print_error_message(t_err *err);
+//void	print_error_and_exit(int errcode, char *emessage);
 void	copy_strerror_message(t_err *err);
+int		sww(t_err *err, char *amessage);
 
 
 #endif

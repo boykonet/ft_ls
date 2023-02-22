@@ -17,8 +17,8 @@ int	add_pattern(t_list **head, char *pattern, char *replacement)
 	t_list		*last;
 	t_pattern	*p;
 
-	if (!head)
-		return (-2);
+	if (!head || !pattern || !replacement)
+		return (-1);
 	p = new_pattern(pattern, replacement);
 	if (!p)
 		return (-1);
@@ -46,23 +46,10 @@ int	flag_not_support_error(t_err *err, char flag)
 	char		ch[2] = {flag, '\0'};
 
 	if (!err)
-		return (-2);
+		return (-1);
 	ft_memcpy(err->message, FLAG_NOT_SUPPORT, ft_strlen(FLAG_NOT_SUPPORT));
 	err->exitcode = 1;
-
-	int errcode = add_pattern(&err->patterns, "{{flag}}", ch);
-	if (errcode != 0)
-	{
-		clear_err(err);
-		return (errcode);
-	}
-	return (0);
-}
-
-void	print_error_and_exit(int errcode)
-{
-	write(CSTDERR, MALLOC_ERROR, ft_strlen(MALLOC_ERROR));
-	exit(errcode);
+	return (add_pattern(&err->patterns, "{{flag}}", ch));
 }
 
 void		replace_pattern(char *dest, const char *src, t_list *patterns)
@@ -101,17 +88,12 @@ void	cleaner(t_ls *ls, int exitcode)
 	exit(exitcode);
 }
 
-void	print_error_message_and_exit(t_ls *ls)
+void	print_error_message(t_err *err)
 {
-	char	message[200];
-
-	if (!ls || !ls->err.message)
+	if (!err || !err->exitcode)
 		return ;
-	replace_pattern(message, ls->err.message, ls->err.patterns);
-	write(CSTDERR, ls->err.message, ft_strlen(ls->err.message));
-	free(message);
-	message = NULL;
-	cleaner(ls, ls->err.exitcode);
+	replace_pattern(err->message, err->message, err->patterns);
+	write(CSTDERR, err->message, ft_strlen(err->message));
 }
 
 void	copy_strerror_message(t_err *err)
@@ -121,4 +103,19 @@ void	copy_strerror_message(t_err *err)
 	errmessage = strerror(errno);
 	ft_memcpy(&err->message[0], ERR_HEADER, ft_strlen(ERR_HEADER));
 	ft_memcpy(&err->message[ft_strlen(ERR_HEADER)], errmessage, ft_strlen(errmessage));
+}
+
+// sww - something went wrong
+// amessage - additional message
+int		sww(t_err *err, char *amessage)
+{
+	ft_memcpy(err->message, SWW, ft_strlen(SWW));
+	err->exitcode = 1;
+	int errcode = add_pattern(&err->patterns, "{{message}}", amessage);
+	if (errcode != 0)
+	{
+		clear_err(err);
+		return (-1);
+	}
+	return (0);
 }
