@@ -18,17 +18,17 @@ void	clear_ls(t_ls *ls)
 	}
 	if (ls->filenames)
 	{
-		free_double_char_array(ls->filenames);
+		free_2_pointer_array((void**)ls->filenames);
 		ls->filenames = NULL;
 	}
 	if (ls->files)
 	{
-		free_double_char_array(ls->files);
+		free_2_pointer_array((void**)ls->files);
 		ls->files = NULL;
 	}
 	if (ls->dirs)
 	{
-		free_double_char_array(ls->dirs);
+		free_2_pointer_array((void**)ls->dirs);
 		ls->dirs = NULL;
 	}
 	clear_err(&ls->err);

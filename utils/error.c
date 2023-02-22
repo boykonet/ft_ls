@@ -12,16 +12,21 @@ t_list	*find_last_elem(t_list **head)
 	return (curr);
 }
 
-t_list	*add_pattern(t_list **head, char *pattern, char *replacement)
+int	add_pattern(t_list **head, char *pattern, char *replacement)
 {
 	t_list		*last;
 	t_pattern	*p;
 
+	if (!head)
+		return (-2);
 	p = new_pattern(pattern, replacement);
 	if (!p)
-		return (NULL);
-	if (!head)
+		return (-1);
+	if (!(*head))
+	{
 		last = ft_lstnew(p);
+		*head = last;
+	}
 	else
 	{
 		last = find_last_elem(head);
@@ -30,84 +35,62 @@ t_list	*add_pattern(t_list **head, char *pattern, char *replacement)
 	}
 	if (!last)
 	{
-		free(p);
-		p = NULL;
-		return (NULL);
+		del_pattern(p);
+		return (-1);
 	}
-	return (last);
+	return (0);
 }
 
 int	flag_not_support_error(t_err *err, char flag)
 {
-	char		ch[2];
+	char		ch[2] = {flag, '\0'};
 
 	if (!err)
-		return (-1);
-	err->message = ft_strdup(FLAG_NOT_SUPPORT);
-	if (!err->message)
-		return (-1);
+		return (-2);
+	ft_memcpy(err->message, FLAG_NOT_SUPPORT, ft_strlen(FLAG_NOT_SUPPORT));
 	err->exitcode = 1;
 
-	ch[0] = flag;
-	err->patterns = add_pattern(NULL, "{{flag}}", ch);
-	if (!err->patterns)
+	int errcode = add_pattern(&err->patterns, "{{flag}}", ch);
+	if (errcode != 0)
 	{
 		clear_err(err);
-		return (-1);
+		return (errcode);
 	}
 	return (0);
 }
 
-// Returns 0 if success, else -1
-int	malloc_error(t_err *err)
+void	print_error_and_exit(int errcode)
 {
-	err->message = ft_strdup(MALLOC_ERROR);
-	if (!err->message)
-		return (-1);
-	err->exitcode = 1;
-	return (0);
+	write(CSTDERR, MALLOC_ERROR, ft_strlen(MALLOC_ERROR));
+	exit(errcode);
 }
 
-char	*replace_pattern(char *str, t_list *patterns)
+void		replace_pattern(char *dest, const char *src, t_list *patterns)
 {
-	t_list	*poh;
-	char	*res, *pres;
+	t_list	*poh; // pointer of head
 	char	*pbegin, *pend;
-	int		bsize, asize;
+	int		asize;
 
+	ft_memcpy(dest, src, ft_strlen(src));
 	poh = patterns;
-	res = ft_strdup(str);
-	if (!res)
-		return (NULL);
 	while (poh)
 	{
-		pres = res;
 		char	*pattern, *replacement;
 
 		pattern = ((t_pattern*)(poh->content))->pattern;
 		replacement = ((t_pattern*)(poh->content))->replacement;
 
-		pbegin = ft_strnstr(res, pattern, ft_strlen(res));
+		pbegin = ft_strnstr(dest, pattern, ft_strlen(dest));
 		if (!*pbegin)
 			continue ;
 		pend = pbegin + ft_strlen(pattern);
 
-		bsize = (int)(pbegin - res);
-		asize = (int)((res + ft_strlen(res)) - pend);
-		res = ft_calloc(bsize + ft_strlen(replacement) + asize + 1, sizeof(char));
-		if (!res)
-		{
-			free(pres);
-			pres = NULL;
-			return (NULL);
-		}
-		ft_memcpy(res, str, bsize);
-		ft_memcpy(res + bsize, replacement, ft_strlen(replacement));
-		ft_memcpy(res + bsize + ft_strlen(replacement), pend, asize);
-		free(pres);
+		// bsize = (int)(pbegin - dest);
+		asize = (int)((dest + ft_strlen(dest)) - pend);
+		ft_memmove(pbegin + ft_strlen(replacement), pbegin + ft_strlen(pattern), asize);
+		ft_memcpy(pbegin, replacement, ft_strlen(replacement));
 		poh = poh->next;
 	}
-	return (res);
 }
 
 void	cleaner(t_ls *ls, int exitcode)
@@ -120,14 +103,22 @@ void	cleaner(t_ls *ls, int exitcode)
 
 void	print_error_message_and_exit(t_ls *ls)
 {
-	char	*message;
+	char	message[200];
 
 	if (!ls || !ls->err.message)
 		return ;
-	message = replace_pattern(ls->err.message, ls->err.patterns);
-	write(CSTDERR, message, ft_strlen(message));
+	replace_pattern(message, ls->err.message, ls->err.patterns);
+	write(CSTDERR, ls->err.message, ft_strlen(ls->err.message));
 	free(message);
 	message = NULL;
 	cleaner(ls, ls->err.exitcode);
 }
 
+void	copy_strerror_message(t_err *err)
+{
+	char	*errmessage;
+
+	errmessage = strerror(errno);
+	ft_memcpy(&err->message[0], ERR_HEADER, ft_strlen(ERR_HEADER));
+	ft_memcpy(&err->message[ft_strlen(ERR_HEADER)], errmessage, ft_strlen(errmessage));
+}

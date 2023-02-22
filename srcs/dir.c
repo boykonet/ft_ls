@@ -21,12 +21,11 @@ int		dir(t_list **l, char *dirname, t_err *err)
 	DIR				*pdir;
 	struct dirent	*pDirent;
 
-
 	// open directory
 	pdir = opendir(dirname);
 	if (pdir == NULL)
 	{
-		err->message = strerror(errno);
+		copy_strerror_message(err);
 		err->exitcode = 1;
 		return (-1);
 	}
@@ -36,7 +35,7 @@ int		dir(t_list **l, char *dirname, t_err *err)
 	if (pDirent == NULL)
 	{
 		closedir(pdir);
-		err->message = strerror(errno);
+		copy_strerror_message(err);
 		err->exitcode = 1;
 		return (-1);
 	}
@@ -50,7 +49,7 @@ int		dir(t_list **l, char *dirname, t_err *err)
 	closedir(pdir);
 	if (pDirent == NULL && errno)
 	{
-		err->message = strerror(errno);
+		copy_strerror_message(err);
 		err->exitcode = 1;
 		return (-1);
 	}

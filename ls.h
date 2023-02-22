@@ -7,7 +7,11 @@
 
 # define FLAG_NOT_SUPPORT	"ls: illegal option -- {{flag}}\nusage: ls [-Ralrt] [file ...]\n"
 # define UNSUPPORTED_ASCII	"ls: unsupported symbol: only ascii printable characters\n"
-# define MALLOC_ERROR		"ls: malloc error\n"
+# define SWW				"ls: something went wrong: {{message}}\n"
+
+# define ERR_HEADER			"ls: "
+# define MALLOC_ERROR		"malloc error"
+# define NULL_PARAMETER		"null parameter"
 
 # include <unistd.h>
 /*
@@ -93,7 +97,7 @@ typedef struct s_pattern
 typedef struct	s_err
 {
 	t_list	*patterns;
-	char	*message;
+	char	message[200];
 	int		exitcode;
 
 } t_err;
@@ -148,8 +152,8 @@ void			lexicography_sort(char ***array);
 
 //void	del_file_struct(void *file);
 
-int				len_double_char_array(const char **darr);
-void			free_double_char_array(char **arr);
+int				len_2_pointer_array(const void **darr);
+void			free_2_pointer_array(void **arr);
 void			cleaner(t_ls *ls, int exitcode);
 void			**calloca_to_2d(size_t size);
 int				eprinter(char *s);
@@ -164,10 +168,12 @@ void		clear_pattern(t_pattern *pattern);
 void		del_pattern(void *node);
 
 t_list	*find_last_elem(t_list **head);
-t_list	*add_pattern(t_list **head, char *pattern, char *replacement);
-char	*replace_pattern(char *str, t_list *patterns);
+int	add_pattern(t_list **head, char *pattern, char *replacement);
+void		replace_pattern(char *dest, const char *src, t_list *patterns);
 
 void	print_error_message_and_exit(t_ls *ls);
+void	print_malloc_error_and_exit(int errcode);
+void	copy_strerror_message(t_err *err);
 
 
 #endif

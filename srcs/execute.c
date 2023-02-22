@@ -128,10 +128,10 @@ int	e(char *flags, const char *folder)
 
 int	execute(t_ls *ls)
 {
-	size_t	i, flen;
-//	int	err;
+	size_t	i, dlen, flen;
 
-	flen = len_double_char_array((const char**)ls->dirs);
+	flen = len_2_pointer_array((const void**)ls->files);
+	dlen = len_2_pointer_array((const void**)ls->dirs);
 	i = 0;
 	while (i < flen)
 	{
@@ -140,6 +140,11 @@ int	execute(t_ls *ls)
 //		{
 //			;
 //		}
+		i++;
+	}
+	i = 0;
+	while (i < dlen)
+	{
 		i++;
 	}
 	return (0);

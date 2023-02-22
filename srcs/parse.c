@@ -36,7 +36,7 @@ char	**copy_filenames(char **srcs)
 	size_t	len;
 
 	i = 0;
-	len = len_double_char_array((const char**)srcs);
+	len = len_2_pointer_array((const void**)srcs);
 	arr = (char**)calloca_to_2d(len + 1);
 	if (!arr)
 		return (NULL);
@@ -44,7 +44,7 @@ char	**copy_filenames(char **srcs)
 		arr[i] = ft_strdup(srcs[i]);
 		if (!arr[i])
 		{
-			free_double_char_array(arr);
+			free_2_pointer_array((void**)arr);
 			return (NULL);
 		}
 		i++;
@@ -52,11 +52,11 @@ char	**copy_filenames(char **srcs)
 	return (arr);
 }
 
-void	print_malloc_error_and_exit(int errcode)
-{
-	write(CSTDERR, MALLOC_ERROR, ft_strlen(MALLOC_ERROR));
-	exit(errcode);
-}
+// void	print_malloc_error_and_exit(int errcode)
+// {
+// 	write(CSTDERR, MALLOC_ERROR, ft_strlen(MALLOC_ERROR));
+// 	exit(errcode);
+// }
 
 char	*parse_flags(char ***data, t_err *err)
 {
@@ -114,7 +114,7 @@ char	**parse_filenames(char ***data, t_err *err)
 	char	*base_dirs[2] = {".", NULL};
 
 	// If no filenames, returns NULL in each case
-	if (len_double_char_array((const char**)(*data)) > 0)
+	if (len_2_pointer_array((const void**)(*data)) > 0)
 		filenames = copy_files_info(*data, err);
 	else
 		filenames = copy_files_info(base_dirs, err);

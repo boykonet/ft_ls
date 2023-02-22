@@ -4,7 +4,7 @@ void	init_err(t_err *err)
 {
 	if (!err)
 		return ;
-	err->message = NULL;
+	ft_bzero(err->message, 200);
 	err->exitcode = 0;
 	err->patterns = NULL;
 }
@@ -13,11 +13,7 @@ void	clear_err(t_err *err)
 {
 	if (!err)
 		return ;
-	if (err->message)
-	{
-		free(err->message);
-		err->message = NULL;
-	}
+	ft_bzero(err->message, 200);
 	if (err->exitcode)
 		err->exitcode = 0;
 	if (err->patterns)

@@ -16,6 +16,104 @@ void	initialization(t_ls *ls)
 	init_ls(ls);
 }
 
+
+int		add_value_to_2array(char ***data, const char *value)
+{
+	char	**p;
+	char	**res;
+	size_t	size;
+
+	if (!data)
+		return (-2);
+	p = *data;
+	size = len_2_pointer_array((const void**)p);
+	res = (char**)calloca_to_2d(size + 1 + 1);
+	if (!res)
+		return (-1);
+	size_t	i = 0;
+	while (p)
+	{
+		res[i] = *p;
+		p++;
+		i++;
+	}
+	res[i] = ft_strdup(value);
+	if (!res[i])
+	{
+		free(res);
+		return (-1);
+	}
+	free_2_pointer_array((void**)*data);
+	*data = res;
+	return (0);
+}
+
+int		sort_filenames(char **filenames, char ***files, char ***dirs)
+{
+	char	**p;
+	int		err;
+
+	if (!files || !dirs || !filenames)
+		return (-2);
+	p = filenames;
+	while (p)
+	{
+		err = if_dir_or_file(*p);
+		if (err == 0) // directory
+		{
+			if (add_value_to_2array(dirs, *p) == -1)
+				return (-1);
+		}
+		else if (err == 1) // file
+		{
+			if (add_value_to_2array(files, *p) == -1)
+				return (-1);
+		}
+		else // some unexpected error
+			return (-1);
+		p++;
+	}
+	return (0);
+}
+
+// sww - something went wrong
+// amessage - additional message
+int		sww(t_err *err, char *amessage)
+{
+	ft_memcpy(err->message, SWW, ft_strlen(SWW));
+	err->exitcode = 1;
+	int errcode = add_pattern(&err->patterns, "{{message}}", amessage);
+	if (errcode != 0)
+	{
+		clear_err(err);
+		return (-1);
+	}
+	return (0);
+}
+
+int		handle_error_codes(int errcode, t_err *err)
+{
+	if (!errcode)
+		return (0);
+	else if (errcode == -1)
+	{
+		if (sww(err, MALLOC_ERROR) == -1)
+			return (-1);
+	}
+	else if (errcode == -2)
+	{
+		if (sww(err, NULL_PARAMETER) == -1)
+			return (-1);
+	}
+	return (0);
+}
+
+int		separate_filenames(char **filenames, char ***files, char ***dirs, t_err *err)
+{
+	int errcode = sort_filenames(filenames, files, dirs);
+	return (handle_error_codes(errcode, err));
+}
+
 void	parsing(t_ls *ls, char **data)
 {
 	data += 1;
@@ -25,6 +123,10 @@ void	parsing(t_ls *ls, char **data)
 	ls->filenames = parse_filenames(&data, &ls->err);
 	if (!ls->filenames)
 		print_error_message_and_exit(ls);
+	int errcode = sort_filenames(ls->filenames, &ls->files, &ls->dirs);
+	if (errcode != 0)
+		handle_error_codes(errcode, &ls->err);
+
 }
 
 void	execution(t_ls *ls)
@@ -32,59 +134,6 @@ void	execution(t_ls *ls)
 	execute(ls);
 }
 
-void	**crealloc(void **data, size_t size)
-{
-	void	**p;
-	void	**res;
-	size_t	count;
-
-	count = 0;
-	p = data;
-	while (p)
-	{
-		count++;
-		p++;
-	}
-	res = calloca_to_2d(size + 1);
-	if (!res)
-	{
-		return (NULL);
-	}
-}
-
-void	**add_file()
-{
-
-}
-
-void	sort_files_and_dirs(char **filenames, char ***files, char ***dirs)
-{
-	char	**p;
-	int		err;
-
-	if (!files || !dirs)
-		return ;
-	if (!filenames)
-		return ;
-	p = filenames;
-	while (p)
-	{
-		err = if_dir_or_file(*p);
-		if (err == 0)
-		{
-			ft_strdup(*p);
-		}
-		else if (err == 1)
-		{
-
-		}
-		else
-		{
-
-		}
-		p++;
-	}
-}
 
 /*
 ** reserved codes:
