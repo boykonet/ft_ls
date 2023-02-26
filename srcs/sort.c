@@ -19,7 +19,7 @@ void	lexicography_sort(char ***array)
 		return ;
 
 	ptr = *array;
-	len = len_2_pointer_array((const void**)ptr);
+	len = len_2array((const void **) ptr);
 	i = 0;
 	while (i < len)
 	{

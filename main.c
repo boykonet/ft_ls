@@ -16,94 +16,60 @@ void	initialization(t_ls *ls)
 	init_ls(ls);
 }
 
-
-int		add_value_to_2array(char ***data, const char *value)
-{
-	char	**p;
-	char	**res;
-	size_t	size;
-
-	if (!data || !value)
-		return (-1);
-	p = *data;
-	size = len_2_pointer_array((const void**)p);
-	res = (char**)calloca_to_2d(size + 1 + 1);
-	if (!res)
-		return (-1);
-	size_t	i = 0;
-	while (p)
-	{
-		res[i] = *p;
-		p++;
-		i++;
-	}
-	res[i] = ft_strdup(value);
-	if (!res[i])
-	{
-		free(res);
-		return (-1);
-	}
-	free_2_pointer_array((void**)*data);
-	*data = res;
-	return (0);
-}
-
 int		separate_filenames(char **filenames, char ***files, char ***dirs)
 {
-	char	**p;
-	int		err;
+	int		errcode;
+	size_t	len, i;
 
 	if (!files || !dirs || !filenames)
-		return (-1);
-	p = filenames;
-	while (p)
+		return (-2);
+	len = len_2array((const void**)filenames);
+	printf("LEN [%zu]\n", len);
+	i = 0;
+	while (i < len)
 	{
-		err = if_dir_or_file(*p);
-		if (err == 0) // directory
+		printf("*p [%s]\n", filenames[i]);
+		errcode = if_dir_or_file(filenames[i]);
+		if (errcode == 0) // directory
 		{
-			if (add_value_to_2array(dirs, *p) == -1)
-				return (-1);
+			errcode = add_value_2array(dirs, filenames[i]);
+			if (errcode != 0)
+				return (errcode);
 		}
-		else if (err == 1) // file
+		else if (errcode == 1) // files
 		{
-			if (add_value_to_2array(files, *p) == -1)
-				return (-1);
+			errcode = add_value_2array(files, filenames[i]);
+			if (errcode != 0)
+				return (errcode);
 		}
-		else // some unexpected error
+		else if (errcode == -1) // some unexpected error
 			return (-1);
-		p++;
+		printf("counter [%zu]\n", i);
+		i++;
 	}
+	printf("end\n");
 	return (0);
-}
-
-void	malloc_error()
-{
-	write(CSTDERR, ERR_HEADER, ft_strlen(ERR_HEADER));
-	write(CSTDERR, MALLOC_ERROR, ft_strlen(MALLOC_ERROR));
-	write(CSTDERR, "\n", 1);
-}
-
-void	check_error(t_ls *ls, int errcode)
-{
-	if (!errcode && !ls->err->exitcode)
-		return ;
-	if (errcode == -1)
-		malloc_error();
-	print_error_message(ls->err);
-	cleaner(ls, ls->err.exitcode);
 }
 
 void	parsing(t_ls *ls, char **data)
 {
+	char	**filenames;
 	int		errcode;
 
 	data += 1;
-	errcode = parse_flags(&data, ls->flags, &ls->err);
-	check_error(ls, errcode);
-	errcode = parse_filenames(data, &ls->filenames, &ls->err);
-	check_error(ls, errcode);
-	errcode = separate_filenames(ls->filenames, &ls->files, &ls->dirs);
-	check_error(ls, errcode);
+	errcode = parse_flags(&data, (char**)&ls->flags, &ls->epatterns);
+	printf("first\n");
+	handle_error(errcode, ls->epatterns);
+	errcode = parse_filenames(data, &filenames);
+	printf("second\n");
+	printf("errcode %d\n", errcode);
+	printf("filenames %s %s %s, len [%d]\n", filenames[0], filenames[1], filenames[2], len_2array(
+			(const void **) filenames));
+	handle_error(errcode, ls->epatterns);
+	errcode = separate_filenames(filenames, &ls->files, &ls->dirs);
+	printf("third\n");
+	free_2array((void**)filenames);
+	handle_error(errcode, ls->epatterns);
 }
 
 void	execution(t_ls *ls)
@@ -129,13 +95,15 @@ int main(int argc, char **argv)
 	parsing(&ls, argv);
 	write(1, "parse\n", 6);
 
-	lexicography_sort(&ls.dirs);
 	int i = 0;
-	while (ls.dirs[i])
-	{
-		printf("filename [%s]\n", ls.dirs[i]);
-		i++;
-	}
+	while (ls.dirs && ls.dirs[i])
+		printf("dirs [%s]\n", ls.dirs[i++]);
+	i = 0;
+	while (ls.files && ls.files[i])
+		printf("files [%s]\n", ls.files[i++]);
+
+	lexicography_sort(&ls.dirs);
+	lexicography_sort(&ls.files);
 //	err = execute(&ls);
 //	write(1, "execute\n", 8);
 //	err_printer_and_cleaner(&ls, err, exitcode);

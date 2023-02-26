@@ -18,7 +18,7 @@ int	add_pattern(t_list **head, char *pattern, char *replacement)
 	t_pattern	*p;
 
 	if (!head || !pattern || !replacement)
-		return (-1);
+		return (-2);
 	p = new_pattern(pattern, replacement);
 	if (!p)
 		return (-1);
@@ -41,16 +41,16 @@ int	add_pattern(t_list **head, char *pattern, char *replacement)
 	return (0);
 }
 
-int	flag_not_support_error(t_err *err, char flag)
-{
-	char		ch[2] = {flag, '\0'};
-
-	if (!err)
-		return (-1);
-	ft_memcpy(err->message, FLAG_NOT_SUPPORT, ft_strlen(FLAG_NOT_SUPPORT));
-	err->exitcode = 1;
-	return (add_pattern(&err->patterns, "{{flag}}", ch));
-}
+//int	flag_not_support_error(t_err *err, char flag)
+//{
+//	char		ch[2] = {flag, '\0'};
+//
+//	if (!err)
+//		return (-1);
+//	ft_memcpy(err->message, FLAG_NOT_SUPPORT, ft_strlen(FLAG_NOT_SUPPORT));
+//	err->exitcode = 1;
+//	return (add_pattern(&err->patterns, "{{flag}}", ch));
+//}
 
 void		replace_pattern(char *dest, const char *src, t_list *patterns)
 {
@@ -72,7 +72,6 @@ void		replace_pattern(char *dest, const char *src, t_list *patterns)
 			continue ;
 		pend = pbegin + ft_strlen(pattern);
 
-		// bsize = (int)(pbegin - dest);
 		asize = (int)((dest + ft_strlen(dest)) - pend);
 		ft_memmove(pbegin + ft_strlen(replacement), pbegin + ft_strlen(pattern), asize);
 		ft_memcpy(pbegin, replacement, ft_strlen(replacement));
@@ -88,34 +87,31 @@ void	cleaner(t_ls *ls, int exitcode)
 	exit(exitcode);
 }
 
-void	print_error_message(t_err *err)
+void	handle_error(int errcode, t_list *params)
 {
-	if (!err || !err->exitcode)
-		return ;
-	replace_pattern(err->message, err->message, err->patterns);
-	write(CSTDERR, err->message, ft_strlen(err->message));
-}
+	char	emessage[200];
 
-void	copy_strerror_message(t_err *err)
-{
-	char	*errmessage;
-
-	errmessage = strerror(errno);
-	ft_memcpy(&err->message[0], ERR_HEADER, ft_strlen(ERR_HEADER));
-	ft_memcpy(&err->message[ft_strlen(ERR_HEADER)], errmessage, ft_strlen(errmessage));
-}
-
-// sww - something went wrong
-// amessage - additional message
-int		sww(t_err *err, char *amessage)
-{
-	ft_memcpy(err->message, SWW, ft_strlen(SWW));
-	err->exitcode = 1;
-	int errcode = add_pattern(&err->patterns, "{{message}}", amessage);
-	if (errcode != 0)
-	{
-		clear_err(err);
-		return (-1);
+	switch (errcode) {
+		case 0:
+			return ;
+		case -1:
+			replace_pattern(emessage, MALLOC_ERROR, NULL);
+			break ;
+		case -2:
+			replace_pattern(emessage, NULL_PARAMETER, NULL);
+			break ;
+		case -3:
+			replace_pattern(emessage, FLAG_NOT_SUPPORT, params);
+			break ;
+		case -4:
+			replace_pattern(emessage, STRERROR_MESSAGE, params);
+			break ;
+		// place for any another cases
+		default:
+			replace_pattern(emessage, UNEXPECTED_ERROR, NULL);
 	}
-	return (0);
+	write(CSTDERR, ERR_HEADER, ft_strlen(ERR_HEADER));
+	write(CSTDERR, emessage, ft_strlen(emessage));
+	write(CSTDERR, "\n", 1);
+	exit(1);
 }

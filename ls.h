@@ -5,12 +5,16 @@
 # define MAX_FLAGS		5
 # define CONST_FLAGS	"Ralrt"
 
-# define FLAG_NOT_SUPPORT	"ls: illegal option -- {{flag}}\nusage: ls [-Ralrt] [file ...]\n"
-# define UNSUPPORTED_ASCII	"ls: unsupported symbol: only ascii printable characters\n"
-# define SWW				"ls: something went wrong: {{message}}\n"
+# define ERR_HEADER					"ls: "
+# define MALLOC_ERROR				"malloc error"
+# define NULL_PARAMETER				"null parameter"
+# define FLAG_NOT_SUPPORT			"illegal option -- {{flag}}\nusage: ls [-Ralrt] [file ...]"
+# define UNSUPPORTED_ASCII			"unsupported symbol: only ascii printable characters"
+# define STRERROR_MESSAGE			"{{message}}"
+# define UNEXPECTED_ERROR			"unexpected error"
 
-# define ERR_HEADER			"ls: "
-# define MALLOC_ERROR		"malloc error"
+# define PATTERN_FLAG_NOT_SUPPORT	"{{flag}}"
+# define PATTERN_STRERROR_MESSAGE	"{{message}}"
 
 # include <unistd.h>
 /*
@@ -93,21 +97,21 @@ typedef struct s_pattern
 	char	*replacement;
 } t_pattern;
 
-typedef struct	s_err
-{
-	t_list	*patterns;
-	char	message[200];
-	int		exitcode;
-
-} t_err;
+//typedef struct	s_err
+//{
+//	t_list	*patterns;
+//	char	message[200];
+//	int		exitcode;
+//
+//} t_err;
 
 typedef struct	s_ls
 {
 	char	flags[MAX_FLAGS + 1];
-	char	**filenames;
+//	char	**filenames;
 	char	**files;
 	char	**dirs;
-	t_err	err;
+	t_list	*epatterns;
 } t_ls;
 
 typedef struct s_iresource
@@ -127,8 +131,8 @@ typedef struct s_resource
 	struct s_file	*child;
 } t_resource;
 
-int				parse_flags(char ***data, char *flags, t_err *err);
-int				parse_filenames(char **data, char ***filenames, t_err *err);
+int		parse_flags(char ***data, char *flags[MAX_FLAGS + 1], t_list **patterns);
+int				parse_filenames(char **data, char ***filenames);
 void 			init_ls(t_ls *ls);
 void			clear_ls(t_ls *ls);
 int				execute(t_ls *ls);
@@ -138,7 +142,7 @@ int				handle_l_flag(void *p);
 int				handle_r_flag(void *p);
 int				handle_t_flag(void *p);
 
-int				dir(t_list **l, char *dirname, t_err *err);
+int		dir(t_list **listdirs, char *dirname, t_list **epatterns);
 int				if_dir_or_file(char *filename);
 int				clstat(t_list **l, char **dfiles);
 char			*creadlink(char *link);
@@ -151,16 +155,16 @@ void			lexicography_sort(char ***array);
 
 //void	del_file_struct(void *file);
 
-int				len_2_pointer_array(const void **darr);
-void			free_2_pointer_array(void **arr);
+int				len_2array(const void **darr);
+void			free_2array(void **arr);
+int				add_value_2array(char ***data, const char *value);
 void			cleaner(t_ls *ls, int exitcode);
 void			**calloca_to_2d(size_t size);
-int				eprinter(char *s);
+char			**copy(const char **srcs, size_t len);
 
-void	init_err(t_err *err);
-void	clear_err(t_err *err);
-int		flag_not_support_error(t_err *err, char flag);
-//int		malloc_error(t_err *err);
+//void	init_err(t_err *err);
+//void	clear_err(t_err *err);
+//int		flag_not_support_error(t_err *err, char flag);
 
 t_pattern	*new_pattern(char *pattern, char *replacement);
 void		clear_pattern(t_pattern *pattern);
@@ -170,10 +174,7 @@ t_list	*find_last_elem(t_list **head);
 int	add_pattern(t_list **head, char *pattern, char *replacement);
 void		replace_pattern(char *dest, const char *src, t_list *patterns);
 
-void	print_error_message(t_err *err);
-//void	print_error_and_exit(int errcode, char *emessage);
-void	copy_strerror_message(t_err *err);
-int		sww(t_err *err, char *amessage);
-
+//void	print_error_message(t_err *err);
+void	handle_error(int errcode, t_list *epatterns);
 
 #endif

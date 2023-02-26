@@ -130,8 +130,8 @@ int	execute(t_ls *ls)
 {
 	size_t	i, dlen, flen;
 
-	flen = len_2_pointer_array((const void**)ls->files);
-	dlen = len_2_pointer_array((const void**)ls->dirs);
+	flen = len_2array((const void **) ls->files);
+	dlen = len_2array((const void **) ls->dirs);
 	i = 0;
 	while (i < flen)
 	{

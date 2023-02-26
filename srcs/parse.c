@@ -1,13 +1,13 @@
 #include "../ls.h"
 
-static int	is_flag_support(const char *sflags, char flag)
+static int	is_flag_support(const char *cflags, char flag)
 {
 	int i;
 
 	i = 0;
 	while (i < MAX_FLAGS)
 	{
-		if (sflags[i++] == flag)
+		if (cflags[i++] == flag)
 			return (1);
 	}
 	return (0);
@@ -29,33 +29,23 @@ static void	add_flag(char flags[MAX_FLAGS + 1], char new_flag)
 	flags[i] = new_flag;
 }
 
-static char	**copy(char **srcs)
+static char	**copy_filenames(char **data)
 {
-	int		i;
-	size_t	len;
+	char	**filenames;
+	char	*base_dirs[2] = {".", NULL};
 
-	i = 0;
-	if (!srcs)
-		return (NULL);
-	len = len_2_pointer_array((const void**)srcs);
-	arr = (char**)calloca_to_2d(len + 1);
-	if (!arr)
-		return (NULL);
-	while (srcs[i]) {
-		arr[i] = ft_strdup(srcs[i]);
-		if (!arr[i])
-		{
-			free_2_pointer_array((void**)arr);
-			return (NULL);
-		}
-		i++;
-	}
-	return (arr);
+	// If no filenames, returns NULL in each case
+	if (len_2array((const void **) data) > 0)
+		filenames = copy((const char**)data, len_2array((const void **) data));
+	else
+		filenames = copy((const char**)base_dirs, len_2array((const void **) base_dirs));
+	return (filenames);
 }
 
-int		parse_flags(char ***data, char *flags, t_err *err)
+int		parse_flags(char ***data, char *flags[MAX_FLAGS + 1], t_list **patterns)
 {
 	char	*param;
+	int 	errcode;
 
 	while (*data)
 	{
@@ -66,8 +56,11 @@ int		parse_flags(char ***data, char *flags, t_err *err)
 			while (*param != '\0')
 			{
 				if (!is_flag_support(CONST_FLAGS, *param))
-					return (flag_not_support_error(err, *param));
-				add_flag(flags, *param);
+				{
+					errcode = add_pattern(patterns, PATTERN_FLAG_NOT_SUPPORT, (char[2]){*param, '\0'});
+					return (errcode != 0 ? errcode : -4);
+				}
+				add_flag(*flags, *param);
 				param++;
 			}
 		} else
@@ -77,25 +70,12 @@ int		parse_flags(char ***data, char *flags, t_err *err)
 	return (0);
 }
 
-static char	**copy_filenames(char **data)
+int		parse_filenames(char **data, char ***filenames)
 {
-	char	**filenames;
-	char	*base_dirs[2] = {".", NULL};
-
-	// If no filenames, returns NULL in each case
-	if (len_2_pointer_array((const void**)data) > 0)
-		filenames = copy(data);
-	else
-		filenames = copy(base_dirs);
-	return (filenames);
-}
-
-int		parse_filenames(char **data, char ***filenames, t_err *err)
-{
-	if (!filenames)
-		return (-1);
+	if (!filenames || !data)
+		return (-2);
 	*filenames = copy_filenames(data);
 	if (!(*filenames))
-		return (sww(err, MALLOC_ERROR));
+		return (-1);
 	return (0);
 }

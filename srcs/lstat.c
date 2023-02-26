@@ -6,7 +6,7 @@ int	clstat(t_list **l, char **dfiles)
 	t_list		*ptr;
 	int			i;
 
-	if (l == NULL || dfiles == NULL || len_2_pointer_array((const void**)dfiles) == 0)
+	if (l == NULL || dfiles == NULL || len_2array((const void **) dfiles) == 0)
 	{
 		// TODO: error
 		return (-1);
@@ -18,7 +18,7 @@ int	clstat(t_list **l, char **dfiles)
 	*l = ft_lstnew((void*)&sb);
 	ptr = *l;
 	i = 1;
-	while (i < len_2_pointer_array((const void**)dfiles))
+	while (i < len_2array((const void **) dfiles))
 	{
 		if (lstat(dfiles[i], &sb) == -1)
 		{

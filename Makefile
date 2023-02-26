@@ -15,8 +15,8 @@ SRCS=		./main.c \
 			./srcs/readlink.c \
 			./srcs/sort.c \
 			./utils/calloca_to_2d.c \
+			./utils/copy.c \
 			./utils/double_array_utils.c \
-			./utils/err_struct.c \
 			./utils/error.c \
 			./utils/pattern.c \
 			./utils/printer.c
