@@ -35,7 +35,7 @@ int		add_value_2array(char ***data, const char *value)
 {
 	char	**p;
 	char	**res;
-	size_t	size;
+	size_t	size, i;
 
 	if (!data || !value)
 		return (-2);
@@ -44,11 +44,10 @@ int		add_value_2array(char ***data, const char *value)
 	res = (char**)calloca_to_2d(size + 1 + 1);
 	if (!res)
 		return (-1);
-	size_t	i = 0;
-	while (p)
+	i = 0;
+	while (p && p[i])
 	{
-		res[i] = *p;
-		p++;
+		res[i] = p[i];
 		i++;
 	}
 	res[i] = ft_strdup(value);
@@ -57,7 +56,7 @@ int		add_value_2array(char ***data, const char *value)
 		free(res);
 		return (-1);
 	}
-	free_2array((void**)*data);
+	free(*data);
 	*data = res;
 	return (0);
 }

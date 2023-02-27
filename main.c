@@ -24,15 +24,20 @@ int		separate_filenames(char **filenames, char ***files, char ***dirs)
 	if (!files || !dirs || !filenames)
 		return (-2);
 	len = len_2array((const void**)filenames);
-	printf("LEN [%zu]\n", len);
+//	printf("LEN [%zu]\n", len);
 	i = 0;
 	while (i < len)
 	{
-		printf("*p [%s]\n", filenames[i]);
+//		printf("*p [%s]\n", filenames[i]);
 		errcode = if_dir_or_file(filenames[i]);
+//		printf("AFTER DIR [%zu], errcode [%d]\n", i, errcode);
 		if (errcode == 0) // directory
 		{
+//			printf("errcode before errcode == 0 [%d]\n", errcode);
+//			for (int j = 0; j < len_2array((const void **) *dirs); j++)
+//				printf("dirs[%d] = %s\n", j, *dirs[j]);
 			errcode = add_value_2array(dirs, filenames[i]);
+//			printf("errcode after errcode == 0 [%d]\n", errcode);
 			if (errcode != 0)
 				return (errcode);
 		}
@@ -42,12 +47,12 @@ int		separate_filenames(char **filenames, char ***files, char ***dirs)
 			if (errcode != 0)
 				return (errcode);
 		}
-		else if (errcode == -1) // some unexpected error
-			return (-1);
-		printf("counter [%zu]\n", i);
+		else if (errcode == -1 || errcode == -2) // some unexpected error
+			return (errcode);
+//		printf("counter [%zu]\n", i);
 		i++;
 	}
-	printf("end\n");
+//	printf("end\n");
 	return (0);
 }
 
@@ -62,9 +67,6 @@ void	parsing(t_ls *ls, char **data)
 	handle_error(errcode, ls->epatterns);
 	errcode = parse_filenames(data, &filenames);
 	printf("second\n");
-	printf("errcode %d\n", errcode);
-	printf("filenames %s %s %s, len [%d]\n", filenames[0], filenames[1], filenames[2], len_2array(
-			(const void **) filenames));
 	handle_error(errcode, ls->epatterns);
 	errcode = separate_filenames(filenames, &ls->files, &ls->dirs);
 	printf("third\n");
@@ -96,14 +98,36 @@ int main(int argc, char **argv)
 	write(1, "parse\n", 6);
 
 	int i = 0;
-	while (ls.dirs && ls.dirs[i])
-		printf("dirs [%s]\n", ls.dirs[i++]);
-	i = 0;
-	while (ls.files && ls.files[i])
-		printf("files [%s]\n", ls.files[i++]);
+
+//	printf("len dirs [%d], len files [%d]\n", len_2array((const void **) ls.dirs), len_2array(
+//			(const void **) ls.files));
+//	while (ls.dirs && ls.dirs[i])
+//	{
+//		printf("dirs[%d] =  [%s]\n", i, ls.dirs[i]);
+//		i++;
+//	}
+//	i = 0;
+//	while (ls.files && ls.files[i])
+//	{
+//		printf("files[%d] = [%s]\n", i, ls.files[i]);
+//		i++;
+//	}
 
 	lexicography_sort(&ls.dirs);
 	lexicography_sort(&ls.files);
+
+	i = 0;
+	while (ls.dirs && ls.dirs[i])
+	{
+		printf("dirs[%d] =  [%s]\n", i, ls.dirs[i]);
+		i++;
+	}
+	i = 0;
+	while (ls.files && ls.files[i])
+	{
+		printf("files[%d] = [%s]\n", i, ls.files[i]);
+		i++;
+	}
 //	err = execute(&ls);
 //	write(1, "execute\n", 8);
 //	err_printer_and_cleaner(&ls, err, exitcode);

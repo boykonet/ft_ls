@@ -56,7 +56,7 @@ void		replace_pattern(char *dest, const char *src, t_list *patterns)
 {
 	t_list	*poh; // pointer of head
 	char	*pbegin, *pend;
-	int		asize;
+	int		bsize, asize;
 
 	ft_memcpy(dest, src, ft_strlen(src));
 	poh = patterns;
@@ -68,13 +68,18 @@ void		replace_pattern(char *dest, const char *src, t_list *patterns)
 		replacement = ((t_pattern*)(poh->content))->replacement;
 
 		pbegin = ft_strnstr(dest, pattern, ft_strlen(dest));
-		if (!*pbegin)
+		if (!pbegin)
+		{
+			poh = poh->next;
 			continue ;
+		}
 		pend = pbegin + ft_strlen(pattern);
 
+		bsize = (int)(pbegin - dest);
 		asize = (int)((dest + ft_strlen(dest)) - pend);
 		ft_memmove(pbegin + ft_strlen(replacement), pbegin + ft_strlen(pattern), asize);
 		ft_memcpy(pbegin, replacement, ft_strlen(replacement));
+		dest[bsize + ft_strlen(replacement) + asize] = '\0';
 		poh = poh->next;
 	}
 }
@@ -91,6 +96,7 @@ void	handle_error(int errcode, t_list *params)
 {
 	char	emessage[200];
 
+	ft_bzero(emessage, 200);
 	switch (errcode) {
 		case 0:
 			return ;
