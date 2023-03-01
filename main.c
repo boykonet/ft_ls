@@ -63,20 +63,21 @@ void	parsing(t_ls *ls, char **data)
 
 	data += 1;
 	errcode = parse_flags(&data, (char**)&ls->flags, &ls->epatterns);
-	printf("first\n");
+//	printf("first\n");
 	handle_error(errcode, ls->epatterns);
 	errcode = parse_filenames(data, &filenames);
-	printf("second\n");
+//	printf("second\n");
 	handle_error(errcode, ls->epatterns);
 	errcode = separate_filenames(filenames, &ls->files, &ls->dirs);
-	printf("third\n");
+//	printf("third\n");
 	free_2array((void**)filenames);
 	handle_error(errcode, ls->epatterns);
 }
 
 void	execution(t_ls *ls)
 {
-	execute(ls);
+	execute_files(ls->files, ls->flags, &ls->epatterns);
+	execute_dirs(ls->dirs, ls->flags, &ls->epatterns);
 }
 
 

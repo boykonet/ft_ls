@@ -71,19 +71,32 @@ void	del_recursive_flag(char **flags)
 	}
 }
 
-//int	if_not_dirs_or_dot(char *dir)
-//{
-//	if (dir == NULL)
-//		return (1);
-//	if (ft_strncmp(dir, ".", ft_strlen(dir)) == 0)
-//		return (1);
-//	return (0);
-//}
-
-t_list *regular(const char *folder)
+int	regular(const char **folders, t_list **epatterns)
 {
-	printf("regular [%s]\n", folder);
-	return (NULL);
+	t_list	*listdirs;
+	char	*emessage;
+	int 	i, errcode;
+
+	listdirs = NULL;
+	emessage = NULL;
+	i = 0;
+	while (folders[i])
+	{
+		errcode = dir(&listdirs, folders[i++], &emessage);
+		switch (errcode) {
+			case 0:
+				break ;
+			case -4:
+				errcode = add_pattern(epatterns, PATTERN_STRERROR_MESSAGE, emessage);
+				if (errcode != 0)
+					return (errcode);
+				return (-4);
+			default:
+				return (errcode);
+		}
+		for 
+	}
+	return (0);
 }
 
 t_list *recursive(const char *folder)
@@ -123,6 +136,16 @@ int	e(char *flags, const char *folder)
 		}
 		i++;
 	}
+	return (0);
+}
+
+int	execute_files(char **files, char flags[MAX_FLAGS + 1], t_list **epatterns)
+{
+	return (0);
+}
+
+int	execute_dirs(char **dirs, char flags[MAX_FLAGS + 1], t_list **epatterns)
+{
 	return (0);
 }
 

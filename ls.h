@@ -142,9 +142,9 @@ int				handle_l_flag(void *p);
 int				handle_r_flag(void *p);
 int				handle_t_flag(void *p);
 
-int		dir(t_list **listdirs, char *dirname, t_list **epatterns);
+int				dir(t_list **listdirs, const char *dirname, char **emessage);
 int				if_dir_or_file(char *filename);
-int				clstat(t_list **l, char **dfiles);
+int				clstat(t_list **l, char **dfiles, char **emessage);
 char			*creadlink(char *link);
 char			*get_user(uid_t uid);
 char			*get_group(gid_t gid);
