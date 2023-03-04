@@ -81,44 +81,152 @@
 //	}
 //}
 
-void RecDir(char *path, int flag) {
-	DIR *dp;
+static void	bubble(void **first, void **second)
+{
+	void *tmp;
 
-	dp = opendir(path);
-	if(!dp) {
-		perror(path);
+	tmp = *first;
+	*first = *second;
+	*second = tmp;
+}
+
+typedef struct s_fileinfo {
+	char	name[255 + 1];
+	int		type;
+	// ...
+} t_fileinfo;
+
+void	sort(t_fileinfo **array)
+{
+	int		i, j;
+
+	if (!array)
+		return ;
+
+	i = 0;
+	while (array[i])
+	{
+		j = i + 1;
+		size_t	isize = strlen(array[i]->name);
+		while (array[j])
+		{
+			size_t	jsize = strlen(array[j]->name);
+			if (strncmp(array[i]->name, array[j]->name, isize > jsize ? isize : jsize) > 0)
+				bubble((void**)&array[i], (void**)&array[j]);
+			j++;
+		}
+		i++;
+	}
+}
+
+char	**copy_dirs(t_fileinfo **files)
+{
+	char	**dirs;
+	size_t	i, j, count;
+
+	count = 0;
+	i = 0;
+	while (files[i])
+	{
+		if (files[i]->type == 4)
+			count++;
+		i++;
+	}
+
+	dirs = (char**)malloc(sizeof(char*) * (count + 1));
+	if (!dirs)
+		return (NULL);
+	i = 0;
+	j = 0;
+	while (files[i])
+	{
+		if (files[i]->type == 4)
+		{
+			dirs[j] = strdup(files[i]->name);
+			if (!dirs[j])
+				// TODO: free dirs
+				return (NULL);
+			j++;
+		}
+		i++;
+	}
+	return (dirs);
+}
+
+void rec_dirs(char *path, int flag_r, int flag_a, int flag_l) {
+	DIR				*dir;
+	t_fileinfo		*fi[1024]; // TODO: find information about maximum files in one directory
+	struct dirent	*ep;
+	char			newdir[512];
+
+	dir = opendir(path);
+	if(!dir) {
+		perror("ls");
 		exit(1);
 	}
-	struct dirent *ep;
-	char newdir[512];
-	printf("%s:\n", path);
-	while((ep = readdir(dp)))
+
+	bzero(fi, sizeof(t_fileinfo*) * 1024);
+	printf("%lu\n", sizeof(fi));
+	int	i = 0;
+	while ((ep = readdir(dir)))
 	{
-		if(strncmp(ep->d_name, ".", 1))
-			printf("%s    ", ep->d_name);
+		printf("[%d] [%s]\n", i, ep->d_name);
+		bzero(fi[i]->name, sizeof(char) * (255 + 1));
+		memcpy(fi[i]->name, ep->d_name, strlen(ep->d_name));
+		printf("%s\n", fi[i]->name);
+		fi[i]->type = ep->d_type;
+		i++;
 	}
-	printf("\n\n");
-	closedir(dp);
-	dp = opendir(path);
-	while((ep = readdir(dp)))
+	if (ep == NULL && errno)
 	{
-		if (strncmp(ep->d_name, ".", 1))
+		// TODO: handle error
+		// ls: ../ex/dir4: No such file or directory
+		perror("ls");
+		exit(1);
+	}
+	closedir(dir);
+
+	printf("%s:\n", path);
+	i = 0;
+
+	sort(fi);
+	printf("before\n");
+	char	**dirs = copy_dirs(fi);
+	printf("after\n");
+
+	while(fi[i] != NULL)
+	{
+		if (!flag_a && !strncmp(fi[i]->name, ".", 1))
 		{
-			if (flag && ep->d_type == 4)
+			i++;
+			continue ;
+		}
+		printf("%s    ", fi[i]->name);
+		i++;
+	}
+
+	printf("\n\n");
+//	dir = opendir(path);
+	if (flag_r)
+	{
+		i = 0;
+		while (dirs[i])
+		{
+			if (strcmp(dirs[i], ".") != 0 && strcmp(dirs[i], "..") != 0)
 			{
 				bzero(newdir, sizeof(char) * 512);
 				strcat(newdir, path);
 				strcat(newdir, "/");
-				strcat(newdir, ep->d_name);
-				RecDir(newdir, 1);
+				strcat(newdir, dirs[i]);
+				rec_dirs(newdir, flag_r, flag_a, flag_l);
 			}
+			i++;
 		}
 	}
-	closedir(dp);
 }
 
 int main(int argc, char **argv)
 {
-	RecDir("..", 1);
+	rec_dirs("..", 1, 0, 0);
 	return (0);
 }
