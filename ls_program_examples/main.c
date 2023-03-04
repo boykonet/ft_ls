@@ -107,11 +107,11 @@ void	sort(t_fileinfo **array)
 	while (array[i])
 	{
 		j = i + 1;
-		size_t	isize = strlen(array[i]->name);
+		size_t	isize = strlen(array[i].name);
 		while (array[j])
 		{
-			size_t	jsize = strlen(array[j]->name);
-			if (strncmp(array[i]->name, array[j]->name, isize > jsize ? isize : jsize) > 0)
+			size_t	jsize = strlen(array[j].name);
+			if (strncmp(array[i].name, array[j].name, isize > jsize ? isize : jsize) > 0)
 				bubble((void**)&array[i], (void**)&array[j]);
 			j++;
 		}
@@ -119,7 +119,7 @@ void	sort(t_fileinfo **array)
 	}
 }
 
-char	**copy_dirs(t_fileinfo **files)
+char	**copy_dirs(t_fileinfo files[1024])
 {
 	char	**dirs;
 	size_t	i, j, count;
@@ -128,7 +128,7 @@ char	**copy_dirs(t_fileinfo **files)
 	i = 0;
 	while (files[i])
 	{
-		if (files[i]->type == 4)
+		if (files[i].type == 4)
 			count++;
 		i++;
 	}
@@ -140,9 +140,9 @@ char	**copy_dirs(t_fileinfo **files)
 	j = 0;
 	while (files[i])
 	{
-		if (files[i]->type == 4)
+		if (files[i].type == 4)
 		{
-			dirs[j] = strdup(files[i]->name);
+			dirs[j] = strdup(files[i].name);
 			if (!dirs[j])
 				// TODO: free dirs
 				return (NULL);
@@ -153,9 +153,18 @@ char	**copy_dirs(t_fileinfo **files)
 	return (dirs);
 }
 
+//void	**crealloc(void **data)
+//{
+//	size_t	size;
+//
+//	if (!data)
+//		return (NULL);
+//
+//}
+
 void rec_dirs(char *path, int flag_r, int flag_a, int flag_l) {
 	DIR				*dir;
-	t_fileinfo		*fi[1024]; // TODO: find information about maximum files in one directory
+	t_fileinfo		fi[1024]; // TODO: find information about maximum files in one directory
 	struct dirent	*ep;
 	char			newdir[512];
 
@@ -166,17 +175,20 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l) {
 	}
 
 	bzero(fi, sizeof(t_fileinfo*) * 1024);
-	printf("%lu\n", sizeof(fi));
 	int	i = 0;
 	while ((ep = readdir(dir)))
 	{
 		printf("[%d] [%s]\n", i, ep->d_name);
-		bzero(fi[i]->name, sizeof(char) * (255 + 1));
-		memcpy(fi[i]->name, ep->d_name, strlen(ep->d_name));
-		printf("%s\n", fi[i]->name);
-		fi[i]->type = ep->d_type;
+		fi[i].name[0] = 'a';
+		fi[i].name[1] = '\0';
+		printf("sizeof(fi[%d]) = %lu, name = %s\n", i, sizeof(fi[i]), fi[i].name);
+		bzero(fi[i].name, sizeof(char) * (255 + 1));
+		memcpy(fi[i].name, ep->d_name, strlen(ep->d_name));
+		printf("%s\n", fi[i].name);
+		fi[i].type = ep->d_type;
 		i++;
 	}
+	size_t	count = i;
 	if (ep == NULL && errno)
 	{
 		// TODO: handle error
@@ -189,19 +201,19 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l) {
 	printf("%s:\n", path);
 	i = 0;
 
-	sort(fi);
+	sort(&fi);
 	printf("before\n");
 	char	**dirs = copy_dirs(fi);
 	printf("after\n");
 
 	while(fi[i] != NULL)
 	{
-		if (!flag_a && !strncmp(fi[i]->name, ".", 1))
+		if (!flag_a && !strncmp(fi[i].name, ".", 1))
 		{
 			i++;
 			continue ;
 		}
-		printf("%s    ", fi[i]->name);
+		printf("%s    ", fi[i].name);
 		i++;
 	}
 
