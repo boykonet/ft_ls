@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <sys/errno.h>
+#include "../libs/libft/libft.h"
 
 
 // собираешь в одно место
@@ -96,6 +97,18 @@ typedef struct s_fileinfo {
 	// ...
 } t_fileinfo;
 
+t_fileinfo	*new_fileinfo(char *name, int type)
+{
+	t_fileinfo *f;
+
+	f = ft_calloc(1, sizeof(t_fileinfo));
+	if (!f)
+		return (NULL);
+	ft_memcpy(f->name, name, ft_strlen(name));
+	f->type = type;
+	return (f);
+}
+
 void	sort(t_fileinfo **array)
 {
 	int		i, j;
@@ -164,7 +177,7 @@ char	**copy_dirs(t_fileinfo files[1024])
 
 void rec_dirs(char *path, int flag_r, int flag_a, int flag_l) {
 	DIR				*dir;
-	t_fileinfo		fi[1024]; // TODO: find information about maximum files in one directory
+	t_list			*files; // TODO: find information about maximum files in one directory
 	struct dirent	*ep;
 	char			newdir[512];
 
@@ -173,20 +186,29 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l) {
 		perror("ls");
 		exit(1);
 	}
-
-	bzero(fi, sizeof(t_fileinfo*) * 1024);
+	ep = readdir(dir);
+	if (ep == NULL && errno)
+	{
+		perror("ls");
+		exit(1);
+	}
+	files = ft_lstnew(new_fileinfo(ep->d_name, ep->d_type));
+	if (files == NULL || files->content == NULL)
+	{
+		perror("ls");
+		exit(1);
+	}
+	t_list *p = files;
 	int	i = 0;
 	while ((ep = readdir(dir)))
 	{
-		printf("[%d] [%s]\n", i, ep->d_name);
-		fi[i].name[0] = 'a';
-		fi[i].name[1] = '\0';
-		printf("sizeof(fi[%d]) = %lu, name = %s\n", i, sizeof(fi[i]), fi[i].name);
-		bzero(fi[i].name, sizeof(char) * (255 + 1));
-		memcpy(fi[i].name, ep->d_name, strlen(ep->d_name));
-		printf("%s\n", fi[i].name);
-		fi[i].type = ep->d_type;
-		i++;
+		p->next = ft_lstnew(new_fileinfo(ep->d_name, ep->d_type));
+		if (p->next == NULL)
+		{
+			perror("ls");
+			exit(1);
+		}
+		p = p->next;
 	}
 	size_t	count = i;
 	if (ep == NULL && errno)
