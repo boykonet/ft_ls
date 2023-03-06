@@ -177,4 +177,7 @@ void		replace_pattern(char *dest, const char *src, t_list *patterns);
 //void	print_error_message(t_err *err);
 void	handle_error(int errcode, t_list *epatterns);
 
+int	execute_files(char **files, char flags[MAX_FLAGS + 1], t_list **epatterns);
+int	execute_dirs(char **dirs, char flags[MAX_FLAGS + 1], t_list **epatterns);
+
 #endif

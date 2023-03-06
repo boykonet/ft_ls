@@ -109,59 +109,64 @@ t_fileinfo	*new_fileinfo(char *name, int type)
 	return (f);
 }
 
-void	sort(t_fileinfo **array)
+void	sort_files(t_list **array)
 {
-	int		i, j;
+	t_list	*curr, *next;
 
 	if (!array)
 		return ;
-
-	i = 0;
-	while (array[i])
+	curr = (*array);
+	while (curr)
 	{
-		j = i + 1;
-		size_t	isize = strlen(array[i].name);
-		while (array[j])
+		next = curr->next;
+		char *cname = ((t_fileinfo*)(curr->content))->name;
+		size_t	csize = ft_strlen(cname);
+		while (next)
 		{
-			size_t	jsize = strlen(array[j].name);
-			if (strncmp(array[i].name, array[j].name, isize > jsize ? isize : jsize) > 0)
-				bubble((void**)&array[i], (void**)&array[j]);
-			j++;
+			char *nname = ((t_fileinfo*)(next->content))->name;
+			size_t	nsize = ft_strlen(nname);
+			if (strncmp(cname, nname, csize > nsize ? csize : nsize) > 0)
+				bubble((void**)&curr, (void**)&next);
+			next = next->next;
 		}
-		i++;
+		curr = curr->next;
 	}
 }
 
-char	**copy_dirs(t_fileinfo files[1024])
+char	**copy_dirs(t_list *files)
 {
+	t_list	*p;
 	char	**dirs;
-	size_t	i, j, count;
+	size_t	j, count;
 
+	if (!files)
+		return (ft_calloc(0, 0));
 	count = 0;
-	i = 0;
-	while (files[i])
+	p = files;
+	while (p)
 	{
-		if (files[i].type == 4)
+		if (((t_fileinfo*)(p->content))->type == 4)
 			count++;
-		i++;
+		p = p->next;
 	}
 
-	dirs = (char**)malloc(sizeof(char*) * (count + 1));
+	dirs = (char**)ft_calloc(count + 1, sizeof(char*));
 	if (!dirs)
 		return (NULL);
-	i = 0;
 	j = 0;
-	while (files[i])
+	p = files;
+	while (p)
 	{
-		if (files[i].type == 4)
+		t_fileinfo 	*fi = (t_fileinfo*)(p->content);
+		if (fi->type == 4)
 		{
-			dirs[j] = strdup(files[i].name);
+			dirs[j] = strdup(fi->name);
 			if (!dirs[j])
 				// TODO: free dirs
 				return (NULL);
 			j++;
 		}
-		i++;
+		p = p->next;
 	}
 	return (dirs);
 }
@@ -223,20 +228,22 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l) {
 	printf("%s:\n", path);
 	i = 0;
 
-	sort(&fi);
+	sort_files(&files);
 	printf("before\n");
-	char	**dirs = copy_dirs(fi);
+	char	**dirs = copy_dirs(files);
 	printf("after\n");
 
-	while(fi[i] != NULL)
+	p = files;
+	while(p != NULL)
 	{
-		if (!flag_a && !strncmp(fi[i].name, ".", 1))
+		t_fileinfo	*fi = (t_fileinfo*)(p->content);
+		if (!flag_a && !strncmp(fi->name, ".", 1))
 		{
-			i++;
+			p = p->next;
 			continue ;
 		}
-		printf("%s    ", fi[i].name);
-		i++;
+		printf("%s    ", fi->name);
+		p = p->next;
 	}
 
 	printf("\n\n");

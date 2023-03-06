@@ -3,7 +3,7 @@ NAME=ft_ls
 
 CC=gcc
 
-CFLAGS= -g -Wall -Wextra -Werror
+CFLAGS= -g #-Wall -Wextra -Werror
 
 SRCS=		./main.c \
 			./srcs/dir.c \
