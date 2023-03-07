@@ -482,110 +482,102 @@ t_fileinfo	*new_fileinfo(char *name, int type)
 	return (f);
 }
 
-void	sort_files(t_list **array)
+void	alphabetical_sort_files(t_fileinfo ***array)
 {
-	t_list	*curr, *next;
+	t_fileinfo	**p;
+	size_t		i, j, len;
 
 	if (!array)
 		return ;
-	curr = (*array);
-	while (curr)
+	p = *array;
+	len = len_2array((const void**)p);
+	i = 0;
+	while (i < len)
 	{
-		next = curr->next;
-		char *cname = ((t_fileinfo*)(curr->content))->name;
-		size_t	csize = ft_strlen(cname);
-		while (next)
+		j = i + 1;
+		while (j < len)
 		{
-			char *nname = ((t_fileinfo*)(next->content))->name;
-			size_t	nsize = ft_strlen(nname);
-			if (ft_strncmp(cname, nname, csize > nsize ? csize : nsize) > 0)
-				bubble((void**)&curr, (void**)&next);
-			next = next->next;
+			if (strcmp(p[i]->name, p[j]->name) > 0)
+				bubble((void**)&p[i], (void**)&p[j]);
+			j++;
 		}
-		curr = curr->next;
+		i++;
 	}
 }
 
-char	**copy_dirs(t_list *files)
+char	**copy_dirs(t_fileinfo **files)
 {
-	t_list	*p;
 	char	**dirs;
-	size_t	j, count;
+	size_t	i, j, count;
 
 	if (!files)
-		return (ft_calloc(0, 0));
+		return (ft_calloc(0, sizeof(char*)));
 	count = 0;
-	p = files;
-	while (p)
+	i = 0;
+	while (files[i])
 	{
-		if (((t_fileinfo*)(p->content))->type == 4)
+		if (files[i]->type == 4)
 			count++;
-		p = p->next;
+		i++;
 	}
 
 	dirs = (char**)ft_calloc(count + 1, sizeof(char*));
 	if (!dirs)
 		return (NULL);
+	i = 0;
 	j = 0;
-	p = files;
-	while (p)
+	while (files[i])
 	{
-		t_fileinfo 	*fi = (t_fileinfo*)(p->content);
-		if (fi->type == 4)
+		if (files[i]->type == 4)
 		{
-			dirs[j] = ft_strdup(fi->name);
+			dirs[j] = ft_strdup(files[i]->name);
 			if (!dirs[j])
-				// TODO: free dirs
+			{
+				free_2array((void**)dirs);
 				return (NULL);
+			}
 			j++;
 		}
-		p = p->next;
+		i++;
 	}
 	return (dirs);
 }
 
-//void	**crealloc(void **data)
-//{
-//	size_t	size;
-//
-//	if (!data)
-//		return (NULL);
-//
-//}
-
-void rec_dirs(char *path, int flag_r, int flag_a, int flag_l) {
+void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
+{
 	DIR				*dir;
-	t_list			*files; // TODO: find information about maximum files in one directory
+	t_fileinfo 		**files;
 	struct dirent	*ep;
 	char			newdir[512];
 
 	dir = opendir(path);
-	if(!dir) {
-		perror("ls");
-		exit(1);
-	}
-	ep = readdir(dir);
-	if (ep == NULL && errno)
+	if(!dir)
 	{
 		perror("ls");
 		exit(1);
 	}
-	files = ft_lstnew(new_fileinfo(ep->d_name, ep->d_type));
-	if (files == NULL || files->content == NULL)
+	files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
+	if (!files)
 	{
 		perror("ls");
 		exit(1);
 	}
-	t_list *p = files;
 	while ((ep = readdir(dir)))
 	{
-		p->next = ft_lstnew(new_fileinfo(ep->d_name, ep->d_type));
-		if (p->next == NULL)
+		t_fileinfo *fi = new_fileinfo(ep->d_name, ep->d_type);
+		if (fi == NULL)
 		{
 			perror("ls");
 			exit(1);
 		}
-		p = p->next;
+		size_t flen = len_2array((const void**)files);
+		if (realloc_2array((void***)&files, flen + 1) != 0)
+		{
+			perror("ls");
+			exit(1);
+		}
+		flen = len_2array((const void**)files);
+		files[flen] = fi;
 	}
 	if (ep == NULL && errno)
 	{
@@ -594,29 +586,35 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l) {
 		perror("ls");
 		exit(1);
 	}
-	closedir(dir);
-
-	printf("%s:\n", path);
-	int i = 0;
-
-	sort_files(&files);
-	char	**dirs = copy_dirs(files);
-
-	p = files;
-	while(p != NULL)
+	if (closedir(dir) == -1)
 	{
-		t_fileinfo	*fi = (t_fileinfo*)(p->content);
-		if (flag_a == 0 && strncmp(fi->name, ".", 1) == 0)
-		{
-			p = p->next;
-			continue ;
-		}
-		printf("%s    ", fi->name);
-		p = p->next;
+		perror("ls");
+		exit(1);
 	}
 
-	printf("\n\n");
-//	dir = opendir(path);
+	if (counter > 0)
+		printf("%s:\n", path);
+
+	alphabetical_sort_files(&files);
+	char	**dirs = copy_dirs(files);
+
+	size_t	i = 0;
+	size_t	lfiles = len_2array((const void**)files);
+	while(files[i])
+	{
+		if (flag_a == 0 && strncmp(files[i]->name, ".", 1) == 0)
+		{
+			i++;
+			continue ;
+		}
+		if (i == lfiles - 1)
+			printf("%s\n", files[i]->name);
+		else
+			printf("%s    ", files[i]->name);
+		i++;
+	}
+	printf("\n");
+
 	if (flag_r)
 	{
 		i = 0;
@@ -627,22 +625,25 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l) {
 				i++;
 				continue ;
 			}
-			if (ft_strncmp(dirs[i], ".", ft_strlen(dirs[i])) != 0 \
-			&& ft_strncmp(dirs[i], "..", ft_strlen(dirs[i])) != 0)
+			size_t	ldname = ft_strlen(dirs[i]);
+			if (ft_strncmp(dirs[i], ".", ldname > 1 ? ldname : 1) != 0 \
+			&& ft_strncmp(dirs[i], "..", ldname > 2 ? ldname : 2) != 0)
 			{
 				ft_bzero(newdir, sizeof(char) * 512);
 				strcat(newdir, path);
 				strcat(newdir, "/");
 				strcat(newdir, dirs[i]);
-				rec_dirs(newdir, flag_r, flag_a, flag_l);
+				rec_dirs(newdir, flag_r, flag_a, flag_l, counter + 1);
 			}
 			i++;
 		}
 	}
+	free_2array((void**)dirs);
+	free_2array((void**)files);
 }
 
 int main()
 {
-	rec_dirs(".", 1, 0, 0);
+	rec_dirs(".", 1, 0, 0, 0);
 	return (0);
 }

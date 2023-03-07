@@ -157,7 +157,7 @@ void			lexicography_sort(char ***array);
 
 int				len_2array(const void **darr);
 void			free_2array(void **arr);
-int				add_value_2array(char ***data, const char *value);
+int				realloc_2array(void ***data, size_t size);
 void			cleaner(t_ls *ls, int exitcode);
 void			**calloca_to_2d(size_t size);
 char			**copy(const char **srcs, size_t len);

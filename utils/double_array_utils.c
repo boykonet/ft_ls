@@ -31,30 +31,23 @@ void	free_2array(void **arr)
 	arr = NULL;
 }
 
-int		add_value_2array(char ***data, const char *value)
+int		realloc_2array(void ***data, size_t size)
 {
-	char	**p;
-	char	**res;
-	size_t	size, i;
+	void	**p;
+	void	**res;
+	size_t	i;
 
-	if (!data || !value)
+	if (!data)
 		return (-2);
 	p = *data;
-	size = len_2array((const void**)p);
-	res = (char**)calloca_to_2d(size + 1 + 1);
+	res = (void**)ft_calloc(size + 1, sizeof(void*));
 	if (!res)
 		return (-1);
 	i = 0;
-	while (p && p[i])
+	while (p && p[i] != NULL)
 	{
 		res[i] = p[i];
 		i++;
-	}
-	res[i] = ft_strdup(value);
-	if (!res[i])
-	{
-		free(res);
-		return (-1);
 	}
 	free(*data);
 	*data = res;
