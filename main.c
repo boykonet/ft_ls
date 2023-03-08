@@ -543,6 +543,59 @@ char	**copy_dirs(t_fileinfo **files)
 	return (dirs);
 }
 
+char	*configure_l_option(char *filename, int type)
+{
+	struct stat	st;
+	char	*str;
+
+	str = NULL;
+	if (lstat(filename, &st) == -1)
+	{
+		perror("ls");
+		exit(1);
+	}
+
+//	st.
+
+	return (str);
+}
+
+void	print_files(t_fileinfo	**files, int flag_a, int flag_l)
+{
+	size_t	i = 0;
+	size_t	lfiles = len_2array((const void**)files);
+	while(files[i])
+	{
+		if (flag_a == 0 && strncmp(files[i]->name, ".", 1) == 0)
+		{
+			i++;
+			continue ;
+		}
+		char	*message = NULL;
+		if (i == lfiles - 1)
+		{
+			if (flag_l == 1)
+				message = configure_l_option(files[i]->name);
+			else
+				message = ft_strjoin(files[i]->name, "\n");
+		}
+		else
+		{
+			if (flag_l == 1)
+			{
+				message = configure_l_option(files[i]->name);
+			}
+			else
+				message = ft_strjoin(files[i]->name, "    ");
+		}
+		write(1, message, ft_strlen(message));
+		free(message);
+		message = NULL;
+		i++;
+	}
+	printf("\n");
+}
+
 void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 {
 	DIR				*dir;
@@ -598,23 +651,9 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 	alphabetical_sort_files(&files);
 	char	**dirs = copy_dirs(files);
 
-	size_t	i = 0;
-	size_t	lfiles = len_2array((const void**)files);
-	while(files[i])
-	{
-		if (flag_a == 0 && strncmp(files[i]->name, ".", 1) == 0)
-		{
-			i++;
-			continue ;
-		}
-		if (i == lfiles - 1)
-			printf("%s\n", files[i]->name);
-		else
-			printf("%s    ", files[i]->name);
-		i++;
-	}
-	printf("\n");
+	print_files(files, flag_a, flag_l);
 
+	size_t i;
 	if (flag_r)
 	{
 		i = 0;
