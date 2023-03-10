@@ -543,26 +543,102 @@ char	**copy_dirs(t_fileinfo **files)
 	return (dirs);
 }
 
-char	*configure_l_option(char *filename, int type)
+char	*join_file(char *filemode, char *nlink, char *owner, char *group, char *nbytes, char *amonth, char *day, char *hour, char *minutes, char *filename)
 {
-	struct stat	st;
-	char	*str;
+	char	separator[3] = "  ";
+	char	*res;
 
-	str = NULL;
+	res = ft_strjoin("-", filemode);
+	res = ft_strjoin(res, separator);
+	res = ft_strjoin(res, nlink);
+	res = ft_strjoin(res, separator);
+	res = ft_strjoin(res, owner);
+	res = ft_strjoin(res, separator);
+	res = ft_strjoin(res, group);
+	res = ft_strjoin(res, separator);
+	res = ft_strjoin(res, nbytes);
+	res = ft_strjoin(res, separator);
+	res = ft_strjoin(res, amonth);
+	res = ft_strjoin(res, separator);
+	res = ft_strjoin(res, day);
+	res = ft_strjoin(res, " ");
+	res = ft_strjoin(res, hour);
+	res = ft_strjoin(res, ":");
+	res = ft_strjoin(res, minutes);
+	res = ft_strjoin(res, " ");
+	res = ft_strjoin(res, filename);
+	res = ft_strjoin(res, "\n");
+
+	return (res);
+}
+
+void	cstrmode(mode_t mode, char *buf)
+{
+	const char	permissions[] = "rwx";
+	size_t		i;
+
+	i = 0;
+	while (i < 9)
+	{
+		buf[i] = (mode & (1 << (8 - i))) ? permissions[i % 3] : '-';
+		i++;
+	}
+}
+
+// file mode
+// number of links
+// owner name
+// group name
+// number of bytes in the file
+// abbreviated month
+// day-of-month file was last modified, hour file last modified, minute file last modified
+// and the pathname
+char	*configure_l_option(char *filename, int type, int *total)
+{
+	struct stat		st;
+	char			filemode[11] = "--------- ";
+	char			*nlink;
+
 	if (lstat(filename, &st) == -1)
 	{
 		perror("ls");
 		exit(1);
 	}
+	*total += st.st_blocks;
 
-//	st.
+	nlink = ft_itoa(st.st_nlink);
+	cstrmode(st.st_mode, filemode);
 
-	return (str);
+	char *size = ft_itoa(st.st_size);
+	char	*month = ft_strdup("May");
+	char	*day = ft_itoa(2);
+	char	*hour = ft_itoa(12);
+	char	*minutes = ft_itoa(14);
+
+	char *res = join_file(filemode, nlink, get_user(st.st_uid), get_group(st.st_gid), size, month, day, hour, minutes, filename);
+	free(nlink);
+	nlink = NULL;
+	free(size);
+	size = NULL;
+	free(month);
+	month = NULL;
+	free(day);
+	day = NULL;
+	free(hour);
+	hour = NULL;
+	free(minutes);
+	minutes = NULL;
+	return (res);
 }
 
 void	print_files(t_fileinfo	**files, int flag_a, int flag_l)
 {
 	size_t	i = 0;
+	char	*res;
+	int		total;
+
+	res = ft_strdup("");
+	total = 0;
 	size_t	lfiles = len_2array((const void**)files);
 	while(files[i])
 	{
@@ -571,11 +647,11 @@ void	print_files(t_fileinfo	**files, int flag_a, int flag_l)
 			i++;
 			continue ;
 		}
-		char	*message = NULL;
+		char	*message, *p = NULL;
 		if (i == lfiles - 1)
 		{
 			if (flag_l == 1)
-				message = configure_l_option(files[i]->name);
+				message = configure_l_option(files[i]->name, files[i]->type, &total);
 			else
 				message = ft_strjoin(files[i]->name, "\n");
 		}
@@ -583,17 +659,25 @@ void	print_files(t_fileinfo	**files, int flag_a, int flag_l)
 		{
 			if (flag_l == 1)
 			{
-				message = configure_l_option(files[i]->name);
+				message = configure_l_option(files[i]->name, files[i]->type, &total);
 			}
 			else
 				message = ft_strjoin(files[i]->name, "    ");
 		}
-		write(1, message, ft_strlen(message));
+		p = res;
+		res = ft_strjoin(res, message);
+		free(p);
+		p = NULL;
 		free(message);
 		message = NULL;
 		i++;
 	}
-	printf("\n");
+	if (flag_l == 1)
+		printf("total %d\n", total);
+	if (res != NULL)
+		write(1, res, ft_strlen(res));
+	free(res);
+	res = NULL;
 }
 
 void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
@@ -683,6 +767,6 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 
 int main()
 {
-	rec_dirs(".", 1, 0, 0, 0);
+	rec_dirs(".", 0, 0, 1, 0);
 	return (0);
 }
