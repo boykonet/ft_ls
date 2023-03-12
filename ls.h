@@ -4,12 +4,13 @@
 # define CSTDERR		2
 # define MAX_FLAGS		5
 # define CONST_FLAGS	"Ralrt"
+# define FILETYPES_SIZE	8
 
 # define ERR_HEADER					"ls: "
 # define MALLOC_ERROR				"malloc error"
 # define NULL_PARAMETER				"null parameter"
 # define FLAG_NOT_SUPPORT			"illegal option -- {{flag}}\nusage: ls [-Ralrt] [file ...]"
-# define UNSUPPORTED_ASCII			"unsupported symbol: only ascii printable characters"
+//# define UNSUPPORTED_ASCII			"unsupported symbol: only ascii printable characters"
 # define STRERROR_MESSAGE			"{{message}}"
 # define UNEXPECTED_ERROR			"unexpected error"
 
@@ -113,23 +114,6 @@ typedef struct	s_ls
 	char	**dirs;
 	t_list	*epatterns;
 } t_ls;
-
-typedef struct s_iresource
-{
-	int		filetype;
-	char	*name;
-//	char	*link;
-//	char	*username;
-//	char	*groupname;
-//	int 	size;
-} t_iresource;
-
-typedef struct s_resource
-{
-	t_iresource		*info;
-	struct s_file	*next;
-	struct s_file	*child;
-} t_resource;
 
 int		parse_flags(char ***data, char *flags[MAX_FLAGS + 1], t_list **patterns);
 int				parse_filenames(char **data, char ***filenames);

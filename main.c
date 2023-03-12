@@ -464,10 +464,38 @@ static void	bubble(void **first, void **second)
 	*second = tmp;
 }
 
-typedef struct s_fileinfo {
-	char	name[255 + 1];
-	int		type;
-	// ...
+
+// file mode
+// number of links
+// owner name
+// group name
+// number of bytes in the file
+// abbreviated month
+// day-of-month file was last modified, hour file last modified, minute file last modified
+// and the pathname
+typedef struct s_iresource
+{
+	int		filetype;
+	char	*name;
+//	char	*link;
+//	char	*username;
+//	char	*groupname;
+//	int 	size;
+} t_iresource;
+
+typedef struct s_fileinfo
+{
+	char		name[255 + 1];
+	int			type;
+	char		filemode[11 + 1];
+	char		nlinks[5 + 1]; // because nlinks_t type is cast for unsigned short, maximum value is 65535
+	char		oname[255 + 1]; // owner name
+	char		gname[255 + 1]; // group name
+	long long	nbytes; // number of bytes
+	char		amonth[3 + 1]; // abbreviated month ---> Jan
+	char		day_lm[2 + 1]; // day last modified ---> 31
+	char		time_lm[5 + 1]; // time last modified ---> 12:23
+	char		link[255 + 1]; // only if type == DT_LNK
 } t_fileinfo;
 
 t_fileinfo	*new_fileinfo(char *name, int type)
@@ -479,6 +507,7 @@ t_fileinfo	*new_fileinfo(char *name, int type)
 		return (NULL);
 	ft_memcpy(f->name, name, ft_strlen(name));
 	f->type = type;
+	ft_memcpy(f->filemode, "---------- ", 11);
 	return (f);
 }
 
@@ -543,30 +572,32 @@ char	**copy_dirs(t_fileinfo **files)
 	return (dirs);
 }
 
-char	*join_file(char *filemode, char *nlink, char *owner, char *group, char *nbytes, char *amonth, char *day, char *hour, char *minutes, char *filename)
+char	*join_file(t_fileinfo *finfo)
 {
-	char	separator[3] = "  ";
 	char	*res;
 
-	res = ft_strjoin("-", filemode);
-	res = ft_strjoin(res, separator);
-	res = ft_strjoin(res, nlink);
-	res = ft_strjoin(res, separator);
-	res = ft_strjoin(res, owner);
-	res = ft_strjoin(res, separator);
-	res = ft_strjoin(res, group);
-	res = ft_strjoin(res, separator);
-	res = ft_strjoin(res, nbytes);
-	res = ft_strjoin(res, separator);
-	res = ft_strjoin(res, amonth);
-	res = ft_strjoin(res, separator);
-	res = ft_strjoin(res, day);
+	res = ft_strjoin("", finfo->filemode);
 	res = ft_strjoin(res, " ");
-	res = ft_strjoin(res, hour);
-	res = ft_strjoin(res, ":");
-	res = ft_strjoin(res, minutes);
+	res = ft_strjoin(res, finfo->nlinks);
 	res = ft_strjoin(res, " ");
-	res = ft_strjoin(res, filename);
+	res = ft_strjoin(res, finfo->oname);
+	res = ft_strjoin(res, "  ");
+	res = ft_strjoin(res, finfo->gname);
+	res = ft_strjoin(res, "  ");
+	res = ft_strjoin(res, ft_itoa(finfo->nbytes));
+	res = ft_strjoin(res, " ");
+	res = ft_strjoin(res, finfo->amonth);
+	res = ft_strjoin(res, " ");
+	res = ft_strjoin(res, finfo->day_lm);
+	res = ft_strjoin(res, " ");
+	res = ft_strjoin(res, finfo->time_lm);
+	res = ft_strjoin(res, " ");
+	res = ft_strjoin(res, finfo->name);
+	if (finfo->type == DT_LNK)
+	{
+		res = ft_strjoin(res, " -> ");
+		res = ft_strjoin(res, finfo->link);
+	}
 	res = ft_strjoin(res, "\n");
 
 	return (res);
@@ -574,7 +605,7 @@ char	*join_file(char *filemode, char *nlink, char *owner, char *group, char *nby
 
 void	cstrmode(mode_t mode, char *buf)
 {
-	const char	permissions[] = "rwx";
+	const char	permissions[4] = "rwx";
 	size_t		i;
 
 	i = 0;
@@ -585,6 +616,36 @@ void	cstrmode(mode_t mode, char *buf)
 	}
 }
 
+typedef struct s_filetypes
+{
+	int		filetype;
+	char	replacement;
+} t_filetypes;
+
+void	set_filetype(char *filetype, int type)
+{
+	t_filetypes	filetypes[FILETYPES_SIZE] = {
+			{.filetype = DT_BLK, .replacement = 'b'},
+			{.filetype = DT_CHR, .replacement = 'c'},
+			{.filetype = DT_DIR, .replacement = 'd'},
+			{.filetype = DT_LNK, .replacement = 'l'},
+			{.filetype = DT_SOCK, .replacement = 's'},
+			{.filetype = DT_FIFO, .replacement = 'p'},
+			{.filetype = DT_REG, .replacement = '-'},
+			{.filetype = DT_UNKNOWN, .replacement = '?'}, // TODO: check the information about unknown file
+	};
+
+	for (int i = 0; i < FILETYPES_SIZE; i++)
+	{
+		if (type == filetypes[i].filetype)
+		{
+			*filetype = filetypes[i].replacement;
+			break ;
+		}
+	}
+}
+
+
 // file mode
 // number of links
 // owner name
@@ -593,49 +654,58 @@ void	cstrmode(mode_t mode, char *buf)
 // abbreviated month
 // day-of-month file was last modified, hour file last modified, minute file last modified
 // and the pathname
-char	*configure_l_option(char *filename, int type, int *total)
+char	*configure_l_option(t_fileinfo *finfo, long long *total)
 {
 	struct stat		st;
-	char			filemode[11] = "--------- ";
-	char			*nlink;
 
-	if (lstat(filename, &st) == -1)
+	if (lstat(finfo->name, &st) == -1)
 	{
 		perror("ls");
 		exit(1);
 	}
+
 	*total += st.st_blocks;
 
-	nlink = ft_itoa(st.st_nlink);
-	cstrmode(st.st_mode, filemode);
+	char *nlinks = ft_itoa(st.st_nlink);
+	ft_memcpy(finfo->nlinks, nlinks, ft_strlen(nlinks));
+	free(nlinks);
+	nlinks = NULL;
 
-	char *size = ft_itoa(st.st_size);
-	char	*month = ft_strdup("May");
-	char	*day = ft_itoa(2);
-	char	*hour = ft_itoa(12);
-	char	*minutes = ft_itoa(14);
+	cstrmode(st.st_mode, &finfo->filemode[1]);
 
-	char *res = join_file(filemode, nlink, get_user(st.st_uid), get_group(st.st_gid), size, month, day, hour, minutes, filename);
-	free(nlink);
-	nlink = NULL;
-	free(size);
-	size = NULL;
-	free(month);
-	month = NULL;
-	free(day);
-	day = NULL;
-	free(hour);
-	hour = NULL;
-	free(minutes);
-	minutes = NULL;
+	set_filetype(&finfo->filemode[0], finfo->type);
+
+	finfo->nbytes = st.st_size;
+
+	char	**t = ft_split(ctime((const time_t*)&st.st_mtimespec.tv_sec), ' ');
+	if (!t)
+	{
+		perror("malloc");
+		exit(1);
+	}
+	*ft_strrchr(t[3], ':') = '\0';
+
+	ft_memcpy(finfo->amonth, t[1], 3);
+	ft_memcpy(finfo->day_lm, t[2], 2);
+	ft_memcpy(finfo->time_lm, t[3], 5);
+
+	ft_memcpy(finfo->oname, get_user(st.st_uid), 255);
+	ft_memcpy(finfo->gname, get_group(st.st_gid), 255);
+
+	if (finfo->type == DT_LNK)
+		ft_memcpy(finfo->link, creadlink(finfo->name), 255);
+
+	char *res = join_file(finfo);
+	free_2array((void**)t);
+	t = NULL;
 	return (res);
 }
 
 void	print_files(t_fileinfo	**files, int flag_a, int flag_l)
 {
-	size_t	i = 0;
-	char	*res;
-	int		total;
+	size_t		i = 0;
+	char		*res;
+	long long	total;
 
 	res = ft_strdup("");
 	total = 0;
@@ -648,19 +718,12 @@ void	print_files(t_fileinfo	**files, int flag_a, int flag_l)
 			continue ;
 		}
 		char	*message, *p = NULL;
-		if (i == lfiles - 1)
-		{
-			if (flag_l == 1)
-				message = configure_l_option(files[i]->name, files[i]->type, &total);
-			else
-				message = ft_strjoin(files[i]->name, "\n");
-		}
+		if (flag_l == 1)
+			message = configure_l_option(files[i], &total);
 		else
 		{
-			if (flag_l == 1)
-			{
-				message = configure_l_option(files[i]->name, files[i]->type, &total);
-			}
+			if (i == lfiles - 1)
+				message = ft_strjoin(files[i]->name, "\n");
 			else
 				message = ft_strjoin(files[i]->name, "    ");
 		}
@@ -673,7 +736,7 @@ void	print_files(t_fileinfo	**files, int flag_a, int flag_l)
 		i++;
 	}
 	if (flag_l == 1)
-		printf("total %d\n", total);
+		printf("total %lld\n", total);
 	if (res != NULL)
 		write(1, res, ft_strlen(res));
 	free(res);
