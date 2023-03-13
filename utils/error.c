@@ -52,25 +52,26 @@ int	add_pattern(t_list **head, char *pattern, char *replacement)
 //	return (add_pattern(&err->patterns, "{{flag}}", ch));
 //}
 
-void		replace_pattern(char *dest, const char *src, t_list *patterns)
+void		replace_pattern(char *dest, const char *src, t_pattern patterns[16])
 {
-	t_list	*poh; // pointer of head
+//	t_list	*poh; // pointer of head
 	char	*pbegin, *pend;
 	int		bsize, asize;
 
 	ft_memcpy(dest, src, ft_strlen(src));
-	poh = patterns;
-	while (poh)
+//	poh = patterns;
+	int i = 0;
+	while (i < 16)
 	{
 		char	*pattern, *replacement;
 
-		pattern = ((t_pattern*)(poh->content))->pattern;
-		replacement = ((t_pattern*)(poh->content))->replacement;
+		pattern = patterns[i].pattern;
+		replacement = patterns[i].replacement;
 
 		pbegin = ft_strnstr(dest, pattern, ft_strlen(dest));
 		if (!pbegin)
 		{
-			poh = poh->next;
+			i++;
 			continue ;
 		}
 		pend = pbegin + ft_strlen(pattern);
@@ -80,7 +81,7 @@ void		replace_pattern(char *dest, const char *src, t_list *patterns)
 		ft_memmove(pbegin + ft_strlen(replacement), pbegin + ft_strlen(pattern), asize);
 		ft_memcpy(pbegin, replacement, ft_strlen(replacement));
 		dest[bsize + ft_strlen(replacement) + asize] = '\0';
-		poh = poh->next;
+		i++;
 	}
 }
 

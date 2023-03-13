@@ -156,7 +156,7 @@ void		del_pattern(void *node);
 
 t_list	*find_last_elem(t_list **head);
 int	add_pattern(t_list **head, char *pattern, char *replacement);
-void		replace_pattern(char *dest, const char *src, t_list *patterns);
+void		replace_pattern(char *dest, const char *src, t_pattern patterns[16]);
 
 //void	print_error_message(t_err *err);
 void	handle_error(int errcode, t_list *epatterns);
