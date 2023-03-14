@@ -197,7 +197,7 @@
 ////			printf("MALLOC ERROR");
 ////			return (-1);
 ////		}
-////		printf("name [%s]\n", fname);
+////		printf("filename [%s]\n", fname);
 ////		l = l->next;
 ////		i++;
 ////	}
@@ -209,7 +209,7 @@
 ////		return (1);
 ////	return (0);
 ////
-//////	// group and user name
+//////	// group and user filename
 //////	while (d != NULL)
 //////	{
 //////		gid_t gid = ((struct stat*)(d->content))->st_gid;
@@ -467,8 +467,8 @@ static void	bubble(void **first, void **second)
 
 // file mode
 // number of links
-// owner name
-// group name
+// owner filename
+// group filename
 // number of bytes in the file
 // abbreviated month
 // day-of-month file was last modified, hour file last modified, minute file last modified
@@ -485,12 +485,13 @@ typedef struct s_iresource
 
 typedef struct s_fileinfo
 {
-	char		name[255 + 1];
+	char		path[3841 + 1];
+	char		filename[255 + 1];
 	int			type;
 	char		filemode[11 + 1];
 	char		nlinks[5 + 1]; // because nlinks_t type is cast for unsigned short, maximum value is 65535
-	char		oname[255 + 1]; // owner name
-	char		gname[255 + 1]; // group name
+	char		oname[255 + 1]; // owner filename
+	char		gname[255 + 1]; // group filename
 	char 		nbytes[11 + 1]; // number of bytes
 	char		amonth[3 + 1]; // abbreviated month ---> Jan
 	char		day_lm[2 + 1]; // day last modified ---> 31
@@ -498,14 +499,15 @@ typedef struct s_fileinfo
 	char		link[255 + 1]; // only if type == DT_LNK
 } t_fileinfo;
 
-t_fileinfo	*new_fileinfo(char *name, int type)
+t_fileinfo	*new_fileinfo(char *path, char *filename, int type)
 {
 	t_fileinfo *f;
 
 	f = ft_calloc(1, sizeof(t_fileinfo));
 	if (!f)
 		return (NULL);
-	ft_memcpy(f->name, name, ft_strlen(name));
+	ft_memcpy(f->path, path, ft_strlen(path));
+	ft_memcpy(f->filename, filename, ft_strlen(filename));
 	f->type = type;
 	ft_memcpy(f->filemode, "---------- ", 11);
 	return (f);
@@ -526,7 +528,7 @@ void	alphabetical_sort_files(t_fileinfo ***array)
 		j = i + 1;
 		while (j < len)
 		{
-			if (strcmp(p[i]->name, p[j]->name) > 0)
+			if (strcmp(p[i]->filename, p[j]->filename) > 0)
 				bubble((void**)&p[i], (void**)&p[j]);
 			j++;
 		}
@@ -559,7 +561,7 @@ char	**copy_dirs(t_fileinfo **files)
 	{
 		if (files[i]->type == 4)
 		{
-			dirs[j] = ft_strdup(files[i]->name);
+			dirs[j] = ft_strdup(files[i]->filename);
 			if (!dirs[j])
 			{
 				free_2array((void**)dirs);
@@ -573,11 +575,11 @@ char	**copy_dirs(t_fileinfo **files)
 }
 
 typedef struct s_maxsymbols {
-	int		ms_link;
-	int 	ms_oname;
-	int		ms_gname;
-	int		ms_bytes;
-	int 	ms_day;
+	size_t	ms_link;
+	size_t	ms_oname;
+	size_t	ms_gname;
+	size_t	ms_bytes;
+	size_t	ms_day;
 } t_maxsymbols;
 
 #define PATTERN_WITHOUT_LINK	"{{filemode}} {{spaces1}}{{nlinks}} {{spaces2}}{{oname}}  {{spaces3}}{{gname}}  {{spaces4}}{{nbytes}} {{amonth}} {{spaces5}}{{day}} {{time}} {{filename}}\n"
@@ -612,7 +614,7 @@ void	print_fileinfo(t_fileinfo *finfo, t_maxsymbols *ms)
 			{.pattern = "{{spaces5}}", .replacement = spaces[4]},
 			{.pattern = "{{day}}", .replacement = finfo->day_lm},
 			{.pattern = "{{time}}", .replacement = finfo->time_lm},
-			{.pattern = "{{filename}}", .replacement = finfo->name},
+			{.pattern = "{{filename}}", .replacement = finfo->filename},
 			{.pattern = "{{link}}", .replacement = finfo->link},
 			NULL,
 	};
@@ -667,62 +669,33 @@ void	set_filetype(char *filetype, int type)
 	}
 }
 
-
-// file mode
-// number of links
-// owner name
-// group name
-// number of bytes in the file
-// abbreviated month
-// day-of-month file was last modified, hour file last modified, minute file last modified
-// and the pathname
-void	configure_l_option(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
+void	conf_filemode(mode_t mode, int filetype, char *filemode)
 {
-	struct stat		st;
+	cstrmode(mode, &filemode[1]);
+	set_filetype(&filemode[0], filetype);
+}
 
-	if (lstat(finfo->name, &st) == -1)
-	{
-		perror("ls");
-		exit(1);
-	}
+void	conf_nlink(nlink_t st_nlink, char *links)
+{
+	char *number_links = ft_itoa(st_nlink);
+//	if (!number_links) // TODO: thinking about static variable and recursive number function
+//		return (NULL);
+	ft_memcpy(links, number_links, ft_strlen(number_links));
+	free(number_links);
+	number_links = NULL;
+}
 
-	*total += st.st_blocks;
-
-	cstrmode(st.st_mode, &finfo->filemode[1]);
-	set_filetype(&finfo->filemode[0], finfo->type);
-
-	char *nlinks = ft_itoa(st.st_nlink);
-	ft_memcpy(finfo->nlinks, nlinks, ft_strlen(nlinks));
-	free(nlinks);
-	nlinks = NULL;
-
-	// 1
-	if (ms->ms_link < ft_strlen(finfo->nlinks))
-		ms->ms_link = (int)ft_strlen(finfo->nlinks);
-
-	ft_memcpy(finfo->oname, get_user(st.st_uid), 255);
-
-	// 2
-	if (ms->ms_oname < ft_strlen(finfo->oname))
-		ms->ms_oname = (int)ft_strlen(finfo->oname);
-
-	ft_memcpy(finfo->gname, get_group(st.st_gid), 255);
-
-	// 3
-	if (ms->ms_gname < ft_strlen(finfo->gname))
-		ms->ms_gname = (int)ft_strlen(finfo->gname);
-
-
-	char	*nbytes = ft_itoa((int)st.st_size);
-	ft_memcpy(finfo->nbytes, nbytes, ft_strlen(nbytes));
+void	conf_nbytes(off_t st_size, char *bytes)
+{
+	char	*nbytes = ft_itoa((int)st_size);
+	ft_memcpy(bytes, nbytes, ft_strlen(nbytes));
 	free(nbytes);
 	nbytes = NULL;
+}
 
-	// 4
-	if (ms->ms_bytes < ft_strlen(finfo->nbytes))
-		ms->ms_bytes = (int)ft_strlen(finfo->nbytes);
-
-	char	**t = ft_split(ctime((const time_t*)&st.st_mtimespec.tv_sec), ' ');
+void	conf_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *time_lm)
+{
+	char	**t = ft_split(ctime((const time_t*)&st_mtimespec.tv_sec), ' ');
 	if (!t)
 	{
 		perror("malloc");
@@ -730,19 +703,126 @@ void	configure_l_option(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
 	}
 	*ft_strrchr(t[3], ':') = '\0';
 
-	ft_memcpy(finfo->amonth, t[1], 3);
-	ft_memcpy(finfo->day_lm, t[2], 2);
-	ft_memcpy(finfo->time_lm, t[3], 5);
-
-	// 5
-	if (ms->ms_day < ft_strlen(finfo->day_lm))
-		ms->ms_day = (int)ft_strlen(finfo->day_lm);
-
-	if (finfo->type == DT_LNK)
-		ft_memcpy(finfo->link, creadlink(finfo->name), 255);
-
+	ft_memcpy(amonth, t[1], ft_strlen(t[1]));
+	ft_memcpy(day_lm, t[2], ft_strlen(t[2]));
+	ft_memcpy(time_lm, t[3], ft_strlen(t[3]));
 	free_2array((void**)t);
 	t = NULL;
+}
+
+void conf_link(const char *filepath, char *link)
+{
+	char	*new_link = creadlink(filepath);
+	if (!new_link)
+	{
+		perror("malloc");
+		exit(1);
+	}
+	ft_memcpy(link, new_link, sizeof(link) - 1);
+}
+
+void	max_spaces(size_t *first, size_t second)
+{
+	if (*first < second)
+		*first = second;
+}
+
+void	configure_l_option(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
+{
+	struct stat		st;
+	char			*filepath;
+
+	filepath = ft_calloc(ft_strlen(finfo->path) + 1 + ft_strlen(finfo->filename) + 1, sizeof(char));
+	if (!filepath)
+	{
+		perror("malloc");
+		exit(1);
+	}
+	strcat(filepath, finfo->path);
+	strcat(filepath, "/");
+	strcat(filepath, finfo->filename);
+
+	if (lstat(filepath, &st) == -1)
+	{
+		perror("ls");
+		exit(1);
+	}
+
+	*total += st.st_blocks;
+
+	conf_filemode(st.st_mode, finfo->type, finfo->filemode); // TODO: might be empty value
+
+	conf_nlink(st.st_nlink, finfo->nlinks);
+//	char *nlinks = ft_itoa(st.st_nlink);
+//	ft_memcpy(finfo->nlinks, nlinks, ft_strlen(nlinks));
+//	free(nlinks);
+//	nlinks = NULL;
+
+	// 1
+	max_spaces(&ms->ms_link, ft_strlen(finfo->nlinks));
+//	if (ms->ms_link < ft_strlen(finfo->nlinks))
+//		ms->ms_link = (int)ft_strlen(finfo->nlinks);
+
+	ft_memcpy(finfo->oname, get_user(st.st_uid), 255);
+
+	// 2
+	max_spaces(&ms->ms_oname, ft_strlen(finfo->oname));
+//	if (ms->ms_oname < ft_strlen(finfo->oname))
+//		ms->ms_oname = (int)ft_strlen(finfo->oname);
+
+	ft_memcpy(finfo->gname, get_group(st.st_gid), 255);
+
+	// 3
+	max_spaces(&ms->ms_gname, ft_strlen(finfo->gname));
+//	if (ms->ms_gname < ft_strlen(finfo->gname))
+//		ms->ms_gname = (int)ft_strlen(finfo->gname);
+
+
+	conf_nbytes(st.st_size, finfo->nbytes);
+//	char	*nbytes = ft_itoa((int)st.st_size);
+//	ft_memcpy(finfo->nbytes, nbytes, ft_strlen(nbytes));
+//	free(nbytes);
+//	nbytes = NULL;
+
+	// 4
+	max_spaces(&ms->ms_bytes, ft_strlen(finfo->nbytes));
+//	if (ms->ms_bytes < ft_strlen(finfo->nbytes))
+//		ms->ms_bytes = (int)ft_strlen(finfo->nbytes);
+
+	conf_time(st.st_mtimespec, finfo->amonth, finfo->day_lm, finfo->time_lm);
+//	char	**t = ft_split(ctime((const time_t*)&st.st_mtimespec.tv_sec), ' ');
+//	if (!t)
+//	{
+//		perror("malloc");
+//		exit(1);
+//	}
+//	*ft_strrchr(t[3], ':') = '\0';
+//
+//	ft_memcpy(finfo->amonth, t[1], 3);
+//	ft_memcpy(finfo->day_lm, t[2], 2);
+//	ft_memcpy(finfo->time_lm, t[3], 5);
+
+	// 5
+	max_spaces(&ms->ms_day, ft_strlen(finfo->day_lm));
+//	if (ms->ms_day < ft_strlen(finfo->day_lm))
+//		ms->ms_day = (int)ft_strlen(finfo->day_lm);
+
+	if (finfo->type == DT_LNK)
+	{
+		conf_link(filepath, finfo->link);
+//		char	*link = creadlink(filepath);
+//		if (!link)
+//		{
+//			perror("malloc");
+//			exit(1);
+//		}
+//		ft_memcpy(finfo->link, link, 255);
+	}
+
+//	printf("path [%s], %s %s %s %s %s %s %s %s %s %s\n", finfo->path, finfo->filemode, finfo->nlinks, finfo->oname, finfo->gname, finfo->nbytes, finfo->amonth, finfo->day_lm, finfo->time_lm, finfo->filename, finfo->link);
+
+	free(filepath);
+	filepath = NULL;
 }
 
 void	print_files(t_fileinfo	**files, int flag_a, int flag_l)
@@ -758,12 +838,10 @@ void	print_files(t_fileinfo	**files, int flag_a, int flag_l)
 	ms.ms_bytes = 0;
 	ms.ms_day = 0;
 
-//	res = ft_strdup("");
 	total = 0;
-	size_t	lfiles = len_2array((const void**)files);
 	while(files[i])
 	{
-		if (flag_a == 0 && strncmp(files[i]->name, ".", 1) == 0)
+		if (flag_a == 0 && strncmp(files[i]->filename, ".", 1) == 0)
 		{
 			i++;
 			continue ;
@@ -772,12 +850,12 @@ void	print_files(t_fileinfo	**files, int flag_a, int flag_l)
 			configure_l_option(files[i], &ms, &total);
 		i++;
 	}
-	if (flag_l == 1)
+	if (flag_l == 1 && len_2array((const void**)files) != 0)
 		printf("total %lld\n", total);
 
 	for (int i = 0; i < len_2array((const void**)files); i++)
 	{
-		if (flag_a == 0 && strncmp(files[i]->name, ".", 1) == 0)
+		if (flag_a == 0 && strncmp(files[i]->filename, ".", 1) == 0)
 		{
 			i++;
 			continue ;
@@ -799,6 +877,7 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 		perror("ls");
 		exit(1);
 	}
+
 	files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
 	if (!files)
 	{
@@ -807,7 +886,7 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 	}
 	while ((ep = readdir(dir)))
 	{
-		t_fileinfo *fi = new_fileinfo(ep->d_name, ep->d_type);
+		t_fileinfo *fi = new_fileinfo(path, ep->d_name, ep->d_type);
 		if (fi == NULL)
 		{
 			perror("ls");
@@ -843,6 +922,8 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 
 	print_files(files, flag_a, flag_l);
 
+	printf("\n");
+
 	size_t i;
 	if (flag_r)
 	{
@@ -873,6 +954,7 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 
 int main()
 {
-	rec_dirs(".", 1, 0, 0, 0);
+	char	path[] = "ex";
+	rec_dirs(path, 1, 0, 1, 0);
 	return (0);
 }

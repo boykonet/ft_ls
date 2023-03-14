@@ -129,11 +129,11 @@ int				handle_t_flag(void *p);
 int				dir(t_list **listdirs, const char *dirname, char **emessage);
 int				if_dir_or_file(char *filename);
 int				clstat(t_list **l, char **dfiles, char **emessage);
-char			*creadlink(char *link);
+char			*creadlink(const char *link);
 char			*get_user(uid_t uid);
 char			*get_group(gid_t gid);
 
-//char			*find_env(char **env, char *name);
+//char			*find_env(char **env, char *filename);
 
 void			lexicography_sort(char ***array);
 

@@ -4,7 +4,7 @@ int	handle_recursive_flag(void *p)
 {
 	(void)p;
 //	t_resource *res = (t_resource *)p;
-//	printf("handle_recursive_flag %s\n", res->info->name);
+//	printf("handle_recursive_flag %s\n", res->info->filename);
 	return (0);
 }
 
@@ -13,7 +13,7 @@ int	handle_a_flag(void *p)
 {
 	(void)p;
 //	t_resource *res = (t_resource *)p;
-//	printf("handle_a_flag %s\n", res->info->name);
+//	printf("handle_a_flag %s\n", res->info->filename);
 	return (0);
 }
 
@@ -21,7 +21,7 @@ int	handle_l_flag(void *p)
 {
 	(void)p;
 //	t_resource *res = (t_resource *)p;
-//	printf("handle_l_flag %s\n", res->info->name);
+//	printf("handle_l_flag %s\n", res->info->filename);
 	return (0);
 }
 
@@ -29,7 +29,7 @@ int	handle_r_flag(void *p)
 {
 	(void)p;
 //	t_resource *res = (t_resource *)p;
-//	printf("handle_r_flag %s\n", res->info->name);
+//	printf("handle_r_flag %s\n", res->info->filename);
 	return (0);
 }
 
@@ -37,7 +37,7 @@ int	handle_t_flag(void *p)
 {
 	(void)p;
 //	t_resource *res = (t_resource *)p;
-//	printf("handle_t_flag %s\n", res->info->name);
+//	printf("handle_t_flag %s\n", res->info->filename);
 	return (0);
 }
 

@@ -1,19 +1,14 @@
 #include "../ls.h"
 
-char	*creadlink(char *link)
+char	*creadlink(const char *link)
 {
-	char	*file;
+	char	file[255 + 1];
 
-	file = ft_calloc(100, sizeof(char));
-	if (file == NULL)
-	{
-		perror("malloc");
-		return (NULL);
-	}
+	ft_bzero(file, sizeof(file));
 	if (readlink(link, file, sizeof(file)) < 0)
 	{
-		perror("readlink");
+		perror("readlink"); // TODO: remove
 		return (NULL);
 	}
-	return (file);
+	return (ft_strdup(file));
 }
