@@ -723,6 +723,8 @@ void conf_link(const char *filepath, char *link)
 
 void	max_spaces(size_t *first, size_t second)
 {
+	if (first == NULL)
+		return ;
 	if (*first < second)
 		*first = second;
 }
@@ -753,71 +755,32 @@ void	configure_l_option(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
 	conf_filemode(st.st_mode, finfo->type, finfo->filemode); // TODO: might be empty value
 
 	conf_nlink(st.st_nlink, finfo->nlinks);
-//	char *nlinks = ft_itoa(st.st_nlink);
-//	ft_memcpy(finfo->nlinks, nlinks, ft_strlen(nlinks));
-//	free(nlinks);
-//	nlinks = NULL;
 
 	// 1
 	max_spaces(&ms->ms_link, ft_strlen(finfo->nlinks));
-//	if (ms->ms_link < ft_strlen(finfo->nlinks))
-//		ms->ms_link = (int)ft_strlen(finfo->nlinks);
 
 	ft_memcpy(finfo->oname, get_user(st.st_uid), 255);
 
 	// 2
 	max_spaces(&ms->ms_oname, ft_strlen(finfo->oname));
-//	if (ms->ms_oname < ft_strlen(finfo->oname))
-//		ms->ms_oname = (int)ft_strlen(finfo->oname);
 
 	ft_memcpy(finfo->gname, get_group(st.st_gid), 255);
 
 	// 3
 	max_spaces(&ms->ms_gname, ft_strlen(finfo->gname));
-//	if (ms->ms_gname < ft_strlen(finfo->gname))
-//		ms->ms_gname = (int)ft_strlen(finfo->gname);
-
 
 	conf_nbytes(st.st_size, finfo->nbytes);
-//	char	*nbytes = ft_itoa((int)st.st_size);
-//	ft_memcpy(finfo->nbytes, nbytes, ft_strlen(nbytes));
-//	free(nbytes);
-//	nbytes = NULL;
 
 	// 4
 	max_spaces(&ms->ms_bytes, ft_strlen(finfo->nbytes));
-//	if (ms->ms_bytes < ft_strlen(finfo->nbytes))
-//		ms->ms_bytes = (int)ft_strlen(finfo->nbytes);
 
 	conf_time(st.st_mtimespec, finfo->amonth, finfo->day_lm, finfo->time_lm);
-//	char	**t = ft_split(ctime((const time_t*)&st.st_mtimespec.tv_sec), ' ');
-//	if (!t)
-//	{
-//		perror("malloc");
-//		exit(1);
-//	}
-//	*ft_strrchr(t[3], ':') = '\0';
-//
-//	ft_memcpy(finfo->amonth, t[1], 3);
-//	ft_memcpy(finfo->day_lm, t[2], 2);
-//	ft_memcpy(finfo->time_lm, t[3], 5);
 
 	// 5
 	max_spaces(&ms->ms_day, ft_strlen(finfo->day_lm));
-//	if (ms->ms_day < ft_strlen(finfo->day_lm))
-//		ms->ms_day = (int)ft_strlen(finfo->day_lm);
 
 	if (finfo->type == DT_LNK)
-	{
 		conf_link(filepath, finfo->link);
-//		char	*link = creadlink(filepath);
-//		if (!link)
-//		{
-//			perror("malloc");
-//			exit(1);
-//		}
-//		ft_memcpy(finfo->link, link, 255);
-	}
 
 //	printf("path [%s], %s %s %s %s %s %s %s %s %s %s\n", finfo->path, finfo->filemode, finfo->nlinks, finfo->oname, finfo->gname, finfo->nbytes, finfo->amonth, finfo->day_lm, finfo->time_lm, finfo->filename, finfo->link);
 
@@ -825,7 +788,7 @@ void	configure_l_option(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
 	filepath = NULL;
 }
 
-void	print_files(t_fileinfo	**files, int flag_a, int flag_l)
+void	print_files(t_fileinfo	**files, int flag_l)
 {
 	size_t		i = 0;
 	long long	total;
@@ -841,27 +804,15 @@ void	print_files(t_fileinfo	**files, int flag_a, int flag_l)
 	total = 0;
 	while(files[i])
 	{
-		if (flag_a == 0 && strncmp(files[i]->filename, ".", 1) == 0)
-		{
-			i++;
-			continue ;
-		}
 		if (flag_l == 1)
 			configure_l_option(files[i], &ms, &total);
 		i++;
 	}
-	if (flag_l == 1 && len_2array((const void**)files) != 0)
+	if (flag_l == 1 && len_2array((const void**)files) > 0)
 		printf("total %lld\n", total);
 
 	for (int i = 0; i < len_2array((const void**)files); i++)
-	{
-		if (flag_a == 0 && strncmp(files[i]->filename, ".", 1) == 0)
-		{
-			i++;
-			continue ;
-		}
 		print_fileinfo(files[i], &ms);
-	}
 }
 
 void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
@@ -892,6 +843,8 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 			perror("ls");
 			exit(1);
 		}
+		if (flag_a == 0 && ft_strncmp(ep->d_name, ".", 1) == 0)
+			continue ;
 		size_t flen = len_2array((const void**)files);
 		if (realloc_2array((void***)&files, flen + 1) != 0)
 		{
@@ -920,7 +873,7 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 	alphabetical_sort_files(&files);
 	char	**dirs = copy_dirs(files);
 
-	print_files(files, flag_a, flag_l);
+	print_files(files, flag_l);
 
 	printf("\n");
 
@@ -952,9 +905,19 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 	free_2array((void**)files);
 }
 
+/*
+** -a      Include directory entries whose names begin with a dot (.).
+** -l      (The lowercase letter ``ell''.)  List in long format.  (See below.)  If the output is to a terminal, a total sum for all the file sizes
+**         is output on a line before the long listing.
+** -R      Recursively list subdirectories encountered.
+** -r      Reverse the order of the sort to get reverse lexicographical order or the oldest entries first (or largest dirs last, if combined with
+**         sort by size
+** -t      Sort by time modified (most recently modified first) before sorting the operands by lexicographical order.
+*/
+
 int main()
 {
-	char	path[] = "ex";
+	char	path[] = ".";
 	rec_dirs(path, 1, 0, 1, 0);
 	return (0);
 }
