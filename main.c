@@ -497,6 +497,7 @@ typedef struct s_fileinfo
 	char		day_lm[2 + 1]; // day last modified ---> 31
 	char		time_lm[5 + 1]; // time last modified ---> 12:23
 	char		link[255 + 1]; // only if type == DT_LNK
+	struct timespec		mtime; // time last modified
 } t_fileinfo;
 
 t_fileinfo	*new_fileinfo(char *path, char *filename, int type)
@@ -513,7 +514,32 @@ t_fileinfo	*new_fileinfo(char *path, char *filename, int type)
 	return (f);
 }
 
-void	alphabetical_sort_files(t_fileinfo ***array)
+int		alphasort_more(t_fileinfo *first, t_fileinfo *second)
+{
+	char	*f, *s;
+
+	f = first->filename;
+	s = second->filename;
+	return ft_memcmp(f, s, ft_strlen(f) > ft_strlen(s) ? ft_strlen(f) : ft_strlen(s)) > 0;
+}
+
+int 	alphasort_less(t_fileinfo *first, t_fileinfo *second)
+{
+	char	*f, *s;
+
+	f = first->filename;
+	s = second->filename;
+	return ft_memcmp(f, s, ft_strlen(f) > ft_strlen(s) ? ft_strlen(f) : ft_strlen(s)) < 0;
+}
+
+int		time_last_modified(t_fileinfo *first, t_fileinfo *second)
+{
+	int f = first->mtime.tv_sec;
+	int s = second->mtime.tv_sec;
+	return (s > f);
+}
+
+void	sort_files(t_fileinfo ***array, int (*func)(t_fileinfo*, t_fileinfo*))
 {
 	t_fileinfo	**p;
 	size_t		i, j, len;
@@ -528,7 +554,7 @@ void	alphabetical_sort_files(t_fileinfo ***array)
 		j = i + 1;
 		while (j < len)
 		{
-			if (strcmp(p[i]->filename, p[j]->filename) > 0)
+			if (func(p[i], p[j]))
 				bubble((void**)&p[i], (void**)&p[j]);
 			j++;
 		}
@@ -648,7 +674,7 @@ typedef struct s_filetypes
 
 void	set_filetype(char *filetype, int type)
 {
-	t_filetypes	filetypes[FILETYPES_SIZE] = {
+	t_filetypes	filetypes[FILETYPES_SIZE + 1] = {
 			{.filetype = DT_BLK, .replacement = 'b'},
 			{.filetype = DT_CHR, .replacement = 'c'},
 			{.filetype = DT_DIR, .replacement = 'd'},
@@ -657,6 +683,7 @@ void	set_filetype(char *filetype, int type)
 			{.filetype = DT_FIFO, .replacement = 'p'},
 			{.filetype = DT_REG, .replacement = '-'},
 			{.filetype = DT_UNKNOWN, .replacement = '?'}, // TODO: check the information about unknown file
+			0,
 	};
 
 	for (int i = 0; i < FILETYPES_SIZE; i++)
@@ -693,9 +720,14 @@ void	conf_nbytes(off_t st_size, char *bytes)
 	nbytes = NULL;
 }
 
-void	conf_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *time_lm)
+void	conf_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *time_lm, struct timespec *mt)
 {
-	char	**t = ft_split(ctime((const time_t*)&st_mtimespec.tv_sec), ' ');
+	char	**t;
+
+	(*mt).tv_sec = st_mtimespec.tv_sec;
+	(*mt).tv_nsec = st_mtimespec.tv_nsec;
+
+	t = ft_split(ctime((const time_t*)&st_mtimespec.tv_sec), ' ');
 	if (!t)
 	{
 		perror("malloc");
@@ -774,7 +806,7 @@ void	configure_l_option(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
 	// 4
 	max_spaces(&ms->ms_bytes, ft_strlen(finfo->nbytes));
 
-	conf_time(st.st_mtimespec, finfo->amonth, finfo->day_lm, finfo->time_lm);
+	conf_time(st.st_mtimespec, finfo->amonth, finfo->day_lm, finfo->time_lm, &finfo->mtime);
 
 	// 5
 	max_spaces(&ms->ms_day, ft_strlen(finfo->day_lm));
@@ -815,7 +847,7 @@ void	print_files(t_fileinfo	**files, int flag_l)
 		print_fileinfo(files[i], &ms);
 }
 
-void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
+void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int flag_rr, int flag_t, int counter)
 {
 	DIR				*dir;
 	t_fileinfo 		**files;
@@ -870,7 +902,10 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 	if (counter > 0)
 		printf("%s:\n", path);
 
-	alphabetical_sort_files(&files);
+	if (flag_rr == 1)
+		sort_files(&files, alphasort_less);
+	else
+		sort_files(&files, alphasort_more);
 	char	**dirs = copy_dirs(files);
 
 	print_files(files, flag_l);
@@ -896,7 +931,7 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 				strcat(newdir, path);
 				strcat(newdir, "/");
 				strcat(newdir, dirs[i]);
-				rec_dirs(newdir, flag_r, flag_a, flag_l, counter + 1);
+				rec_dirs(newdir, flag_r, flag_a, flag_l, flag_rr, flag_t, counter + 1);
 			}
 			i++;
 		}
@@ -918,6 +953,6 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int counter)
 int main()
 {
 	char	path[] = ".";
-	rec_dirs(path, 1, 0, 1, 0);
+	rec_dirs(path, 0, 1, 1, 1, 1, 0);
 	return (0);
 }
