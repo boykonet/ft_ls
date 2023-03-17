@@ -514,7 +514,7 @@ t_fileinfo	*new_fileinfo(char *path, char *filename, int type)
 	return (f);
 }
 
-int		alphasort_more(t_fileinfo *first, t_fileinfo *second)
+int		direct_alphasort(t_fileinfo *first, t_fileinfo *second)
 {
 	char	*f, *s;
 
@@ -523,7 +523,7 @@ int		alphasort_more(t_fileinfo *first, t_fileinfo *second)
 	return ft_memcmp(f, s, ft_strlen(f) > ft_strlen(s) ? ft_strlen(f) : ft_strlen(s)) > 0;
 }
 
-int 	alphasort_less(t_fileinfo *first, t_fileinfo *second)
+int 	reverse_alphasort(t_fileinfo *first, t_fileinfo *second)
 {
 	char	*f, *s;
 
@@ -532,11 +532,14 @@ int 	alphasort_less(t_fileinfo *first, t_fileinfo *second)
 	return ft_memcmp(f, s, ft_strlen(f) > ft_strlen(s) ? ft_strlen(f) : ft_strlen(s)) < 0;
 }
 
-int		time_last_modified(t_fileinfo *first, t_fileinfo *second)
+int		direct_tlastmod(t_fileinfo *first, t_fileinfo *second)
 {
-	int f = first->mtime.tv_sec;
-	int s = second->mtime.tv_sec;
-	return (s > f);
+	return (first->mtime.tv_sec < second->mtime.tv_sec);
+}
+
+int		reverse_tlastmod(t_fileinfo *first, t_fileinfo *second)
+{
+	return (first->mtime.tv_sec > second->mtime.tv_sec);
 }
 
 void	sort_files(t_fileinfo ***array, int (*func)(t_fileinfo*, t_fileinfo*))
@@ -720,12 +723,9 @@ void	conf_nbytes(off_t st_size, char *bytes)
 	nbytes = NULL;
 }
 
-void	conf_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *time_lm, struct timespec *mt)
+void	conf_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *time_lm)
 {
 	char	**t;
-
-	(*mt).tv_sec = st_mtimespec.tv_sec;
-	(*mt).tv_nsec = st_mtimespec.tv_nsec;
 
 	t = ft_split(ctime((const time_t*)&st_mtimespec.tv_sec), ' ');
 	if (!t)
@@ -806,7 +806,10 @@ void	configure_l_option(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
 	// 4
 	max_spaces(&ms->ms_bytes, ft_strlen(finfo->nbytes));
 
-	conf_time(st.st_mtimespec, finfo->amonth, finfo->day_lm, finfo->time_lm, &finfo->mtime);
+	conf_time(st.st_mtimespec, finfo->amonth, finfo->day_lm, finfo->time_lm);
+
+	finfo->mtime.tv_sec = st.st_mtimespec.tv_sec;
+	finfo->mtime.tv_nsec = st.st_mtimespec.tv_nsec;
 
 	// 5
 	max_spaces(&ms->ms_day, ft_strlen(finfo->day_lm));
@@ -820,26 +823,8 @@ void	configure_l_option(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
 	filepath = NULL;
 }
 
-void	print_files(t_fileinfo	**files, int flag_l)
+void	print_files(t_fileinfo	**files, long long total, t_maxsymbols ms, int flag_l)
 {
-	size_t		i = 0;
-	long long	total;
-
-	t_maxsymbols ms;
-
-	ms.ms_link = 0;
-	ms.ms_oname = 0;
-	ms.ms_gname = 0;
-	ms.ms_bytes = 0;
-	ms.ms_day = 0;
-
-	total = 0;
-	while(files[i])
-	{
-		if (flag_l == 1)
-			configure_l_option(files[i], &ms, &total);
-		i++;
-	}
 	if (flag_l == 1 && len_2array((const void**)files) > 0)
 		printf("total %lld\n", total);
 
@@ -902,13 +887,36 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int flag_rr, int f
 	if (counter > 0)
 		printf("%s:\n", path);
 
+	long long	total;
+
+	t_maxsymbols ms;
+
+	ms.ms_link = 0;
+	ms.ms_oname = 0;
+	ms.ms_gname = 0;
+	ms.ms_bytes = 0;
+	ms.ms_day = 0;
+
+	total = 0;
+	if (flag_l == 1)
+	{
+		for (int i = 0; files[i]; i++)
+			configure_l_option(files[i], &ms, &total);
+	}
+
 	if (flag_rr == 1)
-		sort_files(&files, alphasort_less);
+		sort_files(&files, reverse_alphasort);
 	else
-		sort_files(&files, alphasort_more);
+		sort_files(&files, direct_alphasort);
+	if (flag_t == 1 && flag_rr == 0)
+		sort_files(&files, direct_tlastmod);
+	else if (flag_t == 1 && flag_rr == 1)
+		sort_files(&files, reverse_tlastmod);
 	char	**dirs = copy_dirs(files);
 
-	print_files(files, flag_l);
+	printf("time last modified [%ld]\n", files[0]->mtime.tv_sec);
+
+	print_files(files, total, ms, flag_l);
 
 	printf("\n");
 
@@ -953,6 +961,6 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int flag_rr, int f
 int main()
 {
 	char	path[] = ".";
-	rec_dirs(path, 0, 1, 1, 1, 1, 0);
+	rec_dirs(path, 0, 0, 1, 1, 0, 0);
 	return (0);
 }
