@@ -17,6 +17,9 @@
 # define PATTERN_FLAG_NOT_SUPPORT	"{{flag}}"
 # define PATTERN_STRERROR_MESSAGE	"{{message}}"
 
+# define PATTERN_WITHOUT_LINK	"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{time}} {{filename}}\n"
+# define PATTERN_WITH_LINK		"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{time}} {{filename}} -> {{link}}\n"
+
 # include <unistd.h>
 /*
 ** write
@@ -98,24 +101,21 @@ typedef struct s_pattern
 	char	*replacement;
 } t_pattern;
 
-//typedef struct	s_err
-//{
-//	t_list	*patterns;
-//	char	message[200];
-//	int		exitcode;
-//
-//} t_err;
-
 typedef struct	s_ls
 {
-	char	flags[MAX_FLAGS + 1];
-//	char	**filenames;
-	char	**files;
-	char	**dirs;
-	t_list	*epatterns;
+	unsigned char	flags;
+	char			**files;
+	char			**dirs;
+	t_list			*epatterns;
 } t_ls;
 
-int		parse_flags(char ***data, char *flags[MAX_FLAGS + 1], t_list **patterns);
+typedef struct s_flags {
+	char	flag;
+	int		shift;
+	int		shnum;
+} t_flags;
+
+int		parse_flags(char ***data, unsigned char *flags, t_list **patterns);
 int				parse_filenames(char **data, char ***filenames);
 void 			init_ls(t_ls *ls);
 void			clear_ls(t_ls *ls);
@@ -156,7 +156,7 @@ void		del_pattern(void *node);
 
 t_list	*find_last_elem(t_list **head);
 int	add_pattern(t_list **head, char *pattern, char *replacement);
-void		replace_pattern(char *dest, const char *src, t_pattern patterns[16]);
+void		replace_pattern(char *dest, const char *src, t_pattern patterns[16], size_t pcount);
 
 //void	print_error_message(t_err *err);
 void	handle_error(int errcode, t_list *epatterns);

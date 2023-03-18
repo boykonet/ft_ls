@@ -52,16 +52,15 @@ int	add_pattern(t_list **head, char *pattern, char *replacement)
 //	return (add_pattern(&err->patterns, "{{flag}}", ch));
 //}
 
-void		replace_pattern(char *dest, const char *src, t_pattern patterns[16])
+void		replace_pattern(char *dest, const char *src, t_pattern patterns[16], size_t pcount)
 {
-//	t_list	*poh; // pointer of head
 	char	*pbegin, *pend;
 	int		bsize, asize;
+	size_t	i;
 
+	i = 0;
 	ft_memcpy(dest, src, ft_strlen(src));
-//	poh = patterns;
-	int i = 0;
-	while (i < 16)
+	while (i < pcount)
 	{
 		char	*pattern, *replacement;
 
@@ -102,10 +101,10 @@ void	handle_error(int errcode, t_list *params)
 		case 0:
 			return ;
 		case -1:
-			replace_pattern(emessage, MALLOC_ERROR, NULL);
+			replace_pattern(emessage, MALLOC_ERROR, NULL, 0);
 			break ;
 		case -2:
-			replace_pattern(emessage, NULL_PARAMETER, NULL);
+			replace_pattern(emessage, NULL_PARAMETER, NULL, 0);
 			break ;
 		case -3:
 			replace_pattern(emessage, FLAG_NOT_SUPPORT, params);
@@ -115,7 +114,7 @@ void	handle_error(int errcode, t_list *params)
 			break ;
 		// place for any another cases
 		default:
-			replace_pattern(emessage, UNEXPECTED_ERROR, NULL);
+			replace_pattern(emessage, UNEXPECTED_ERROR, NULL, 0);
 	}
 	write(CSTDERR, ERR_HEADER, ft_strlen(ERR_HEADER));
 	write(CSTDERR, emessage, ft_strlen(emessage));

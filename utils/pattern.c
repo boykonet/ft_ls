@@ -22,14 +22,6 @@ t_pattern	*new_pattern(char *pattern, char *replacement)
 	return (p);
 }
 
-//void	init_pattern(t_pattern *pattern)
-//{
-//	if (!pattern)
-//		return ;
-//	pattern->pattern = NULL;
-//	pattern->replacement = NULL;
-//}
-
 void	clear_pattern(t_pattern *p)
 {
 	if (!p)

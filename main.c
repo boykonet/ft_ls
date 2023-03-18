@@ -10,70 +10,7 @@
 //** -t      Sort by time modified (most recently modified first) before sorting the operands by lexicographical order.
 //*/
 //
-//
-//void	initialization(t_ls *ls)
-//{
-//	init_ls(ls);
-//}
-//
-//int		separate_filenames(char **filenames, char ***files, char ***dirs)
-//{
-//	int		errcode;
-//	size_t	len, i;
-//
-//	if (!files || !dirs || !filenames)
-//		return (-2);
-//	len = len_2array((const void**)filenames);
-////	printf("LEN [%zu]\n", len);
-//	i = 0;
-//	while (i < len)
-//	{
-////		printf("*p [%s]\n", filenames[i]);
-//		errcode = if_dir_or_file(filenames[i]);
-////		printf("AFTER DIR [%zu], errcode [%d]\n", i, errcode);
-//		if (errcode == 0) // directory
-//		{
-////			printf("errcode before errcode == 0 [%d]\n", errcode);
-////			for (int j = 0; j < len_2array((const void **) *dirs); j++)
-////				printf("dirs[%d] = %s\n", j, *dirs[j]);
-//			errcode = add_value_2array(dirs, filenames[i]);
-////			printf("errcode after errcode == 0 [%d]\n", errcode);
-//			if (errcode != 0)
-//				return (errcode);
-//		}
-//		else if (errcode == 1) // files
-//		{
-//			errcode = add_value_2array(files, filenames[i]);
-//			if (errcode != 0)
-//				return (errcode);
-//		}
-//		else if (errcode == -1 || errcode == -2) // some unexpected error
-//			return (errcode);
-////		printf("counter [%zu]\n", i);
-//		i++;
-//	}
-////	printf("end\n");
-//	return (0);
-//}
-//
-//void	parsing(t_ls *ls, char **data)
-//{
-//	char	**filenames;
-//	int		errcode;
-//
-//	data += 1;
-//	errcode = parse_flags(&data, (char**)&ls->flags, &ls->epatterns);
-////	printf("first\n");
-//	handle_error(errcode, ls->epatterns);
-//	errcode = parse_filenames(data, &filenames);
-////	printf("second\n");
-//	handle_error(errcode, ls->epatterns);
-//	errcode = separate_filenames(filenames, &ls->files, &ls->dirs);
-////	printf("third\n");
-//	free_2array((void**)filenames);
-//	handle_error(errcode, ls->epatterns);
-//}
-//
+
 //void	execution(t_ls *ls)
 //{
 //	execute_files(ls->files, ls->flags, &ls->epatterns);
@@ -81,12 +18,6 @@
 //}
 //
 //
-///*
-//** reserved codes:
-//** -1 - malloc error
-//**  0 - OK
-//**  32...126 - flag not supported
-//*/
 //int main(int argc, char **argv)
 //{
 //	t_ls	ls;
@@ -611,9 +542,6 @@ typedef struct s_maxsymbols {
 	size_t	ms_day;
 } t_maxsymbols;
 
-#define PATTERN_WITHOUT_LINK	"{{filemode}} {{spaces1}}{{nlinks}} {{spaces2}}{{oname}}  {{spaces3}}{{gname}}  {{spaces4}}{{nbytes}} {{amonth}} {{spaces5}}{{day}} {{time}} {{filename}}\n"
-#define PATTERN_WITH_LINK		"{{filemode}} {{spaces1}}{{nlinks}} {{spaces2}}{{oname}}  {{spaces3}}{{gname}}  {{spaces4}}{{nbytes}} {{amonth}} {{spaces5}}{{day}} {{time}} {{filename}} -> {{link}}\n"
-
 void	print_fileinfo(t_fileinfo *finfo, t_maxsymbols *ms)
 {
 	char	spaces[5][255] = {0};
@@ -631,16 +559,16 @@ void	print_fileinfo(t_fileinfo *finfo, t_maxsymbols *ms)
 
 	t_pattern	patterns[16] = {
 			{.pattern = "{{filemode}}", .replacement = finfo->filemode},
-			{.pattern = "{{spaces1}}", .replacement = spaces[0]},
+			{.pattern = "{{s1}}", .replacement = spaces[0]},
 			{.pattern = "{{nlinks}}", .replacement = finfo->nlinks},
-			{.pattern = "{{spaces2}}", .replacement = spaces[1]},
+			{.pattern = "{{s2}}", .replacement = spaces[1]},
 			{.pattern = "{{oname}}", .replacement = finfo->oname},
-			{.pattern = "{{spaces3}}", .replacement = spaces[2]},
+			{.pattern = "{{s3}}", .replacement = spaces[2]},
 			{.pattern = "{{gname}}", .replacement = finfo->gname},
-			{.pattern = "{{spaces4}}", .replacement = spaces[3]},
+			{.pattern = "{{s4}}", .replacement = spaces[3]},
 			{.pattern = "{{nbytes}}", .replacement = finfo->nbytes},
 			{.pattern = "{{amonth}}", .replacement = finfo->amonth},
-			{.pattern = "{{spaces5}}", .replacement = spaces[4]},
+			{.pattern = "{{s5}}", .replacement = spaces[4]},
 			{.pattern = "{{day}}", .replacement = finfo->day_lm},
 			{.pattern = "{{time}}", .replacement = finfo->time_lm},
 			{.pattern = "{{filename}}", .replacement = finfo->filename},
@@ -649,9 +577,9 @@ void	print_fileinfo(t_fileinfo *finfo, t_maxsymbols *ms)
 	};
 
 	if (finfo->type == DT_LNK)
-		replace_pattern(pattern, PATTERN_WITH_LINK, patterns);
+		replace_pattern(pattern, PATTERN_WITH_LINK, patterns, 15);
 	else
-		replace_pattern(pattern, PATTERN_WITHOUT_LINK, patterns);
+		replace_pattern(pattern, PATTERN_WITHOUT_LINK, patterns, 15);
 
 	write(1, pattern, ft_strlen(pattern));
 }
@@ -765,16 +693,18 @@ void	configure_l_option(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
 {
 	struct stat		st;
 	char			*filepath;
+	size_t			flen;
 
-	filepath = ft_calloc(ft_strlen(finfo->path) + 1 + ft_strlen(finfo->filename) + 1, sizeof(char));
+	flen = ft_strlen(finfo->path) + 1 + ft_strlen(finfo->filename) + 1;
+	filepath = ft_calloc(flen, sizeof(char));
 	if (!filepath)
 	{
 		perror("malloc");
 		exit(1);
 	}
-	strcat(filepath, finfo->path);
-	strcat(filepath, "/");
-	strcat(filepath, finfo->filename);
+	ft_strlcat(filepath, finfo->path, flen);
+	ft_strlcat(filepath, "/", flen);
+	ft_strlcat(filepath, finfo->filename, flen);
 
 	if (lstat(filepath, &st) == -1)
 	{
@@ -788,36 +718,27 @@ void	configure_l_option(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
 
 	conf_nlink(st.st_nlink, finfo->nlinks);
 
-	// 1
-	max_spaces(&ms->ms_link, ft_strlen(finfo->nlinks));
-
 	ft_memcpy(finfo->oname, get_user(st.st_uid), 255);
-
-	// 2
-	max_spaces(&ms->ms_oname, ft_strlen(finfo->oname));
 
 	ft_memcpy(finfo->gname, get_group(st.st_gid), 255);
 
-	// 3
-	max_spaces(&ms->ms_gname, ft_strlen(finfo->gname));
-
 	conf_nbytes(st.st_size, finfo->nbytes);
-
-	// 4
-	max_spaces(&ms->ms_bytes, ft_strlen(finfo->nbytes));
 
 	conf_time(st.st_mtimespec, finfo->amonth, finfo->day_lm, finfo->time_lm);
 
 	finfo->mtime.tv_sec = st.st_mtimespec.tv_sec;
 	finfo->mtime.tv_nsec = st.st_mtimespec.tv_nsec;
 
-	// 5
-	max_spaces(&ms->ms_day, ft_strlen(finfo->day_lm));
-
 	if (finfo->type == DT_LNK)
 		conf_link(filepath, finfo->link);
 
 //	printf("path [%s], %s %s %s %s %s %s %s %s %s %s\n", finfo->path, finfo->filemode, finfo->nlinks, finfo->oname, finfo->gname, finfo->nbytes, finfo->amonth, finfo->day_lm, finfo->time_lm, finfo->filename, finfo->link);
+
+	max_spaces(&ms->ms_link, ft_strlen(finfo->nlinks));
+	max_spaces(&ms->ms_oname, ft_strlen(finfo->oname));
+	max_spaces(&ms->ms_gname, ft_strlen(finfo->gname));
+	max_spaces(&ms->ms_bytes, ft_strlen(finfo->nbytes));
+	max_spaces(&ms->ms_day, ft_strlen(finfo->day_lm));
 
 	free(filepath);
 	filepath = NULL;
@@ -832,29 +753,38 @@ void	print_files(t_fileinfo	**files, long long total, t_maxsymbols ms, int flag_
 		print_fileinfo(files[i], &ms);
 }
 
-void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int flag_rr, int flag_t, int counter)
+void	imaxsymbs(t_maxsymbols *ms)
+{
+	ms->ms_link = 0;
+	ms->ms_oname = 0;
+	ms->ms_gname = 0;
+	ms->ms_bytes = 0;
+	ms->ms_day = 0;
+}
+
+#define NO_SUCH_FILE_OR_DIR		"ls: {{dirname}}"
+
+void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
 {
 	DIR				*dir;
-	t_fileinfo 		**files;
 	struct dirent	*ep;
-	char			newdir[512];
 
-	dir = opendir(path);
+	dir = opendir(dirpath);
 	if(!dir)
 	{
 		perror("ls");
 		exit(1);
 	}
 
-	files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
-	if (!files)
+	*files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
+	if (!*files)
 	{
 		perror("ls");
 		exit(1);
 	}
 	while ((ep = readdir(dir)))
 	{
-		t_fileinfo *fi = new_fileinfo(path, ep->d_name, ep->d_type);
+		t_fileinfo *fi = new_fileinfo(dirpath, ep->d_name, ep->d_type);
 		if (fi == NULL)
 		{
 			perror("ls");
@@ -862,20 +792,25 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int flag_rr, int f
 		}
 		if (flag_a == 0 && ft_strncmp(ep->d_name, ".", 1) == 0)
 			continue ;
-		size_t flen = len_2array((const void**)files);
-		if (realloc_2array((void***)&files, flen + 1) != 0)
+		size_t flen = len_2array((const void**)(*files));
+		if (realloc_2array((void***)files, flen + 1) != 0)
 		{
 			perror("ls");
 			exit(1);
 		}
-		flen = len_2array((const void**)files);
-		files[flen] = fi;
+		flen = len_2array((const void**)(*files));
+		(*files)[flen] = fi;
 	}
 	if (ep == NULL && errno)
 	{
-		// TODO: handle error
-		// ls: ../ex/dir4: No such file or directory
-		perror("ls");
+		char	e[4 + 255 + 1];
+		t_pattern p[16] = {
+			{.pattern = "{{dirname}}", .replacement = dirpath},
+			NULL,
+		};
+		replace_pattern(e,NO_SUCH_FILE_OR_DIR,
+				p, 1);
+		perror(e);
 		exit(1);
 	}
 	if (closedir(dir) == -1)
@@ -883,19 +818,21 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int flag_rr, int f
 		perror("ls");
 		exit(1);
 	}
+}
+
+void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int flag_rr, int flag_t, int counter)
+{
+	t_fileinfo 		**files;
+	char			newdir[512 + 1];
+	long long		total;
+
+	openreaddir(&files, path, flag_a);
 
 	if (counter > 0)
 		printf("%s:\n", path);
 
-	long long	total;
-
 	t_maxsymbols ms;
-
-	ms.ms_link = 0;
-	ms.ms_oname = 0;
-	ms.ms_gname = 0;
-	ms.ms_bytes = 0;
-	ms.ms_day = 0;
+	imaxsymbs(&ms);
 
 	total = 0;
 	if (flag_l == 1)
@@ -914,11 +851,9 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int flag_rr, int f
 		sort_files(&files, reverse_tlastmod);
 	char	**dirs = copy_dirs(files);
 
-	printf("time last modified [%ld]\n", files[0]->mtime.tv_sec);
-
 	print_files(files, total, ms, flag_l);
 
-	printf("\n");
+//	printf("\n");
 
 	size_t i;
 	if (flag_r)
@@ -926,6 +861,8 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int flag_rr, int f
 		i = 0;
 		while (dirs[i])
 		{
+			if (counter >= 0 && dirs[i] != NULL)
+				printf("\n");
 			if (flag_a == 0 && ft_strncmp(dirs[i], ".", 1) == 0)
 			{
 				i++;
@@ -935,10 +872,10 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int flag_rr, int f
 			if (ft_strncmp(dirs[i], ".", ldname > 1 ? ldname : 1) != 0 \
 			&& ft_strncmp(dirs[i], "..", ldname > 2 ? ldname : 2) != 0)
 			{
-				ft_bzero(newdir, sizeof(char) * 512);
-				strcat(newdir, path);
-				strcat(newdir, "/");
-				strcat(newdir, dirs[i]);
+				ft_bzero(newdir, sizeof(char) * (512 + 1));
+				ft_strlcat(newdir, path, 512);
+				ft_strlcat(newdir, "/", 512);
+				ft_strlcat(newdir, dirs[i], 512);
 				rec_dirs(newdir, flag_r, flag_a, flag_l, flag_rr, flag_t, counter + 1);
 			}
 			i++;
@@ -948,19 +885,65 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l, int flag_rr, int f
 	free_2array((void**)files);
 }
 
-/*
-** -a      Include directory entries whose names begin with a dot (.).
-** -l      (The lowercase letter ``ell''.)  List in long format.  (See below.)  If the output is to a terminal, a total sum for all the file sizes
-**         is output on a line before the long listing.
-** -R      Recursively list subdirectories encountered.
-** -r      Reverse the order of the sort to get reverse lexicographical order or the oldest entries first (or largest dirs last, if combined with
-**         sort by size
-** -t      Sort by time modified (most recently modified first) before sorting the operands by lexicographical order.
-*/
-
-int main()
+void	initialization(t_ls *ls)
 {
-	char	path[] = ".";
-	rec_dirs(path, 0, 0, 1, 1, 0, 0);
+	init_ls(ls);
+}
+
+int		separate_filenames(char **filenames, char ***files, char ***dirs)
+{
+	int		errcode;
+	size_t	len, i;
+
+	if (!files || !dirs || !filenames)
+		return (-2);
+	len = len_2array((const void**)filenames);
+	i = 0;
+	while (i < len)
+	{
+		errcode = if_dir_or_file(filenames[i]);
+		if (errcode == 0) // directory
+		{
+			errcode = add_value_2array(dirs, filenames[i]);
+			if (errcode != 0)
+				return (errcode);
+		}
+		else if (errcode == 1) // files
+		{
+			errcode = add_value_2array(files, filenames[i]);
+			if (errcode != 0)
+				return (errcode);
+		}
+		else if (errcode == -1 || errcode == -2) // some unexpected error
+			return (errcode);
+		i++;
+	}
+	return (0);
+}
+
+void	parsing(t_ls *ls, char **data)
+{
+	char	**filenames;
+	int		errcode;
+
+	errcode = parse_flags(&data, (unsigned char*)&ls->flags, &ls->epatterns);
+	handle_error(errcode, ls->epatterns);
+	errcode = parse_filenames(data, &filenames);
+	handle_error(errcode, ls->epatterns);
+	errcode = separate_filenames(filenames, &ls->files, &ls->dirs);
+	free_2array((void**)filenames);
+	handle_error(errcode, ls->epatterns);
+}
+
+int main(int argc, char **argv)
+{
+	t_ls	ls;
+
+	(void)argc;
+	initialization(&ls);
+	parsing(&ls, argv + 1);
+
+	for (size_t i = 0; i < len_2array((const void**)ls.dirs); i++)
+		rec_dirs(ls.dirs[i], 1, 0, 1, 0, 0, 0);
 	return (0);
 }
