@@ -107,10 +107,10 @@ void	handle_error(int errcode, t_list *params)
 			replace_pattern(emessage, NULL_PARAMETER, NULL, 0);
 			break ;
 		case -3:
-			replace_pattern(emessage, FLAG_NOT_SUPPORT, params);
+			replace_pattern(emessage, FLAG_NOT_SUPPORT, params, 1);
 			break ;
 		case -4:
-			replace_pattern(emessage, STRERROR_MESSAGE, params);
+			replace_pattern(emessage, STRERROR_MESSAGE, params, 1);
 			break ;
 		// place for any another cases
 		default:

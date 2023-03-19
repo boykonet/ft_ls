@@ -20,6 +20,22 @@
 # define PATTERN_WITHOUT_LINK	"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{time}} {{filename}}\n"
 # define PATTERN_WITH_LINK		"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{time}} {{filename}} -> {{link}}\n"
 
+
+# define REC_FLAG_SHIFT	7
+# define REC_FLAG_NUM	128
+
+# define A_FLAG_SHIFT	6
+# define A_FLAG_NUM		64
+
+# define L_FLAG_SHIFT	5
+# define L_FLAG_NUM		32
+
+# define R_FLAG_SHIFT	4
+# define R_FLAG_NUM		16
+
+# define T_FLAG_SHIFT	3
+# define T_FLAG_NUM		8
+
 # include <unistd.h>
 /*
 ** write
@@ -115,6 +131,31 @@ typedef struct s_flags {
 	int		shnum;
 } t_flags;
 
+typedef struct s_maxsymbols {
+	size_t	ms_link;
+	size_t	ms_oname;
+	size_t	ms_gname;
+	size_t	ms_bytes;
+	size_t	ms_day;
+} t_maxsymbols;
+
+typedef struct s_fileinfo
+{
+	char		path[3841 + 1];
+	char		filename[255 + 1];
+	int			type;
+	char		filemode[11 + 1];
+	char		nlinks[5 + 1]; // because nlinks_t type is cast for unsigned short, maximum value is 65535
+	char		oname[255 + 1]; // owner filename
+	char		gname[255 + 1]; // group filename
+	char 		nbytes[11 + 1]; // number of bytes
+	char		amonth[3 + 1]; // abbreviated month ---> Jan
+	char		day_lm[2 + 1]; // day last modified ---> 31
+	char		time_lm[5 + 1]; // time last modified ---> 12:23
+	char		link[255 + 1]; // only if type == DT_LNK
+	struct timespec		mtime; // time last modified
+} t_fileinfo;
+
 int		parse_flags(char ***data, unsigned char *flags, t_list **patterns);
 int				parse_filenames(char **data, char ***filenames);
 void 			init_ls(t_ls *ls);
@@ -142,6 +183,7 @@ void			lexicography_sort(char ***array);
 int				len_2array(const void **darr);
 void			free_2array(void **arr);
 int				realloc_2array(void ***data, size_t size);
+int 			add_2array(void ***data, void *value);
 void			cleaner(t_ls *ls, int exitcode);
 void			**calloca_to_2d(size_t size);
 char			**copy(const char **srcs, size_t len);
@@ -163,5 +205,7 @@ void	handle_error(int errcode, t_list *epatterns);
 
 int	execute_files(char **files, char flags[MAX_FLAGS + 1], t_list **epatterns);
 int	execute_dirs(char **dirs, char flags[MAX_FLAGS + 1], t_list **epatterns);
+
+int		is_flag(unsigned char flags, int shift, int num);
 
 #endif

@@ -50,19 +50,26 @@ static char	**copy_filenames(char **data)
 */
 void	set_flag(unsigned char *flags, int shift, int num)
 {
-	if ((*flags & (1 << shift)) != num)
-		*flags |= (1 << shift);
+	if (((*flags) & (1 << shift)) != num)
+		(*flags) |= (1 << shift);
+}
+
+int		is_flag(unsigned char flags, int shift, int num)
+{
+	if ((flags & (1 << shift)) == num)
+		return (1);
+	return (0);
 }
 
 int		add_flag(unsigned char *flags, char nf)
 {
 	size_t	i;
 	t_flags f[MAX_FLAGS + 1] = {
-			{.flag = 'R', .shift = 7, .shnum = 128},
-			{.flag = 'a', .shift = 6, .shnum = 64},
-			{.flag = 'l', .shift = 5, .shnum = 32},
-			{.flag = 'r', .shift = 4, .shnum = 16},
-			{.flag = 't', .shift = 3, .shnum = 8},
+			{.flag = 'R', .shift = REC_FLAG_SHIFT, .shnum = REC_FLAG_NUM},
+			{.flag = 'a', .shift = A_FLAG_SHIFT, .shnum = A_FLAG_NUM},
+			{.flag = 'l', .shift = L_FLAG_SHIFT, .shnum = L_FLAG_NUM},
+			{.flag = 'r', .shift = R_FLAG_SHIFT, .shnum = R_FLAG_NUM},
+			{.flag = 't', .shift = T_FLAG_SHIFT, .shnum = T_FLAG_NUM},
 			0,
 	};
 
@@ -86,9 +93,9 @@ int		parse_flags(char ***data, unsigned char *flags, t_list **patterns)
 
 	if (data == NULL || flags == NULL || patterns == NULL)
 		return (-2);
-	if (len_2array((const void**)*data) == 0)
+	if (len_2array((const void**)(*data)) == 0)
 		return (0);
-	while (*data)
+	while (*data != NULL && **data != NULL)
 	{
 		param = **data;
 		if (*param == '-')
