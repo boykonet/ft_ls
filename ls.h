@@ -123,6 +123,7 @@ typedef struct	s_ls
 	char			**files;
 	char			**dirs;
 	t_list			*epatterns;
+	int 			possible_files;
 } t_ls;
 
 typedef struct s_flags {
@@ -203,9 +204,13 @@ void		replace_pattern(char *dest, const char *src, t_pattern patterns[16], size_
 //void	print_error_message(t_err *err);
 void	handle_error(int errcode, t_list *epatterns);
 
-int	execute_files(char **files, char flags[MAX_FLAGS + 1], t_list **epatterns);
-int	execute_dirs(char **dirs, char flags[MAX_FLAGS + 1], t_list **epatterns);
+int	execute_files(char **files, unsigned char flags, t_list **epatterns);
+int	execute_dirs(char **dirs,unsigned char flags, t_list **epatterns, int possible_files);
 
 int		is_flag(unsigned char flags, int shift, int num);
+
+void rec_dirs(char *path, unsigned char flags, int counter, int possible_files);
+
+void	get_fileinfo(t_fileinfo *finfo, t_maxsymbols *ms, long long *total);
 
 #endif

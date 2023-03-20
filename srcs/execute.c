@@ -143,13 +143,17 @@ t_list *recursive(const char *folder)
 //	return (0);
 //}
 
-int	execute_files(char **files, char flags[MAX_FLAGS + 1], t_list **epatterns)
+int	execute_files(char **files, unsigned char flags, t_list **epatterns)
 {
+	for (size_t i = 0; i < len_2array((const void**)files); i++)
+		;
 	return (0);
 }
 
-int	execute_dirs(char **dirs, char flags[MAX_FLAGS + 1], t_list **epatterns)
+int	execute_dirs(char **dirs, unsigned char flags, t_list **epatterns, int possible_files)
 {
+	for (size_t i = 0; i < len_2array((const void**)dirs); i++)
+		rec_dirs(dirs[i], flags, 0, possible_files);
 	return (0);
 }
 

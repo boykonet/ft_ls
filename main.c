@@ -10,12 +10,6 @@
 //** -t      Sort by time modified (most recently modified first) before sorting the operands by lexicographical order.
 //*/
 //
-
-//void	execution(t_ls *ls)
-//{
-//	execute_files(ls->files, ls->flags, &ls->epatterns);
-//	execute_dirs(ls->dirs, ls->flags, &ls->epatterns);
-//}
 //
 //
 //int main(int argc, char **argv)
@@ -636,22 +630,28 @@ void	max_spaces(size_t *first, size_t second)
 		*first = second;
 }
 
-void	configure_l_option(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
+void	get_fileinfo(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
 {
 	struct stat		st;
 	char			*filepath;
 	size_t			flen;
 
-	flen = ft_strlen(finfo->path) + 1 + ft_strlen(finfo->filename) + 1;
-	filepath = ft_calloc(flen, sizeof(char));
-	if (!filepath)
+	filepath = NULL;
+	if (finfo->type == DT_DIR)
 	{
-		perror("malloc");
-		exit(1);
+		flen = ft_strlen(finfo->path) + 1 + ft_strlen(finfo->filename) + 1;
+		filepath = ft_calloc(flen, sizeof(char));
+		if (!filepath)
+		{
+			perror("malloc");
+			exit(1);
+		}
+		ft_strlcat(filepath, finfo->path, flen);
+		ft_strlcat(filepath, "/", flen);
+		ft_strlcat(filepath, finfo->filename, flen);
 	}
-	ft_strlcat(filepath, finfo->path, flen);
-	ft_strlcat(filepath, "/", flen);
-	ft_strlcat(filepath, finfo->filename, flen);
+	else
+		filepath = ft_strdup(finfo->filename);
 
 	if (lstat(filepath, &st) == -1)
 	{
@@ -659,33 +659,32 @@ void	configure_l_option(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
 		exit(1);
 	}
 
-	*total += st.st_blocks;
+	if (total)
+		*total += st.st_blocks;
 
 	conf_filemode(st.st_mode, finfo->type, finfo->filemode); // TODO: might be empty value
-
 	conf_nlink(st.st_nlink, finfo->nlinks);
 
 	ft_memcpy(finfo->oname, get_user(st.st_uid), 255);
-
 	ft_memcpy(finfo->gname, get_group(st.st_gid), 255);
 
 	conf_nbytes(st.st_size, finfo->nbytes);
 
 	conf_time(st.st_mtimespec, finfo->amonth, finfo->day_lm, finfo->time_lm);
-
 	finfo->mtime.tv_sec = st.st_mtimespec.tv_sec;
 	finfo->mtime.tv_nsec = st.st_mtimespec.tv_nsec;
 
 	if (finfo->type == DT_LNK)
 		conf_link(filepath, finfo->link);
 
-//	printf("path [%s], %s %s %s %s %s %s %s %s %s %s\n", finfo->path, finfo->filemode, finfo->nlinks, finfo->oname, finfo->gname, finfo->nbytes, finfo->amonth, finfo->day_lm, finfo->time_lm, finfo->filename, finfo->link);
-
-	max_spaces(&ms->ms_link, ft_strlen(finfo->nlinks));
-	max_spaces(&ms->ms_oname, ft_strlen(finfo->oname));
-	max_spaces(&ms->ms_gname, ft_strlen(finfo->gname));
-	max_spaces(&ms->ms_bytes, ft_strlen(finfo->nbytes));
-	max_spaces(&ms->ms_day, ft_strlen(finfo->day_lm));
+	if (ms)
+	{
+		max_spaces(&ms->ms_link, ft_strlen(finfo->nlinks));
+		max_spaces(&ms->ms_oname, ft_strlen(finfo->oname));
+		max_spaces(&ms->ms_gname, ft_strlen(finfo->gname));
+		max_spaces(&ms->ms_bytes, ft_strlen(finfo->nbytes));
+		max_spaces(&ms->ms_day, ft_strlen(finfo->day_lm));
+	}
 
 	free(filepath);
 	filepath = NULL;
@@ -709,7 +708,7 @@ void	imaxsymbs(t_maxsymbols *ms)
 	ms->ms_day = 0;
 }
 
-#define NO_SUCH_FILE_OR_DIR		"ls: {{dirname}}"
+//#define NO_SUCH_FILE_OR_DIR		"ls: {{dirname}}"
 
 void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
 {
@@ -731,14 +730,14 @@ void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
 	}
 	while ((ep = readdir(dir)))
 	{
+		if (flag_a == 0 && ft_strncmp(ep->d_name, ".", 1) == 0)
+			continue ;
 		t_fileinfo *fi = new_fileinfo(dirpath, ep->d_name, ep->d_type);
 		if (fi == NULL)
 		{
 			perror("ls");
 			exit(1);
 		}
-		if (flag_a == 0 && ft_strncmp(ep->d_name, ".", 1) == 0)
-			continue ;
 		size_t flen = len_2array((const void**)(*files));
 		if (realloc_2array((void***)files, flen + 1) != 0)
 		{
@@ -748,16 +747,12 @@ void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
 		flen = len_2array((const void**)(*files));
 		(*files)[flen] = fi;
 	}
-	if (ep == NULL && errno)
+	if (ep == NULL && errno != 0)
 	{
-		char	e[4 + 255 + 1];
-		t_pattern p[16] = {
-			{.pattern = "{{dirname}}", .replacement = dirpath},
-			NULL,
-		};
-		replace_pattern(e,NO_SUCH_FILE_OR_DIR,
-				p, 1);
-		perror(e);
+		char *s = ft_strjoin("ls: ", dirpath);
+		perror(s);
+		free(s);
+		s = NULL;
 		exit(1);
 	}
 	if (closedir(dir) == -1)
@@ -767,7 +762,7 @@ void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
 	}
 }
 
-void rec_dirs(char *path, unsigned char flags, int counter)
+void rec_dirs(char *path, unsigned char flags, int counter, int possible_files)
 {
 	t_fileinfo 		**files;
 	char			newdir[512 + 1];
@@ -775,7 +770,7 @@ void rec_dirs(char *path, unsigned char flags, int counter)
 
 	openreaddir(&files, path, is_flag(flags, A_FLAG_SHIFT, A_FLAG_NUM));
 
-	if (counter > 0)
+	if (counter > 0 || possible_files > 1)
 		printf("%s:\n", path);
 
 	t_maxsymbols ms;
@@ -783,7 +778,7 @@ void rec_dirs(char *path, unsigned char flags, int counter)
 
 	total = 0;
 	for (int i = 0; files[i]; i++)
-		configure_l_option(files[i], &ms, &total);
+		get_fileinfo(files[i], &ms, &total);
 
 	if (is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 0)
 	{
@@ -835,7 +830,7 @@ void rec_dirs(char *path, unsigned char flags, int counter)
 				ft_strlcat(newdir, path, 512);
 				ft_strlcat(newdir, "/", 512);
 				ft_strlcat(newdir, dirs[i], 512);
-				rec_dirs(newdir, flags, counter + 1);
+				rec_dirs(newdir, flags, counter + 1, possible_files);
 			}
 			i++;
 		}
@@ -843,6 +838,87 @@ void rec_dirs(char *path, unsigned char flags, int counter)
 	free_2array((void**)dirs);
 	free_2array((void**)files);
 }
+
+
+
+
+void efiles(char **files, unsigned char flags)
+{
+	t_fileinfo 		**f;
+
+	for (size_t i = 0; i < len_2array((const void**)files); i++)
+	{
+		f[i] = new_fileinfo("", files[i], 0);
+		if (f[i] == NULL)
+		{
+			perror("ls");
+			exit(1);
+		}
+	}
+
+//	switch (st.st_mode & S_IFMT) {
+//		case S_IFREG:
+//			puts("|| regular file");
+//			break;
+//		case S_IFDIR:
+//			puts("|| directory");
+//			break;
+//		case S_IFCHR:
+//			puts("|| character device");
+//			break;
+//		case S_IFBLK:
+//			puts("|| block device");
+//			break;
+//		case S_IFLNK:
+//			puts("|| symbolic link");
+//			break;
+//		case S_IFIFO:
+//			puts("|| pipe");
+//			break;
+//		case S_IFSOCK:
+//			puts("|| socket");
+//			break;
+//		default:
+//			puts("|| unknown");
+//	}
+
+	for (int i = 0; f[i]; i++)
+		get_fileinfo(f[i], NULL, NULL);
+
+	if (is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 0)
+	{
+		sort_files(&f, order_cmp_by_filename, FLAG_INVERTED_NO);
+	}
+	else if (is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 1)
+	{
+		sort_files(&f, order_cmp_by_filename, FLAG_INVERTED_YES);
+	}
+
+	if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 1 \
+		&& is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 0)
+	{
+		sort_files(&f, order_cmp_by_tlastmod, FLAG_INVERTED_NO);
+	}
+	else if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 1 \
+		&& is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 1)
+	{
+		sort_files(&f, order_cmp_by_tlastmod, FLAG_INVERTED_YES);
+	}
+	char	**dirs = copy_dirs(f);
+
+//	if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM) == 1)
+//		print_files(files, total, ms, 1);
+//	else
+//		print_files(files, total, ms, 0);
+
+//	printf("\n");
+
+	size_t i;
+	free_2array((void**)f);
+}
+
+
+
 
 void	initialization(t_ls *ls)
 {
@@ -864,12 +940,12 @@ int	add_2array(void ***data, void *value)
 	return (0);
 }
 
-int		separate_filenames(char **filenames, char ***files, char ***dirs)
+int		separate_filenames(char **filenames, char ***files, char ***dirs, int *count_possible_files_and_dirs)
 {
 	int		errcode;
 	size_t	len, i;
 
-	if (files == NULL || dirs == NULL || filenames == NULL)
+	if (files == NULL || dirs == NULL || filenames == NULL || count_possible_files_and_dirs == NULL)
 		return (-2);
 	len = len_2array((const void**)filenames);
 	i = 0;
@@ -889,7 +965,14 @@ int		separate_filenames(char **filenames, char ***files, char ***dirs)
 				return (errcode);
 		}
 		else if (errcode < 0) // some unexpected error
-			return (errcode);
+		{
+			char *s = ft_strjoin("ls: ", filenames[i]);
+			perror(s);
+			free(s);
+			s = NULL;
+			errno = 0;
+		}
+		*count_possible_files_and_dirs += 1;
 		i++;
 	}
 	return (0);
@@ -904,9 +987,15 @@ void	parsing(t_ls *ls, char **data)
 	handle_error(errcode, ls->epatterns);
 	errcode = parse_filenames(data, &filenames);
 	handle_error(errcode, ls->epatterns);
-	errcode = separate_filenames(filenames, &ls->files, &ls->dirs);
+	errcode = separate_filenames(filenames, &ls->files, &ls->dirs, &ls->possible_files);
 	free_2array((void**)filenames);
 	handle_error(errcode, ls->epatterns);
+}
+
+void	execution(t_ls *ls)
+{
+	execute_files(ls->files, ls->flags, &ls->epatterns);
+	execute_dirs(ls->dirs, ls->flags, &ls->epatterns, ls->possible_files);
 }
 
 int main(int argc, char **argv)
@@ -915,14 +1004,12 @@ int main(int argc, char **argv)
 
 	(void)argc;
 	initialization(&ls);
-	printf("init\n");
 	parsing(&ls, argv + 1);
-	printf("parse\n");
+	execution(&ls);
 
-	for (size_t i = 0; i < len_2array((const void**)ls.files); i++)
-		;
-
-	for (size_t i = 0; i < len_2array((const void**)ls.dirs); i++)
-		rec_dirs(ls.dirs[i], ls.flags, 0);
 	return (0);
 }
+
+// ./ft_ls empty_folder -a
+// expected - ls: -a: No such file or directory
+// have - ls: malloc error

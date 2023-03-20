@@ -6,6 +6,7 @@ void	init_ls(t_ls *ls)
 	ls->files = NULL;
 	ls->dirs = NULL;
 	ls->epatterns = NULL;
+	ls->possible_files = 0;
 }
 
 void	clear_ls(t_ls *ls)
@@ -26,5 +27,6 @@ void	clear_ls(t_ls *ls)
 		ft_lstclear(&ls->epatterns, del_pattern);
 		ls->epatterns = NULL;
 	}
+	ls->possible_files = 0;
 }
 
