@@ -456,7 +456,7 @@ char	**copy_dirs(t_fileinfo **files)
 	i = 0;
 	while (files[i])
 	{
-		if (files[i]->type == 4)
+		if (files[i]->type == S_IFDIR)
 			count++;
 		i++;
 	}
@@ -468,7 +468,7 @@ char	**copy_dirs(t_fileinfo **files)
 	j = 0;
 	while (files[i])
 	{
-		if (files[i]->type == 4)
+		if (files[i]->type == S_IFDIR)
 		{
 			dirs[j] = ft_strdup(files[i]->filename);
 			if (!dirs[j])
@@ -517,7 +517,7 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces *s)
 			NULL,
 	};
 
-	if (finfo->type == DT_LNK)
+	if (finfo->type == S_IFLNK)
 		replace_pattern(pattern, PATTERN_WITH_LINK, patterns, 15);
 	else
 		replace_pattern(pattern, PATTERN_WITHOUT_LINK, patterns, 15);
@@ -546,15 +546,41 @@ typedef struct s_filetypes
 
 void	set_filetype(char *filetype, int type)
 {
+
+	//	switch (st.st_mode & S_IFMT) {
+//		case S_IFREG:
+//			puts("|| regular file");
+//			break;
+//		case S_IFDIR:
+//			puts("|| directory");
+//			break;
+//		case S_IFCHR:
+//			puts("|| character device");
+//			break;
+//		case S_IFBLK:
+//			puts("|| block device");
+//			break;
+//		case S_IFLNK:
+//			puts("|| symbolic link");
+//			break;
+//		case S_IFIFO:
+//			puts("|| pipe");
+//			break;
+//		case S_IFSOCK:
+//			puts("|| socket");
+//			break;
+//		default:
+//			puts("|| unknown");
+//	}
 	t_filetypes	filetypes[FILETYPES_SIZE + 1] = {
-			{.filetype = DT_BLK, .replacement = 'b'},
-			{.filetype = DT_CHR, .replacement = 'c'},
-			{.filetype = DT_DIR, .replacement = 'd'},
-			{.filetype = DT_LNK, .replacement = 'l'},
-			{.filetype = DT_SOCK, .replacement = 's'},
-			{.filetype = DT_FIFO, .replacement = 'p'},
-			{.filetype = DT_REG, .replacement = '-'},
-			{.filetype = DT_UNKNOWN, .replacement = '?'}, // TODO: check the information about unknown file
+			{.filetype = S_IFBLK, .replacement = 'b'},
+			{.filetype = S_IFCHR, .replacement = 'c'},
+			{.filetype = S_IFDIR, .replacement = 'd'},
+			{.filetype = S_IFLNK, .replacement = 'l'},
+			{.filetype = S_IFSOCK, .replacement = 's'},
+			{.filetype = S_IFIFO, .replacement = 'p'},
+			{.filetype = S_IFREG, .replacement = '-'},
+			{.filetype = S_IFWHT, .replacement = '?'}, // TODO: check the information about unknown file
 			0,
 	};
 
@@ -637,30 +663,29 @@ void	get_fileinfo(t_fileinfo *finfo, long long *total)
 	size_t			flen;
 
 	filepath = NULL;
-	if (finfo->type == DT_DIR)
+	flen = ft_strlen(finfo->path) + 1 + ft_strlen(finfo->filename) + 1;
+	filepath = ft_calloc(flen, sizeof(char));
+	if (!filepath)
 	{
-		flen = ft_strlen(finfo->path) + 1 + ft_strlen(finfo->filename) + 1;
-		filepath = ft_calloc(flen, sizeof(char));
-		if (!filepath)
-		{
-			perror("malloc");
-			exit(1);
-		}
-		ft_strlcat(filepath, finfo->path, flen);
-		ft_strlcat(filepath, "/", flen);
-		ft_strlcat(filepath, finfo->filename, flen);
+		perror("malloc");
+		exit(1);
 	}
-	else
-		filepath = ft_strdup(finfo->filename);
+	ft_strlcat(filepath, finfo->path, flen);
+	ft_strlcat(filepath, "/", flen);
+	ft_strlcat(filepath, finfo->filename, flen);
 
 	if (lstat(filepath, &st) == -1)
 	{
+		printf("here filepath [%s]\n", filepath);
 		perror("ls");
 		exit(1);
 	}
 
 	if (total)
 		*total += st.st_blocks;
+
+	// filetype
+	finfo->type = st.st_mode & S_IFMT;
 
 	conf_filemode(st.st_mode, finfo->type, finfo->filemode); // TODO: might be empty value
 	conf_nlink(st.st_nlink, finfo->nlinks);
@@ -674,17 +699,8 @@ void	get_fileinfo(t_fileinfo *finfo, long long *total)
 	finfo->mtime.tv_sec = st.st_mtimespec.tv_sec;
 	finfo->mtime.tv_nsec = st.st_mtimespec.tv_nsec;
 
-	if (finfo->type == DT_LNK)
+	if (finfo->type == S_IFLNK)
 		conf_link(filepath, finfo->link);
-
-//	if (ms)
-//	{
-//		max_spaces(&ms->ms_link, ft_strlen(finfo->nlinks));
-//		max_spaces(&ms->ms_oname, ft_strlen(finfo->oname));
-//		max_spaces(&ms->ms_gname, ft_strlen(finfo->gname));
-//		max_spaces(&ms->ms_bytes, ft_strlen(finfo->nbytes));
-//		max_spaces(&ms->ms_day, ft_strlen(finfo->day_lm));
-//	}
 
 	free(filepath);
 	filepath = NULL;
@@ -704,13 +720,27 @@ void	counter_of_spaces(t_fileinfo **info, t_spaces *spaces)
 	}
 }
 
-void	print_files(t_fileinfo	**files, long long total, t_spaces spaces, int flag_l)
+void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces spaces, int flag_l)
 {
+	size_t	i;
+
+	i = 0;
 	if (flag_l == 1 && len_2array((const void**)files) > 0)
 		printf("total %lld\n", total);
 
-	for (int i = 0; i < len_2array((const void**)files); i++)
-		print_fileinfo(files[i], &spaces);
+	while (files[i])
+	{
+		print_fileinfo(files[i++], &spaces);
+	}
+}
+
+void	print_files_from_files(t_fileinfo **files, t_spaces spaces, int flag_l)
+{
+	size_t	i;
+
+	i = 0;
+	while (files[i])
+		print_fileinfo(files[i++], &spaces);
 }
 
 void	ispaces(t_spaces *spaces)
@@ -722,8 +752,6 @@ void	ispaces(t_spaces *spaces)
 	spaces->s_day = 0;
 }
 
-//#define NO_SUCH_FILE_OR_DIR		"ls: {{dirname}}"
-
 void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
 {
 	DIR				*dir;
@@ -732,14 +760,20 @@ void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
 	dir = opendir(dirpath);
 	if(!dir)
 	{
-		perror("ls");
+		char *s = ft_strjoin("ls: ", dirpath);
+		perror(s);
+		free(s);
+		s = NULL;
 		exit(1);
 	}
 
 	*files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
 	if (!*files)
 	{
-		perror("ls");
+		char *s = ft_strjoin("ls: ", dirpath);
+		perror(s);
+		free(s);
+		s = NULL;
 		exit(1);
 	}
 	while ((ep = readdir(dir)))
@@ -749,13 +783,13 @@ void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
 		t_fileinfo *fi = new_fileinfo(dirpath, ep->d_name, ep->d_type);
 		if (fi == NULL)
 		{
-			perror("ls");
+			perror("malloc");
 			exit(1);
 		}
 		size_t flen = len_2array((const void**)(*files));
 		if (realloc_2array((void***)files, flen + 1) != 0)
 		{
-			perror("ls");
+			perror("malloc");
 			exit(1);
 		}
 		flen = len_2array((const void**)(*files));
@@ -771,30 +805,16 @@ void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
 	}
 	if (closedir(dir) == -1)
 	{
-		perror("ls");
+		char *s = ft_strjoin("ls: ", dirpath);
+		perror(s);
+		free(s);
+		s = NULL;
 		exit(1);
 	}
 }
 
-void rec_dirs(char *path, unsigned char flags, int counter, int possible_files)
+void	sort_by_flags(t_fileinfo **files, unsigned char flags)
 {
-	t_fileinfo 		**files;
-	char			newdir[512 + 1];
-	long long		total;
-
-	openreaddir(&files, path, is_flag(flags, A_FLAG_SHIFT, A_FLAG_NUM));
-
-	if (counter > 0 || possible_files > 1)
-		printf("%s:\n", path);
-
-	total = 0;
-	for (int i = 0; files[i]; i++)
-		get_fileinfo(files[i], &total);
-
-	t_spaces spaces;
-	ispaces(&spaces);
-	counter_of_spaces(files, &spaces);
-
 	if (is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 0)
 	{
 		sort_files(&files, order_cmp_by_filename, FLAG_INVERTED_NO);
@@ -814,12 +834,33 @@ void rec_dirs(char *path, unsigned char flags, int counter, int possible_files)
 	{
 		sort_files(&files, order_cmp_by_tlastmod, FLAG_INVERTED_YES);
 	}
-	char	**dirs = copy_dirs(files);
+}
 
-	if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM) == 1)
-		print_files(files, total, spaces, 1);
-	else
-		print_files(files, total, spaces, 0);
+void rec_dirs(char *path, unsigned char flags, int counter, int possible_files)
+{
+	t_fileinfo 		**files;
+	char			newdir[512 + 1];
+	long long		total;
+	t_spaces		spaces;
+
+	openreaddir(&files, path, is_flag(flags, A_FLAG_SHIFT, A_FLAG_NUM));
+
+	if (counter > 0 || possible_files > 1)
+		printf("%s:\n", path);
+
+	total = 0;
+	for (int i = 0; files[i]; i++)
+		get_fileinfo(files[i], &total);
+
+	// count of spaces
+	ispaces(&spaces);
+	counter_of_spaces(files, &spaces);
+
+	sort_by_flags(files, flags);
+
+	print_files_from_dirs(files, total, spaces, is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM));
+
+	char	**dirs = copy_dirs(files);
 
 //	printf("\n");
 
@@ -855,82 +896,49 @@ void rec_dirs(char *path, unsigned char flags, int counter, int possible_files)
 }
 
 
-
-
 void efiles(char **files, unsigned char flags)
 {
 	t_fileinfo 		**f;
+	size_t			i;
 
-	for (size_t i = 0; files[i]; i++)
+	i = 0;
+	f = ft_calloc(1, sizeof(t_fileinfo*));
+	if (f == NULL)
 	{
-		f[i] = new_fileinfo("", files[i], 0);
-		if (f[i] == NULL)
+		perror("malloc");
+		exit(1);
+	}
+	while (files[i])
+	{
+		t_fileinfo *ff = new_fileinfo(".", files[i], 0);
+		if (ff == NULL)
 		{
 			perror("ls");
 			exit(1);
 		}
-		get_fileinfo(f[i], NULL);
+		size_t	filen = len_2array((const void**)f);
+		if (add_2array((void***)&f, ff) != 0)
+		{
+			perror("malloc");
+			exit(1);
+		}
+		i++;
 	}
 
-//	switch (st.st_mode & S_IFMT) {
-//		case S_IFREG:
-//			puts("|| regular file");
-//			break;
-//		case S_IFDIR:
-//			puts("|| directory");
-//			break;
-//		case S_IFCHR:
-//			puts("|| character device");
-//			break;
-//		case S_IFBLK:
-//			puts("|| block device");
-//			break;
-//		case S_IFLNK:
-//			puts("|| symbolic link");
-//			break;
-//		case S_IFIFO:
-//			puts("|| pipe");
-//			break;
-//		case S_IFSOCK:
-//			puts("|| socket");
-//			break;
-//		default:
-//			puts("|| unknown");
-//	}
+	i = 0;
+	while (f[i])
+		get_fileinfo(f[i++], 0);
 
 	t_spaces spaces;
 	ispaces(&spaces);
 	counter_of_spaces(f, &spaces);
 
-	if (is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 0)
-	{
-		sort_files(&f, order_cmp_by_filename, FLAG_INVERTED_NO);
-	}
-	else if (is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 1)
-	{
-		sort_files(&f, order_cmp_by_filename, FLAG_INVERTED_YES);
-	}
+	sort_by_flags(f, flags);
 
-	if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 1 \
-		&& is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 0)
-	{
-		sort_files(&f, order_cmp_by_tlastmod, FLAG_INVERTED_NO);
-	}
-	else if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 1 \
-		&& is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 1)
-	{
-		sort_files(&f, order_cmp_by_tlastmod, FLAG_INVERTED_YES);
-	}
-	char	**dirs = copy_dirs(f);
-
-	if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM) == 1)
-		print_files(f, 0, spaces, 1);
-	else
-		print_files(f, 0, spaces, 0);
+	print_files_from_files(f, spaces, is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM));
 
 	printf("\n");
 
-	size_t i;
 	free_2array((void**)f);
 }
 
@@ -966,6 +974,19 @@ int		separate_filenames(char **filenames, char ***files, char ***dirs, int *coun
 		return (-2);
 	len = len_2array((const void**)filenames);
 	i = 0;
+
+	(*files) = ft_calloc(1, sizeof(char*));
+	if (*files == NULL)
+	{
+		perror("malloc");
+		exit(1);
+	}
+	*dirs = ft_calloc(1, sizeof(char*));
+	if (*dirs == NULL)
+	{
+		perror("malloc");
+		exit(1);
+	}
 	while (i < len)
 	{
 		errcode = if_dir_or_file(filenames[i]);
@@ -1013,8 +1034,10 @@ void	parsing(t_ls *ls, char **data)
 
 void	execution(t_ls *ls)
 {
-	execute_files(ls->files, ls->flags, &ls->epatterns);
-	execute_dirs(ls->dirs, ls->flags, &ls->epatterns, ls->possible_files);
+	if (len_2array((const void**)ls->files) > 0)
+		execute_files(ls->files, ls->flags, &ls->epatterns);
+	if (len_2array((const void**)ls->dirs) > 0)
+		execute_dirs(ls->dirs, ls->flags, &ls->epatterns, ls->possible_files);
 }
 
 int main(int argc, char **argv)
@@ -1028,7 +1051,3 @@ int main(int argc, char **argv)
 
 	return (0);
 }
-
-// ./ft_ls empty_folder -a
-// expected - ls: -a: No such file or directory
-// have - ls: malloc error

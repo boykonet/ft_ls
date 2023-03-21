@@ -145,37 +145,24 @@ t_list *recursive(const char *folder)
 
 int	execute_files(char **files, unsigned char flags, t_list **epatterns)
 {
-	for (size_t i = 0; i < len_2array((const void**)files); i++)
-		;
+	if (files == NULL)
+		return (-2);
+	efiles(files, flags);
 	return (0);
 }
 
 int	execute_dirs(char **dirs, unsigned char flags, t_list **epatterns, int possible_files)
 {
-	for (size_t i = 0; i < len_2array((const void**)dirs); i++)
+	size_t	i;
+
+	i = 0;
+	if (dirs == NULL)
+		return (-2);
+	while (dirs[i])
+	{
 		rec_dirs(dirs[i], flags, 0, possible_files);
-	return (0);
-}
-
-int	execute(t_ls *ls)
-{
-	size_t	i, dlen, flen;
-
-	flen = len_2array((const void **) ls->files);
-	dlen = len_2array((const void **) ls->dirs);
-	i = 0;
-	while (i < flen)
-	{
-//		err = e(ls->flags, ls->dirs[i]);
-//		if (!err)
-//		{
-//			;
-//		}
-		i++;
-	}
-	i = 0;
-	while (i < dlen)
-	{
+		if (dirs[i + 1] != NULL)
+			write(1, "\n", 1);
 		i++;
 	}
 	return (0);

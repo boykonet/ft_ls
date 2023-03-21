@@ -175,11 +175,7 @@ char			*creadlink(const char *link);
 char			*get_user(uid_t uid);
 char			*get_group(gid_t gid);
 
-//char			*find_env(char **env, char *filename);
-
 void			lexicography_sort(char ***array);
-
-//void	del_file_struct(void *file);
 
 int				len_2array(const void **darr);
 void			free_2array(void **arr);
@@ -189,10 +185,6 @@ void			cleaner(t_ls *ls, int exitcode);
 void			**calloca_to_2d(size_t size);
 char			**copy(const char **srcs, size_t len);
 
-//void	init_err(t_err *err);
-//void	clear_err(t_err *err);
-//int		flag_not_support_error(t_err *err, char flag);
-
 t_pattern	*new_pattern(char *pattern, char *replacement);
 void		clear_pattern(t_pattern *pattern);
 void		del_pattern(void *node);
@@ -201,7 +193,6 @@ t_list	*find_last_elem(t_list **head);
 int	add_pattern(t_list **head, char *pattern, char *replacement);
 void		replace_pattern(char *dest, const char *src, t_pattern patterns[16], size_t pcount);
 
-//void	print_error_message(t_err *err);
 void	handle_error(int errcode, t_list *epatterns);
 
 int	execute_files(char **files, unsigned char flags, t_list **epatterns);
@@ -212,5 +203,10 @@ int		is_flag(unsigned char flags, int shift, int num);
 void rec_dirs(char *path, unsigned char flags, int counter, int possible_files);
 
 void	get_fileinfo(t_fileinfo *finfo, long long *total);
+
+void efiles(char **files, unsigned char flags);
+
+void	print_files_from_files(t_fileinfo **files, t_spaces spaces, int flag_l);
+void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces spaces, int flag_l);
 
 #endif
