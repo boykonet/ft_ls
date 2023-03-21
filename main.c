@@ -483,18 +483,18 @@ char	**copy_dirs(t_fileinfo **files)
 	return (dirs);
 }
 
-void	print_fileinfo(t_fileinfo *finfo, t_maxsymbols *ms)
+void	print_fileinfo(t_fileinfo *finfo, t_spaces *s)
 {
 	char	spaces[5][255] = {0};
 
 	for (int i = 0; i < 5; i++)
 		ft_memset(spaces[i], ' ', 254);
 
-	spaces[0][ms->ms_link - ft_strlen(finfo->nlinks)] = '\0';
-	spaces[1][ms->ms_oname - ft_strlen(finfo->oname)] = '\0';
-	spaces[2][ms->ms_gname - ft_strlen(finfo->gname)] = '\0';
-	spaces[3][ms->ms_bytes - ft_strlen(finfo->nbytes)] = '\0';
-	spaces[4][ms->ms_day - ft_strlen(finfo->day_lm)] = '\0';
+	spaces[0][s->s_link - ft_strlen(finfo->nlinks)] = '\0';
+	spaces[1][s->s_oname - ft_strlen(finfo->oname)] = '\0';
+	spaces[2][s->s_gname - ft_strlen(finfo->gname)] = '\0';
+	spaces[3][s->s_bytes - ft_strlen(finfo->nbytes)] = '\0';
+	spaces[4][s->s_day - ft_strlen(finfo->day_lm)] = '\0';
 
 	char	pattern[1024] = {0};
 
@@ -630,7 +630,7 @@ void	max_spaces(size_t *first, size_t second)
 		*first = second;
 }
 
-void	get_fileinfo(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
+void	get_fileinfo(t_fileinfo *finfo, long long *total)
 {
 	struct stat		st;
 	char			*filepath;
@@ -677,35 +677,49 @@ void	get_fileinfo(t_fileinfo *finfo, t_maxsymbols *ms, long long *total)
 	if (finfo->type == DT_LNK)
 		conf_link(filepath, finfo->link);
 
-	if (ms)
-	{
-		max_spaces(&ms->ms_link, ft_strlen(finfo->nlinks));
-		max_spaces(&ms->ms_oname, ft_strlen(finfo->oname));
-		max_spaces(&ms->ms_gname, ft_strlen(finfo->gname));
-		max_spaces(&ms->ms_bytes, ft_strlen(finfo->nbytes));
-		max_spaces(&ms->ms_day, ft_strlen(finfo->day_lm));
-	}
+//	if (ms)
+//	{
+//		max_spaces(&ms->ms_link, ft_strlen(finfo->nlinks));
+//		max_spaces(&ms->ms_oname, ft_strlen(finfo->oname));
+//		max_spaces(&ms->ms_gname, ft_strlen(finfo->gname));
+//		max_spaces(&ms->ms_bytes, ft_strlen(finfo->nbytes));
+//		max_spaces(&ms->ms_day, ft_strlen(finfo->day_lm));
+//	}
 
 	free(filepath);
 	filepath = NULL;
 }
 
-void	print_files(t_fileinfo	**files, long long total, t_maxsymbols ms, int flag_l)
+void	counter_of_spaces(t_fileinfo **info, t_spaces *spaces)
+{
+	if (info == NULL || spaces == NULL)
+		return ;
+	for (size_t i = 0; info[i]; i++)
+	{
+		max_spaces(&spaces->s_link, ft_strlen(info[i]->nlinks));
+		max_spaces(&spaces->s_oname, ft_strlen(info[i]->oname));
+		max_spaces(&spaces->s_gname, ft_strlen(info[i]->gname));
+		max_spaces(&spaces->s_bytes, ft_strlen(info[i]->nbytes));
+		max_spaces(&spaces->s_day, ft_strlen(info[i]->day_lm));
+	}
+}
+
+void	print_files(t_fileinfo	**files, long long total, t_spaces spaces, int flag_l)
 {
 	if (flag_l == 1 && len_2array((const void**)files) > 0)
 		printf("total %lld\n", total);
 
 	for (int i = 0; i < len_2array((const void**)files); i++)
-		print_fileinfo(files[i], &ms);
+		print_fileinfo(files[i], &spaces);
 }
 
-void	imaxsymbs(t_maxsymbols *ms)
+void	ispaces(t_spaces *spaces)
 {
-	ms->ms_link = 0;
-	ms->ms_oname = 0;
-	ms->ms_gname = 0;
-	ms->ms_bytes = 0;
-	ms->ms_day = 0;
+	spaces->s_link = 0;
+	spaces->s_oname = 0;
+	spaces->s_gname = 0;
+	spaces->s_bytes = 0;
+	spaces->s_day = 0;
 }
 
 //#define NO_SUCH_FILE_OR_DIR		"ls: {{dirname}}"
@@ -773,12 +787,13 @@ void rec_dirs(char *path, unsigned char flags, int counter, int possible_files)
 	if (counter > 0 || possible_files > 1)
 		printf("%s:\n", path);
 
-	t_maxsymbols ms;
-	imaxsymbs(&ms);
-
 	total = 0;
 	for (int i = 0; files[i]; i++)
-		get_fileinfo(files[i], &ms, &total);
+		get_fileinfo(files[i], &total);
+
+	t_spaces spaces;
+	ispaces(&spaces);
+	counter_of_spaces(files, &spaces);
 
 	if (is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 0)
 	{
@@ -802,9 +817,9 @@ void rec_dirs(char *path, unsigned char flags, int counter, int possible_files)
 	char	**dirs = copy_dirs(files);
 
 	if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM) == 1)
-		print_files(files, total, ms, 1);
+		print_files(files, total, spaces, 1);
 	else
-		print_files(files, total, ms, 0);
+		print_files(files, total, spaces, 0);
 
 //	printf("\n");
 
@@ -846,7 +861,7 @@ void efiles(char **files, unsigned char flags)
 {
 	t_fileinfo 		**f;
 
-	for (size_t i = 0; i < len_2array((const void**)files); i++)
+	for (size_t i = 0; files[i]; i++)
 	{
 		f[i] = new_fileinfo("", files[i], 0);
 		if (f[i] == NULL)
@@ -854,6 +869,7 @@ void efiles(char **files, unsigned char flags)
 			perror("ls");
 			exit(1);
 		}
+		get_fileinfo(f[i], NULL);
 	}
 
 //	switch (st.st_mode & S_IFMT) {
@@ -882,8 +898,9 @@ void efiles(char **files, unsigned char flags)
 //			puts("|| unknown");
 //	}
 
-	for (int i = 0; f[i]; i++)
-		get_fileinfo(f[i], NULL, NULL);
+	t_spaces spaces;
+	ispaces(&spaces);
+	counter_of_spaces(f, &spaces);
 
 	if (is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 0)
 	{
@@ -906,12 +923,12 @@ void efiles(char **files, unsigned char flags)
 	}
 	char	**dirs = copy_dirs(f);
 
-//	if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM) == 1)
-//		print_files(files, total, ms, 1);
-//	else
-//		print_files(files, total, ms, 0);
+	if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM) == 1)
+		print_files(f, 0, spaces, 1);
+	else
+		print_files(f, 0, spaces, 0);
 
-//	printf("\n");
+	printf("\n");
 
 	size_t i;
 	free_2array((void**)f);
@@ -985,8 +1002,10 @@ void	parsing(t_ls *ls, char **data)
 
 	errcode = parse_flags(&data, &ls->flags, &ls->epatterns);
 	handle_error(errcode, ls->epatterns);
+
 	errcode = parse_filenames(data, &filenames);
 	handle_error(errcode, ls->epatterns);
+
 	errcode = separate_filenames(filenames, &ls->files, &ls->dirs, &ls->possible_files);
 	free_2array((void**)filenames);
 	handle_error(errcode, ls->epatterns);

@@ -132,13 +132,13 @@ typedef struct s_flags {
 	int		shnum;
 } t_flags;
 
-typedef struct s_maxsymbols {
-	size_t	ms_link;
-	size_t	ms_oname;
-	size_t	ms_gname;
-	size_t	ms_bytes;
-	size_t	ms_day;
-} t_maxsymbols;
+typedef struct s_spaces {
+	size_t	s_link;
+	size_t	s_oname;
+	size_t	s_gname;
+	size_t	s_bytes;
+	size_t	s_day;
+} t_spaces;
 
 typedef struct s_fileinfo
 {
@@ -211,6 +211,6 @@ int		is_flag(unsigned char flags, int shift, int num);
 
 void rec_dirs(char *path, unsigned char flags, int counter, int possible_files);
 
-void	get_fileinfo(t_fileinfo *finfo, t_maxsymbols *ms, long long *total);
+void	get_fileinfo(t_fileinfo *finfo, long long *total);
 
 #endif
