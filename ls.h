@@ -36,6 +36,13 @@
 # define T_FLAG_SHIFT	3
 # define T_FLAG_NUM		8
 
+
+# define FLAG_INVERTED_NO	0
+# define FLAG_INVERTED_YES	1
+
+# define IF_DIRS_NO			0
+# define IF_DIRS_YES		1
+
 # include <unistd.h>
 /*
 ** write
@@ -157,16 +164,10 @@ typedef struct s_fileinfo
 	struct timespec		mtime; // time last modified
 } t_fileinfo;
 
-int		parse_flags(char ***data, unsigned char *flags, t_list **patterns);
-int				parse_filenames(char **data, char ***filenames);
+void			parsing(t_ls *ls, char **data);
+
 void 			init_ls(t_ls *ls);
 void			clear_ls(t_ls *ls);
-int				execute(t_ls *ls);
-int				handle_recursive_flag(void *p);
-int				handle_a_flag(void *p);
-int				handle_l_flag(void *p);
-int				handle_r_flag(void *p);
-int				handle_t_flag(void *p);
 
 int				dir(t_list **listdirs, const char *dirname, char **emessage);
 int				if_dir_or_file(char *filename);
@@ -175,8 +176,6 @@ char			*creadlink(const char *link);
 char			*get_user(uid_t uid);
 char			*get_group(gid_t gid);
 
-void			lexicography_sort(char ***array);
-
 int				len_2array(const void **darr);
 void			free_2array(void **arr);
 int				realloc_2array(void ***data, size_t size);
@@ -184,29 +183,33 @@ int 			add_2array(void ***data, void *value);
 void			cleaner(t_ls *ls, int exitcode);
 void			**calloca_to_2d(size_t size);
 char			**copy(const char **srcs, size_t len);
+char			**copy_dirs(t_fileinfo **files);
 
-t_pattern	*new_pattern(char *pattern, char *replacement);
-void		clear_pattern(t_pattern *pattern);
-void		del_pattern(void *node);
+t_pattern		*new_pattern(char *pattern, char *replacement);
+void			clear_pattern(t_pattern *pattern);
+void			del_pattern(void *node);
+int				add_pattern(t_list **head, char *pattern, char *replacement);
+void			replace_pattern(char *dest, const char *src, t_pattern patterns[16], size_t pcount);
 
-t_list	*find_last_elem(t_list **head);
-int	add_pattern(t_list **head, char *pattern, char *replacement);
-void		replace_pattern(char *dest, const char *src, t_pattern patterns[16], size_t pcount);
+t_list			*find_last_elem(t_list **head);
 
-void	handle_error(int errcode, t_list *epatterns);
+void			handle_error(int errcode, t_list *epatterns);
 
-int	execute_files(char **files, unsigned char flags, t_list **epatterns);
-int	execute_dirs(char **dirs,unsigned char flags, t_list **epatterns, int possible_files);
+void			execution(t_ls *ls);
 
-int		is_flag(unsigned char flags, int shift, int num);
+int				is_flag(unsigned char flags, int shift, int num);
 
-void rec_dirs(char *path, unsigned char flags, int counter, int possible_files);
+void 			rec_dirs(char *path, unsigned char flags, int counter, int possible_files);
 
-void	get_fileinfo(t_fileinfo *finfo, long long *total);
+void			get_fileinfo(t_fileinfo *finfo, long long *total);
 
-void efiles(char **files, unsigned char flags);
+void			efiles(char **files, unsigned char flags);
 
-void	print_files_from_files(t_fileinfo **files, t_spaces spaces, int flag_l);
-void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces spaces, int flag_l);
+void	print_files_from_files(t_fileinfo **files, t_spaces maxs, int flag_l);
+void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, int flag_l);
+
+void	sort_fileinfo(t_fileinfo ***array, int (*func)(t_fileinfo*, t_fileinfo*, int), int is_inverted);
+int		order_cmp_by_filename(t_fileinfo *first, t_fileinfo *second, int is_inverted);
+int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int is_inverted);
 
 #endif

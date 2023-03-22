@@ -310,85 +310,6 @@
 // пробегаешься еще раз по всем файлам, находишь директорию, рекурсивно вызываешь свою функцию
 
 
-
-
-//void	list_files(const char *dirname)
-//{
-//	struct dirent	*pointers[100];
-//	size_t			max_len;
-//
-//	bzero(pointers, sizeof(struct dirent*) * 100);
-//	DIR *dir = opendir(dirname);
-//	if (dir == NULL)
-//	{
-//		printf("dir is NULL - dirname [%s]\n", dirname);
-//		return ;
-//	}
-//
-//	struct dirent *entity;
-//
-//	max_len = 0;
-//	int i = 0;
-//	while ((entity = readdir(dir)) != NULL)
-//	{
-//		pointers[i++] = entity;
-//		size_t	current_len = strlen(entity->d_name);
-//		if (max_len < current_len)
-//			max_len = current_len;
-//	}
-//	if (entity == NULL && errno != 0)
-//	{
-//		printf("entity is NULL, errno [%s]\n", strerror(errno));
-//		exit(1);
-//	}
-//	closedir(dir);
-//	i = 0;
-//	printf("%s:\n", dirname);
-//	printf("    ");
-//	while (pointers[i])
-//	{
-//		printf("%s", pointers[i]->d_name);
-//		printf("    ");
-//		i++;
-//	}
-//	printf("\n");
-//
-//	i = 0;
-//	while (pointers[i])
-//	{
-//		if (pointers[i]->d_type == DT_DIR && strcmp(pointers[i]->d_name, ".") != 0 && strcmp(pointers[i]->d_name, "..") != 0)
-//		{
-//			char path[200] = {0};
-//			bzero(path, sizeof(char) * 200);
-//			strcat(path, dirname);
-//			strcat(path, "/");
-//			strcat(path, pointers[i]->d_name);
-//			if (strcmp(path, "../ex/dir4") == 0)
-//			{
-//				printf("dirname [%s] d_name [%s] path [%s]\n\n", dirname, pointers[i]->d_name, path);
-//				int j = 0;
-//				while (pointers[j])
-//				{
-//					printf("pointers[%d] = %s\n", j, pointers[j]->d_name);
-//					j++;
-//				}
-//			}
-//			list_files(path);
-////			printf("\n");
-//		}
-//		i++;
-//	}
-//}
-
-static void	bubble(void **first, void **second)
-{
-	void *tmp;
-
-	tmp = *first;
-	*first = *second;
-	*second = tmp;
-}
-
 t_fileinfo	*new_fileinfo(char *path, char *filename, int type)
 {
 	t_fileinfo *f;
@@ -403,100 +324,31 @@ t_fileinfo	*new_fileinfo(char *path, char *filename, int type)
 	return (f);
 }
 
-# define FLAG_INVERTED_NO	0
-# define FLAG_INVERTED_YES	1
-
-int		order_cmp_by_filename(t_fileinfo *first, t_fileinfo *second, int inverted)
+void	set_spaces(char spaces[5][254 + 1], t_fileinfo *finfo, t_spaces maxs)
 {
-	int 	flen, slen;
-	int 	res;
+	int		cos[5] = {0}; // count of spaces
+	size_t	i;
 
-	flen = ft_strlen(first->filename);
-	slen = ft_strlen(second->filename);
-	res = ft_memcmp(first->filename, second->filename, flen > slen ? flen: slen);
-	return (inverted == FLAG_INVERTED_NO) ? (res > 0) : (res < 0);
-}
+	cos[0] = maxs.s_link - ft_strlen(finfo->nlinks);
+	cos[1] = maxs.s_oname - ft_strlen(finfo->oname);
+	cos[2] = maxs.s_gname - ft_strlen(finfo->gname);
+	cos[3] = maxs.s_bytes - ft_strlen(finfo->nbytes);
+	cos[4] = maxs.s_day - ft_strlen(finfo->day_lm);
 
-int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int inverted)
-{
-	return (inverted == FLAG_INVERTED_NO ? (first->mtime.tv_sec < second->mtime.tv_sec) : (first->mtime.tv_sec > second->mtime.tv_sec));
-}
-
-void	sort_files(t_fileinfo ***array, int (*func)(t_fileinfo*, t_fileinfo*, int), int inverted)
-{
-	t_fileinfo	**p;
-	size_t		i, j, len;
-
-	if (!array)
-		return ;
-	p = *array;
-	len = len_2array((const void**)p);
 	i = 0;
-	while (i < len)
+	while (i < 5)
 	{
-		j = i + 1;
-		while (j < len)
-		{
-			if (func(p[i], p[j], inverted))
-				bubble((void**)&p[i], (void**)&p[j]);
-			j++;
-		}
+		ft_memset(spaces[i], ' ', cos[i]);
 		i++;
 	}
 }
 
-char	**copy_dirs(t_fileinfo **files)
+void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
 {
-	char	**dirs;
-	size_t	i, j, count;
-
-	if (!files)
-		return (ft_calloc(0, sizeof(char*)));
-	count = 0;
-	i = 0;
-	while (files[i])
-	{
-		if (files[i]->type == S_IFDIR)
-			count++;
-		i++;
-	}
-
-	dirs = (char**)ft_calloc(count + 1, sizeof(char*));
-	if (!dirs)
-		return (NULL);
-	i = 0;
-	j = 0;
-	while (files[i])
-	{
-		if (files[i]->type == S_IFDIR)
-		{
-			dirs[j] = ft_strdup(files[i]->filename);
-			if (!dirs[j])
-			{
-				free_2array((void**)dirs);
-				return (NULL);
-			}
-			j++;
-		}
-		i++;
-	}
-	return (dirs);
-}
-
-void	print_fileinfo(t_fileinfo *finfo, t_spaces *s)
-{
-	char	spaces[5][255] = {0};
-
-	for (int i = 0; i < 5; i++)
-		ft_memset(spaces[i], ' ', 254);
-
-	spaces[0][s->s_link - ft_strlen(finfo->nlinks)] = '\0';
-	spaces[1][s->s_oname - ft_strlen(finfo->oname)] = '\0';
-	spaces[2][s->s_gname - ft_strlen(finfo->gname)] = '\0';
-	spaces[3][s->s_bytes - ft_strlen(finfo->nbytes)] = '\0';
-	spaces[4][s->s_day - ft_strlen(finfo->day_lm)] = '\0';
-
+	char	spaces[5][254 + 1] = {0};
 	char	pattern[1024] = {0};
+
+	set_spaces(spaces, finfo, maxs);
 
 	t_pattern	patterns[16] = {
 			{.pattern = "{{filemode}}", .replacement = finfo->filemode},
@@ -546,32 +398,6 @@ typedef struct s_filetypes
 
 void	set_filetype(char *filetype, int type)
 {
-
-	//	switch (st.st_mode & S_IFMT) {
-//		case S_IFREG:
-//			puts("|| regular file");
-//			break;
-//		case S_IFDIR:
-//			puts("|| directory");
-//			break;
-//		case S_IFCHR:
-//			puts("|| character device");
-//			break;
-//		case S_IFBLK:
-//			puts("|| block device");
-//			break;
-//		case S_IFLNK:
-//			puts("|| symbolic link");
-//			break;
-//		case S_IFIFO:
-//			puts("|| pipe");
-//			break;
-//		case S_IFSOCK:
-//			puts("|| socket");
-//			break;
-//		default:
-//			puts("|| unknown");
-//	}
 	t_filetypes	filetypes[FILETYPES_SIZE + 1] = {
 			{.filetype = S_IFBLK, .replacement = 'b'},
 			{.filetype = S_IFCHR, .replacement = 'c'},
@@ -720,7 +546,7 @@ void	counter_of_spaces(t_fileinfo **info, t_spaces *spaces)
 	}
 }
 
-void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces spaces, int flag_l)
+void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, int flag_l)
 {
 	size_t	i;
 
@@ -729,18 +555,16 @@ void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces spaces,
 		printf("total %lld\n", total);
 
 	while (files[i])
-	{
-		print_fileinfo(files[i++], &spaces);
-	}
+		print_fileinfo(files[i++], maxs);
 }
 
-void	print_files_from_files(t_fileinfo **files, t_spaces spaces, int flag_l)
+void	print_files_from_files(t_fileinfo **files, t_spaces maxs, int flag_l)
 {
 	size_t	i;
 
 	i = 0;
 	while (files[i])
-		print_fileinfo(files[i++], &spaces);
+		print_fileinfo(files[i++], maxs);
 }
 
 void	ispaces(t_spaces *spaces)
@@ -817,22 +641,22 @@ void	sort_by_flags(t_fileinfo **files, unsigned char flags)
 {
 	if (is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 0)
 	{
-		sort_files(&files, order_cmp_by_filename, FLAG_INVERTED_NO);
+		sort_fileinfo(&files, order_cmp_by_filename, FLAG_INVERTED_NO);
 	}
 	else if (is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 1)
 	{
-		sort_files(&files, order_cmp_by_filename, FLAG_INVERTED_YES);
+		sort_fileinfo(&files, order_cmp_by_filename, FLAG_INVERTED_YES);
 	}
 
 	if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 1 \
 		&& is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 0)
 	{
-		sort_files(&files, order_cmp_by_tlastmod, FLAG_INVERTED_NO);
+		sort_fileinfo(&files, order_cmp_by_tlastmod, FLAG_INVERTED_NO);
 	}
 	else if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 1 \
 		&& is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 1)
 	{
-		sort_files(&files, order_cmp_by_tlastmod, FLAG_INVERTED_YES);
+		sort_fileinfo(&files, order_cmp_by_tlastmod, FLAG_INVERTED_YES);
 	}
 }
 
@@ -937,107 +761,12 @@ void efiles(char **files, unsigned char flags)
 
 	print_files_from_files(f, spaces, is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM));
 
-	printf("\n");
-
 	free_2array((void**)f);
 }
-
-
-
 
 void	initialization(t_ls *ls)
 {
 	init_ls(ls);
-}
-
-int	add_2array(void ***data, void *value)
-{
-	int		e;
-	size_t	len;
-
-	if (data == NULL || value == NULL)
-		return (-2);
-	len = len_2array((const void**)(*data));
-	e = realloc_2array(data, len + 1);
-	if (e != 0)
-		return (e);
-	(*data)[len] = value;
-	return (0);
-}
-
-int		separate_filenames(char **filenames, char ***files, char ***dirs, int *count_possible_files_and_dirs)
-{
-	int		errcode;
-	size_t	len, i;
-
-	if (files == NULL || dirs == NULL || filenames == NULL || count_possible_files_and_dirs == NULL)
-		return (-2);
-	len = len_2array((const void**)filenames);
-	i = 0;
-
-	(*files) = ft_calloc(1, sizeof(char*));
-	if (*files == NULL)
-	{
-		perror("malloc");
-		exit(1);
-	}
-	*dirs = ft_calloc(1, sizeof(char*));
-	if (*dirs == NULL)
-	{
-		perror("malloc");
-		exit(1);
-	}
-	while (i < len)
-	{
-		errcode = if_dir_or_file(filenames[i]);
-		if (errcode == 0) // directory
-		{
-			errcode = add_2array((void***)dirs, ft_strdup(filenames[i]));
-			if (errcode != 0)
-				return (errcode);
-		}
-		else if (errcode == 1) // files
-		{
-			errcode = add_2array((void***)files, ft_strdup(filenames[i]));
-			if (errcode != 0)
-				return (errcode);
-		}
-		else if (errcode < 0) // some unexpected error
-		{
-			char *s = ft_strjoin("ls: ", filenames[i]);
-			perror(s);
-			free(s);
-			s = NULL;
-			errno = 0;
-		}
-		*count_possible_files_and_dirs += 1;
-		i++;
-	}
-	return (0);
-}
-
-void	parsing(t_ls *ls, char **data)
-{
-	char	**filenames;
-	int		errcode;
-
-	errcode = parse_flags(&data, &ls->flags, &ls->epatterns);
-	handle_error(errcode, ls->epatterns);
-
-	errcode = parse_filenames(data, &filenames);
-	handle_error(errcode, ls->epatterns);
-
-	errcode = separate_filenames(filenames, &ls->files, &ls->dirs, &ls->possible_files);
-	free_2array((void**)filenames);
-	handle_error(errcode, ls->epatterns);
-}
-
-void	execution(t_ls *ls)
-{
-	if (len_2array((const void**)ls->files) > 0)
-		execute_files(ls->files, ls->flags, &ls->epatterns);
-	if (len_2array((const void**)ls->dirs) > 0)
-		execute_dirs(ls->dirs, ls->flags, &ls->epatterns, ls->possible_files);
 }
 
 int main(int argc, char **argv)

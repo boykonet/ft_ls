@@ -53,3 +53,18 @@ int		realloc_2array(void ***data, size_t size)
 	*data = res;
 	return (0);
 }
+
+int	add_2array(void ***data, void *value)
+{
+	int		e;
+	size_t	len;
+
+	if (data == NULL || value == NULL)
+		return (-2);
+	len = len_2array((const void**)(*data));
+	e = realloc_2array(data, len + 1);
+	if (e != 0)
+		return (e);
+	(*data)[len] = value;
+	return (0);
+}
