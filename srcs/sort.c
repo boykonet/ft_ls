@@ -22,7 +22,7 @@ int		order_cmp_by_filename(t_fileinfo *first, t_fileinfo *second, int is_inverte
 
 int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int is_inverted)
 {
-	return (is_inverted == FLAG_INVERTED_NO ? (first->mtime.tv_sec < second->mtime.tv_sec) : (first->mtime.tv_sec > second->mtime.tv_sec));
+	return (is_inverted == FLAG_INVERTED_NO ? ((first->mtime.tv_sec < second->mtime.tv_sec)) : ((first->mtime.tv_sec > second->mtime.tv_sec)));
 }
 
 void	sort_fileinfo(t_fileinfo ***array, int (*func)(t_fileinfo*, t_fileinfo*, int), int is_inverted)

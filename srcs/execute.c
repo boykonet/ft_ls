@@ -142,7 +142,7 @@ void	execution(t_ls *ls)
 	dlen = len_2array((const void**)ls->dirs);
 	if (flen > 0)
 		execute_files(ls->files, ls->flags, &ls->epatterns);
-	if (dlen > 0)
+	if (dlen > 0 && flen > 0)
 		printf("\n");
 	if (dlen > 0)
 		execute_dirs(ls->dirs, ls->flags, &ls->epatterns, ls->possible_files);

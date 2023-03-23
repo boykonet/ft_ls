@@ -18,6 +18,8 @@ SRCS=		./main.c \
 			./utils/copy.c \
 			./utils/double_array_utils.c \
 			./utils/error.c \
+			./utils/fileinfo.c \
+			./utils/max.c \
 			./utils/pattern.c \
 			./utils/printer.c
 

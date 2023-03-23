@@ -297,7 +297,6 @@
 
 
 #include <stdio.h>
-#include <string.h>
 #include <dirent.h>
 #include <stdlib.h>
 #include <sys/errno.h>
@@ -310,23 +309,9 @@
 // пробегаешься еще раз по всем файлам, находишь директорию, рекурсивно вызываешь свою функцию
 
 
-t_fileinfo	*new_fileinfo(char *path, char *filename, int type)
+void	set_spaces(char spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1], t_fileinfo *finfo, t_spaces maxs)
 {
-	t_fileinfo *f;
-
-	f = ft_calloc(1, sizeof(t_fileinfo));
-	if (!f)
-		return (NULL);
-	ft_memcpy(f->path, path, ft_strlen(path));
-	ft_memcpy(f->filename, filename, ft_strlen(filename));
-	f->type = type;
-	ft_memcpy(f->filemode, "---------- ", 11);
-	return (f);
-}
-
-void	set_spaces(char spaces[5][254 + 1], t_fileinfo *finfo, t_spaces maxs)
-{
-	int		cos[5] = {0}; // count of spaces
+	int		cos[LONG_FORNAT_PARRERN_MAXS] = {0}; // count of spaces
 	size_t	i;
 
 	cos[0] = maxs.s_link - ft_strlen(finfo->nlinks);
@@ -334,9 +319,10 @@ void	set_spaces(char spaces[5][254 + 1], t_fileinfo *finfo, t_spaces maxs)
 	cos[2] = maxs.s_gname - ft_strlen(finfo->gname);
 	cos[3] = maxs.s_bytes - ft_strlen(finfo->nbytes);
 	cos[4] = maxs.s_day - ft_strlen(finfo->day_lm);
+	cos[5] = maxs.s_time_year - ft_strlen(finfo->time_year_lm);
 
 	i = 0;
-	while (i < 5)
+	while (i < LONG_FORNAT_PARRERN_MAXS)
 	{
 		ft_memset(spaces[i], ' ', cos[i]);
 		i++;
@@ -345,12 +331,12 @@ void	set_spaces(char spaces[5][254 + 1], t_fileinfo *finfo, t_spaces maxs)
 
 void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
 {
-	char	spaces[5][254 + 1] = {0};
+	char	spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1] = {0};
 	char	pattern[1024] = {0};
 
 	set_spaces(spaces, finfo, maxs);
 
-	t_pattern	patterns[16] = {
+	t_pattern	patterns[MAX_REPL_PATTERNS + 1] = {
 			{.pattern = "{{filemode}}", .replacement = finfo->filemode},
 			{.pattern = "{{s1}}", .replacement = spaces[0]},
 			{.pattern = "{{nlinks}}", .replacement = finfo->nlinks},
@@ -363,18 +349,50 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
 			{.pattern = "{{amonth}}", .replacement = finfo->amonth},
 			{.pattern = "{{s5}}", .replacement = spaces[4]},
 			{.pattern = "{{day}}", .replacement = finfo->day_lm},
-			{.pattern = "{{time}}", .replacement = finfo->time_lm},
+			{.pattern = "{{s6}}", .replacement = spaces[5]},
+			{.pattern = "{{time_year}}", .replacement = finfo->time_year_lm},
 			{.pattern = "{{filename}}", .replacement = finfo->filename},
 			{.pattern = "{{link}}", .replacement = finfo->link},
 			NULL,
 	};
 
 	if (finfo->type == S_IFLNK)
-		replace_pattern(pattern, PATTERN_WITH_LINK, patterns, 15);
+		replace_pattern(pattern, PATTERN_WITH_LINK, patterns);
 	else
-		replace_pattern(pattern, PATTERN_WITHOUT_LINK, patterns, 15);
+		replace_pattern(pattern, PATTERN_WITHOUT_LINK, patterns);
 
 	write(1, pattern, ft_strlen(pattern));
+}
+
+int 	the_largest_filename(char **files)
+{
+	size_t	max, i, clen;
+
+	max = 0;
+	if (files == NULL)
+		return (0);
+	i = 0;
+	while (files[i])
+	{
+		clen = ft_strlen(files[i]); // current len
+		if (max < clen)
+			max = clen;
+		i++;
+	}
+	return (i);
+}
+
+void	print_without_full_info(char **files)
+{
+	int		largest;
+	size_t	flen, cos; // cos - count of spaces
+	size_t	size_of_one_frame;
+
+	flen = len_2array((const void**)files); // 192 + 1 // 240 + 1? // I decided to make it  no more than 256 + 1
+	largest = the_largest_filename(files);
+	if (largest == 0)
+		return ;
+	size_of_one_frame = (largest / 8) + (largest % 8) + (8 - (largest % 8));
 }
 
 void	cstrmode(mode_t mode, char *buf)
@@ -389,12 +407,6 @@ void	cstrmode(mode_t mode, char *buf)
 		i++;
 	}
 }
-
-typedef struct s_filetypes
-{
-	int		filetype;
-	char	replacement;
-} t_filetypes;
 
 void	set_filetype(char *filetype, int type)
 {
@@ -418,6 +430,31 @@ void	set_filetype(char *filetype, int type)
 			break ;
 		}
 	}
+}
+
+# define XATTR_SIZE	1024
+
+void	set_file_attribute(char *path, char *attr, mode_t st_mode)
+{
+	ssize_t xattr_size;
+
+	xattr_size = listxattr(path, NULL, 0, 0);
+	if (xattr_size == -1)
+	{
+		if (errno == ENOTSUP)
+			return ;
+		else
+		{
+			perror("listxattr");
+			exit(1);
+		}
+	}
+	if (xattr_size > 0)
+		*attr = '@';
+	if ((st_mode & S_IFMT) == S_IFLNK)
+		return ;
+	if (st_mode & S_ISVTX)
+		*attr = '+';
 }
 
 void	conf_filemode(mode_t mode, int filetype, char *filemode)
@@ -444,9 +481,16 @@ void	conf_nbytes(off_t st_size, char *bytes)
 	nbytes = NULL;
 }
 
-void	conf_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *time_lm)
+# define HALF_OF_YEAR_SECONDS	365.2422 * 0.5 * 24 * 60 * 60
+
+void	conf_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *time_year_lm, struct timespec *mtime)
 {
 	char	**t;
+	time_t	sts;
+	long	diff;
+
+	mtime->tv_sec = st_mtimespec.tv_sec;
+	mtime->tv_nsec = st_mtimespec.tv_nsec;
 
 	t = ft_split(ctime((const time_t*)&st_mtimespec.tv_sec), ' ');
 	if (!t)
@@ -454,11 +498,28 @@ void	conf_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *t
 		perror("malloc");
 		exit(1);
 	}
-	*ft_strrchr(t[3], ':') = '\0';
 
 	ft_memcpy(amonth, t[1], ft_strlen(t[1]));
 	ft_memcpy(day_lm, t[2], ft_strlen(t[2]));
-	ft_memcpy(time_lm, t[3], ft_strlen(t[3]));
+
+	// get current time
+	sts = time(NULL);
+	if (sts == -1)
+	{
+		perror("time");
+		exit(1);
+	}
+	diff = sts - (const time_t)st_mtimespec.tv_sec;
+	if (diff >= 0 && diff < HALF_OF_YEAR_SECONDS)
+	{
+		*ft_strrchr(t[3], ':') = '\0';
+		ft_memcpy(time_year_lm, t[3], ft_strlen(t[3]));
+	}
+	else
+	{
+		*ft_strrchr(t[4], '\n') = '\0';
+		ft_memcpy(time_year_lm, t[4], ft_strlen(t[4]));
+	}
 	free_2array((void**)t);
 	t = NULL;
 }
@@ -471,15 +532,35 @@ void conf_link(const char *filepath, char *link)
 		perror("malloc");
 		exit(1);
 	}
-	ft_memcpy(link, new_link, sizeof(link) - 1);
+	ft_memcpy(link, new_link, ft_strlen(new_link));
 }
 
-void	max_spaces(size_t *first, size_t second)
+void	conf_owner(char oname[255 + 1], uid_t st_uid)
 {
-	if (first == NULL)
+	char	*owner;
+
+	owner = get_user(st_uid);
+
+	ft_memcpy(oname, owner, 255);
+	free(owner);
+	owner = NULL;
+}
+
+void	conf_group(char gname[255 + 1], gid_t st_gid)
+{
+	char	*group;
+
+	group = get_group(st_gid);
+	ft_memcpy(gname, group, 255);
+	free(group);
+	group = NULL;
+}
+
+void	conf_filetype(int *type, mode_t st_mode)
+{
+	if (type == NULL)
 		return ;
-	if (*first < second)
-		*first = second;
+	*type = st_mode & S_IFMT;
 }
 
 void	get_fileinfo(t_fileinfo *finfo, long long *total)
@@ -502,28 +583,26 @@ void	get_fileinfo(t_fileinfo *finfo, long long *total)
 
 	if (lstat(filepath, &st) == -1)
 	{
-		printf("here filepath [%s]\n", filepath);
 		perror("ls");
 		exit(1);
 	}
 
-	if (total)
+	if (total != NULL)
 		*total += st.st_blocks;
 
 	// filetype
-	finfo->type = st.st_mode & S_IFMT;
+	conf_filetype(&finfo->type, st.st_mode);
 
 	conf_filemode(st.st_mode, finfo->type, finfo->filemode); // TODO: might be empty value
+	set_file_attribute(filepath, &finfo->filemode[10], st.st_mode);
 	conf_nlink(st.st_nlink, finfo->nlinks);
 
-	ft_memcpy(finfo->oname, get_user(st.st_uid), 255);
-	ft_memcpy(finfo->gname, get_group(st.st_gid), 255);
+	conf_owner(finfo->oname, st.st_uid);
+	conf_group(finfo->gname, st.st_gid);
 
 	conf_nbytes(st.st_size, finfo->nbytes);
 
-	conf_time(st.st_mtimespec, finfo->amonth, finfo->day_lm, finfo->time_lm);
-	finfo->mtime.tv_sec = st.st_mtimespec.tv_sec;
-	finfo->mtime.tv_nsec = st.st_mtimespec.tv_nsec;
+	conf_time(st.st_mtimespec, finfo->amonth, finfo->day_lm, finfo->time_year_lm, &finfo->mtime); // TODO: if more than 6 months or in the future, print year (check future time)
 
 	if (finfo->type == S_IFLNK)
 		conf_link(filepath, finfo->link);
@@ -543,6 +622,7 @@ void	counter_of_spaces(t_fileinfo **info, t_spaces *spaces)
 		max_spaces(&spaces->s_gname, ft_strlen(info[i]->gname));
 		max_spaces(&spaces->s_bytes, ft_strlen(info[i]->nbytes));
 		max_spaces(&spaces->s_day, ft_strlen(info[i]->day_lm));
+		max_spaces(&spaces->s_time_year, ft_strlen(info[i]->time_year_lm));
 	}
 }
 
@@ -574,6 +654,7 @@ void	ispaces(t_spaces *spaces)
 	spaces->s_gname = 0;
 	spaces->s_bytes = 0;
 	spaces->s_day = 0;
+	spaces->s_time_year = 0;
 }
 
 void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
@@ -737,10 +818,9 @@ void efiles(char **files, unsigned char flags)
 		t_fileinfo *ff = new_fileinfo(".", files[i], 0);
 		if (ff == NULL)
 		{
-			perror("ls");
+			perror("malloc");
 			exit(1);
 		}
-		size_t	filen = len_2array((const void**)f);
 		if (add_2array((void***)&f, ff) != 0)
 		{
 			perror("malloc");
@@ -751,7 +831,7 @@ void efiles(char **files, unsigned char flags)
 
 	i = 0;
 	while (f[i])
-		get_fileinfo(f[i++], 0);
+		get_fileinfo(f[i++], NULL);
 
 	t_spaces spaces;
 	ispaces(&spaces);
@@ -780,3 +860,48 @@ int main(int argc, char **argv)
 
 	return (0);
 }
+
+
+
+//f1r5s15% ./ft_ls -tl ex
+//
+//total 8
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:40 tw
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:40 el
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:40 ten
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 nine
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 eight
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 seven
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 six
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 five
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 first
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 second		(2)
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 third		(3)
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 fouth		(1)
+//srwxr-xr-x  1 gkarina  piscine    0 Feb  3 23:52 socket.sock
+//prw-r--r--  1 gkarina  piscine    0 Feb  3 23:51 myfifo
+//drwxr-xr-x  7 gkarina  piscine  238 Feb  3 22:57 dir1
+//drwxr-xr-x  2 gkarina  piscine   68 Feb  3 22:57 dir2
+//lrwxr-xr-x  1 gkarina  piscine    4 Jan 31 22:42 link -> file
+//-rw-r--r--  1 gkarina  piscine    0 Jan 31 22:42 file
+//f1r5s15% ls -tl ex
+//total 8
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:40 tw
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:40 el
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:40 ten
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 nine
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 eight
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 seven
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 six
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 five
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 first
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 fouth		1
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 second		2
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 third		3
+//srwxr-xr-x  1 gkarina  piscine    0 Feb  3 23:52 socket.sock
+//prw-r--r--  1 gkarina  piscine    0 Feb  3 23:51 myfifo
+//drwxr-xr-x  7 gkarina  piscine  238 Feb  3 22:57 dir1
+//drwxr-xr-x  2 gkarina  piscine   68 Feb  3 22:57 dir2
+//lrwxr-xr-x  1 gkarina  piscine    4 Jan 31 22:42 link -> file
+//-rw-r--r--  1 gkarina  piscine    0 Jan 31 22:42 file
+

@@ -1,10 +1,13 @@
 #ifndef LS_H
 # define LS_H
 
-# define CSTDERR		2
-# define MAX_FLAGS		5
-# define CONST_FLAGS	"Ralrt"
-# define FILETYPES_SIZE	8
+# define CSTDERR			2
+# define MAX_FLAGS			5
+//# define CONST_FLAGS		"Ralrt"
+# define FILETYPES_SIZE		8
+# define MAX_REPL_PATTERNS	16
+# define LONG_FORNAT_PARRERN_MAXS	6
+
 
 # define ERR_HEADER					"ls: "
 # define MALLOC_ERROR				"malloc error"
@@ -17,22 +20,26 @@
 # define PATTERN_FLAG_NOT_SUPPORT	"{{flag}}"
 # define PATTERN_STRERROR_MESSAGE	"{{message}}"
 
-# define PATTERN_WITHOUT_LINK	"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{time}} {{filename}}\n"
-# define PATTERN_WITH_LINK		"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{time}} {{filename}} -> {{link}}\n"
+# define PATTERN_WITHOUT_LINK	"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}}\n"
+# define PATTERN_WITH_LINK		"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}} -> {{link}}\n"
 
-
+# define REC_FLAG		'R'
 # define REC_FLAG_SHIFT	7
 # define REC_FLAG_NUM	128
 
+# define A_FLAG			'a'
 # define A_FLAG_SHIFT	6
 # define A_FLAG_NUM		64
 
+# define L_FLAG			'l'
 # define L_FLAG_SHIFT	5
 # define L_FLAG_NUM		32
 
+# define R_FLAG			'r'
 # define R_FLAG_SHIFT	4
 # define R_FLAG_NUM		16
 
+# define T_FLAG			't'
 # define T_FLAG_SHIFT	3
 # define T_FLAG_NUM		8
 
@@ -145,24 +152,31 @@ typedef struct s_spaces {
 	size_t	s_gname;
 	size_t	s_bytes;
 	size_t	s_day;
+	size_t	s_time_year;
 } t_spaces;
 
 typedef struct s_fileinfo
 {
-	char		path[3841 + 1];
-	char		filename[255 + 1];
-	int			type;
-	char		filemode[11 + 1];
-	char		nlinks[5 + 1]; // because nlinks_t type is cast for unsigned short, maximum value is 65535
-	char		oname[255 + 1]; // owner filename
-	char		gname[255 + 1]; // group filename
-	char 		nbytes[11 + 1]; // number of bytes
-	char		amonth[3 + 1]; // abbreviated month ---> Jan
-	char		day_lm[2 + 1]; // day last modified ---> 31
-	char		time_lm[5 + 1]; // time last modified ---> 12:23
-	char		link[255 + 1]; // only if type == DT_LNK
-	struct timespec		mtime; // time last modified
+	char				path[3841 + 1];
+	char				filename[255 + 1];
+	int					type;
+	char				filemode[11 + 1];
+	char				nlinks[5 + 1];			// because nlinks_t type is cast for unsigned short, maximum value is 65535
+	char				oname[255 + 1];			// owner filename
+	char				gname[255 + 1];			// group filename
+	char 				nbytes[11 + 1];			// number of bytes
+	char				amonth[3 + 1];			// abbreviated month ---> Jan
+	char				day_lm[2 + 1];			// day last modified ---> 31
+	char				time_year_lm[5 + 1];	// time last modified or year if mote than 6 months or the date in the future ---> 12:23
+	char				link[255 + 1];			// only if type == S_IFLNK
+	struct timespec		mtime;					// time last modified
 } t_fileinfo;
+
+typedef struct s_filetypes
+{
+	int		filetype;
+	char	replacement;
+} t_filetypes;
 
 void			parsing(t_ls *ls, char **data);
 
@@ -189,7 +203,7 @@ t_pattern		*new_pattern(char *pattern, char *replacement);
 void			clear_pattern(t_pattern *pattern);
 void			del_pattern(void *node);
 int				add_pattern(t_list **head, char *pattern, char *replacement);
-void			replace_pattern(char *dest, const char *src, t_pattern patterns[16], size_t pcount);
+void			replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PATTERNS + 1]);
 
 t_list			*find_last_elem(t_list **head);
 
@@ -211,5 +225,9 @@ void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, i
 void	sort_fileinfo(t_fileinfo ***array, int (*func)(t_fileinfo*, t_fileinfo*, int), int is_inverted);
 int		order_cmp_by_filename(t_fileinfo *first, t_fileinfo *second, int is_inverted);
 int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int is_inverted);
+
+void	max_spaces(size_t *first, size_t second);
+
+t_fileinfo	*new_fileinfo(char *path, char *filename, int type);
 
 #endif
