@@ -109,7 +109,7 @@
 //	return (NULL);
 //}
 
-static int	execute_files(char **files, unsigned char flags, t_list **epatterns)
+static int	execute_files(char **files, unsigned char flags)
 {
 	if (files == NULL)
 		return (-2);
@@ -117,7 +117,7 @@ static int	execute_files(char **files, unsigned char flags, t_list **epatterns)
 	return (0);
 }
 
-static int	execute_dirs(char **dirs, unsigned char flags, t_list **epatterns, int possible_files)
+static int	execute_dirs(char **dirs, unsigned char flags, int possible_files)
 {
 	size_t	i;
 
@@ -141,9 +141,9 @@ void	execution(t_ls *ls)
 	flen = len_2array((const void**)ls->files);
 	dlen = len_2array((const void**)ls->dirs);
 	if (flen > 0)
-		execute_files(ls->files, ls->flags, &ls->epatterns);
+		execute_files(ls->files, ls->flags);
 	if (dlen > 0 && flen > 0)
 		printf("\n");
 	if (dlen > 0)
-		execute_dirs(ls->dirs, ls->flags, &ls->epatterns, ls->possible_files);
+		execute_dirs(ls->dirs, ls->flags, ls->possible_files);
 }

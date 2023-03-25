@@ -1,313 +1,14 @@
-//#include "ls.h"
-//
-///*
-//** -a      Include directory entries whose names begin with a dot (.).
-//** -l      (The lowercase letter ``ell''.)  List in long format.  (See below.)  If the output is to a terminal, a total sum for all the file sizes
-//**         is output on a line before the long listing.
-//** -R      Recursively list subdirectories encountered.
-//** -r      Reverse the order of the sort to get reverse lexicographical order or the oldest entries first (or largest dirs last, if combined with
-//**         sort by size
-//** -t      Sort by time modified (most recently modified first) before sorting the operands by lexicographical order.
-//*/
-//
-//
-//
-//int main(int argc, char **argv)
-//{
-//	t_ls	ls;
-//
-//	(void)argc;
-//	initialization(&ls);
-//	write(1, "init\n", 5);
-//
-//	parsing(&ls, argv);
-//	write(1, "parse\n", 6);
-//
-//	int i = 0;
-//
-////	printf("len dirs [%d], len files [%d]\n", len_2array((const void **) ls.dirs), len_2array(
-////			(const void **) ls.files));
-////	while (ls.dirs && ls.dirs[i])
-////	{
-////		printf("dirs[%d] =  [%s]\n", i, ls.dirs[i]);
-////		i++;
-////	}
-////	i = 0;
-////	while (ls.files && ls.files[i])
-////	{
-////		printf("files[%d] = [%s]\n", i, ls.files[i]);
-////		i++;
-////	}
-//
-//	lexicography_sort(&ls.dirs);
-//	lexicography_sort(&ls.files);
-//
-//	i = 0;
-//	while (ls.dirs && ls.dirs[i])
-//	{
-//		printf("dirs[%d] =  [%s]\n", i, ls.dirs[i]);
-//		i++;
-//	}
-//	i = 0;
-//	while (ls.files && ls.files[i])
-//	{
-//		printf("files[%d] = [%s]\n", i, ls.files[i]);
-//		i++;
-//	}
-////	err = execute(&ls);
-////	write(1, "execute\n", 8);
-////	err_printer_and_cleaner(&ls, err, exitcode);
-//	return (0);
-//}
-//
-//// -----------------------
-////	printf("flag [- %c]\n", ls.flags[0]);
-////	printf("len flags %zu\n", ft_strlen(ls.flags));
-//
-////	int i = 0;
-////	while (ls.flags[i] != '\0') {
-////		printf("HEY\n");
-////		printf("flag [-%c]\n", ls.flags[i]);
-////		i++;
-////	}
-////	i = 0;
-////	while (ls.dirs[i] != NULL) {
-////		printf("HEY AGAIN\n");
-////		printf("folder [-%s]\n", ls.dirs[i]);
-////		i++;
-////	}
-//// -----------------------
-//
-//// // test dir function
-////int main(int argc, char **argv)
-////{
-////	t_list *l, *d;
-////	size_t count_elements;
-////	char **elems;
-////
-////	if (argc <= 1)
-////	{
-////		printf("NOT ARGUMENT STUPID\n");
-////		return (0);
-////	}
-////
-////	printf("argument [%s]\n", argv[1]);
-////	l = dir(argv[1]);
-////
-////	count_elements = ft_lstsize(l);
-////
-////	elems = (char**)calloca_to_2d(count_elements);
-////	if (elems == NULL)
-////	{
-////		printf("MALLOC ERROR");
-////		return (-1);
-////	}
-////
-////	char *dirpath = ft_strjoin(argv[1], "/");
-////
-////	size_t i = 0;
-////	while (l != NULL)
-////	{
-////		char *fname = ((struct dirent*)(l->content))->d_name;
-////		if (ft_memcmp(fname, ".", ft_strlen(fname)) == 0
-////		|| ft_memcmp(fname, "..", ft_strlen(fname)) == 0)
-////		{
-////			l = l->next;
-////			continue ;
-////		}
-////		elems[i] = ft_strjoin(dirpath, fname);
-////		if (elems[i] == NULL)
-////		{
-////			free_double_char_array(elems);
-////			printf("MALLOC ERROR");
-////			return (-1);
-////		}
-////		printf("filename [%s]\n", fname);
-////		l = l->next;
-////		i++;
-////	}
-////
-////	free(dirpath);
-////
-////	d = clstat(elems);
-////	if (d == NULL)
-////		return (1);
-////	return (0);
-////
-//////	// group and user filename
-//////	while (d != NULL)
-//////	{
-//////		gid_t gid = ((struct stat*)(d->content))->st_gid;
-//////		uid_t uid = ((struct stat*)(d->content))->st_uid;
-//////
-//////		char *group_name = get_group(gid);
-//////		char *user_name = get_user(uid);
-//////
-//////		printf("group [%s]\n", group_name);
-//////		printf("user [%s]\n", user_name);
-//////
-//////		printf("gid [%u]\n", gid);
-//////		d = d->next;
-//////	}
-////}
-//
-////int main(int argc, char **argv)
-////{
-////	if (argc <= 1)
-////	{
-////		printf("NO ARGUMENT STUPID\n");
-////		return (1);
-////	}
-////
-////	ssize_t buflen, keylen, vallen;
-////	char	*buf, *key, *val;
-////
-////	buflen = listxattr(argv[1], NULL, 0, 0);
-////	if (buflen == -1)
-////	{
-////		perror("listxattr");
-////		return (1);
-////	}
-////	if (buflen == 0)
-////	{
-////		printf("[%s] has no attributes\n", argv[1]);
-////		return (0);
-////	}
-////
-////	buf = ft_calloc(buflen, sizeof(char));
-////	if (buf == NULL)
-////	{
-////		perror("malloc");
-////		return (1);
-////	}
-////
-////	buflen = listxattr(argv[1], buf, buflen, 0);
-////	if (buflen == -1)
-////	{
-////		perror("listxattr");
-////		return (1);
-////	}
-////
-////	key = buf;
-////
-////	while (buflen > 0)
-////	{
-////		printf("attribute key [%s]\n", key);
-////
-////		vallen = getxattr(argv[1], key, NULL, 0, 0, 0);
-////		if (vallen == -1)
-////		{
-////			perror("getxattr");
-////			return (1);
-////		}
-////
-////		if (vallen > 0)
-////		{
-////			val = ft_calloc(vallen + 1, sizeof(char));
-////			if (val == NULL)
-////			{
-////				perror("malloc");
-////				return (1);
-////			}
-////			vallen = getxattr(argv[1], key, val, vallen, 0, 0);
-////			if (vallen == -1)
-////			{
-////				perror("getxattr");
-////			}
-////			else
-////			{
-////				val[vallen] = 0;
-////				printf("attribute value [%s]\n", val);
-////			}
-////			free(val);
-////		}
-////		else if (vallen == 0)
-////		{
-////			printf("<no value>");
-////		}
-////
-////		printf("\n");
-////
-////		keylen = ft_strlen(key) + 1;
-////		buflen -= keylen;
-////		key += keylen;
-////	}
-////	free(buf);
-////	return (0);
-////}
-//
-//
-////int main(int argc, char **argv)
-////{
-////	if (argc <= 0)
-////	{
-////		printf("NOT ARGUMENT STUPID\n");
-////		return (1);
-////	}
-////
-////	char *filename = creadlink(argv[1]);
-////	printf("readlink returned [%s] for [%s]\n", filename, argv[1]);
-////
-//////	if (readlink(argv[1], buf, sizeof(buf)) < 0)
-//////	{
-//////		perror("readlink");
-//////		return (1);
-//////	}
-//////	else
-//////	{
-//////		printf("readlink returned [%s] for [%s]\n", buf, argv[1]);
-//////	}
-////	return (0);
-////}
-//
-////int main()
-////{
-////	t_list *l;
-////
-////	char *err = dir(&l, ".");
-////	if (*err != '\0')
-////		printf("ERROR [%s]\n", err);
-////
-////	while (l)
-////	{
-////		printf("{%s}\n", ((struct dirent*)(l->content))->d_name);
-////		l = l->next;
-////	}
-////}
-//
-//
-////int main(int argc, char **argv, char **env)
-////{
-////	if (argc > 1 || len_double_char_array(argv) > 1)
-////		return (1);
-////	char *s = find_env(env, "PWD");
-////	printf("[%s]\n", s);
-////	free(s);
-////}
-//
-//
-//
-//
-
-
-
-
-
-// ---------------------------------------------------
-
-
-#include <stdio.h>
-#include <dirent.h>
-#include <stdlib.h>
-#include <sys/errno.h>
 #include "ls.h"
 
-
-// собираешь в одно место
-// сортируешь в соответсвии с теми флагами, которые пришли
-// выводишь на экран
-// пробегаешься еще раз по всем файлам, находишь директорию, рекурсивно вызываешь свою функцию
-
+/*
+** -a      Include directory entries whose names begin with a dot (.).
+** -l      (The lowercase letter ``ell''.)  List in long format.  (See below.)  If the output is to a terminal, a total sum for all the file sizes
+**         is output on a line before the long listing.
+** -R      Recursively list subdirectories encountered.
+** -r      Reverse the order of the sort to get reverse lexicographical order or the oldest entries first (or largest dirs last, if combined with
+**         sort by size
+** -t      Sort by time modified (most recently modified first) before sorting the operands by lexicographical order.
+*/
 
 void	set_spaces(char spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1], t_fileinfo *finfo, t_spaces maxs)
 {
@@ -331,9 +32,10 @@ void	set_spaces(char spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1], t_fileinfo *finf
 
 void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
 {
-	char	spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1] = {0};
+	char	spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1];
 	char	pattern[1024] = {0};
 
+	ft_bzero(spaces, LONG_FORNAT_PARRERN_MAXS * (254 + 1) * sizeof(char));
 	set_spaces(spaces, finfo, maxs);
 
 	t_pattern	patterns[MAX_REPL_PATTERNS + 1] = {
@@ -352,9 +54,7 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
 			{.pattern = "{{s6}}", .replacement = spaces[5]},
 			{.pattern = "{{time_year}}", .replacement = finfo->time_year_lm},
 			{.pattern = "{{filename}}", .replacement = finfo->filename},
-			{.pattern = "{{link}}", .replacement = finfo->link},
-			NULL,
-	};
+			{.pattern = "{{link}}", .replacement = finfo->link}};
 
 	if (finfo->type == S_IFLNK)
 		replace_pattern(pattern, PATTERN_WITH_LINK, patterns);
@@ -364,7 +64,7 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
 	write(1, pattern, ft_strlen(pattern));
 }
 
-int 	the_largest_filename(char **files)
+int 	the_largest_filename(t_fileinfo **files)
 {
 	size_t	max, i, clen;
 
@@ -374,7 +74,7 @@ int 	the_largest_filename(char **files)
 	i = 0;
 	while (files[i])
 	{
-		clen = ft_strlen(files[i]); // current len
+		clen = ft_strlen(files[i]->filename); // current len
 		if (max < clen)
 			max = clen;
 		i++;
@@ -382,17 +82,33 @@ int 	the_largest_filename(char **files)
 	return (i);
 }
 
-void	print_without_full_info(char **files)
+void	print_without_full_info(t_fileinfo **files)
 {
+	char	buf[255 + 1];
 	int		largest;
-	size_t	flen, cos; // cos - count of spaces
-	size_t	size_of_one_frame;
+	size_t	cos, i; // count of symbols
 
-	flen = len_2array((const void**)files); // 192 + 1 // 240 + 1? // I decided to make it  no more than 256 + 1
 	largest = the_largest_filename(files);
 	if (largest == 0)
 		return ;
-	size_of_one_frame = (largest / 8) + (largest % 8) + (8 - (largest % 8));
+	cos = largest + (largest % 8) + (8 - (largest % 8));
+	i = 0;
+	while (files[i])
+	{
+		size_t	lfilename = ft_strlen(files[i]->filename);
+		if (files[i + 1] == NULL)
+		{
+			write(1, files[i]->filename, lfilename);
+		}
+		else
+		{
+			ft_memset(buf, ' ', cos + 1);
+			buf[cos] = '\0';
+			ft_memcpy(buf, files[i]->filename, ft_strlen(files[i]->filename));
+			write(1, buf, ft_strlen(buf));
+		}
+		i++;
+	}
 }
 
 void	cstrmode(mode_t mode, char *buf)
@@ -418,9 +134,7 @@ void	set_filetype(char *filetype, int type)
 			{.filetype = S_IFSOCK, .replacement = 's'},
 			{.filetype = S_IFIFO, .replacement = 'p'},
 			{.filetype = S_IFREG, .replacement = '-'},
-			{.filetype = S_IFWHT, .replacement = '?'}, // TODO: check the information about unknown file
-			0,
-	};
+			{.filetype = S_IFWHT, .replacement = '?'}}; // TODO: check the information about unknown file
 
 	for (int i = 0; i < FILETYPES_SIZE; i++)
 	{
@@ -438,7 +152,28 @@ void	set_file_attribute(char *path, char *attr, mode_t st_mode)
 {
 	ssize_t xattr_size;
 
-	xattr_size = listxattr(path, NULL, 0, 0);
+//	printf("SET FILE ATTRIBUTE\n");
+//
+//	if (getxattr(path, "com.apple.FinderInfo", NULL, 0, 0, XATTR_NOFOLLOW) != -1)
+//	{
+//		printf("FIRST\n");
+//		*attr = '+';
+//	}
+//	else
+//	{
+//		printf("getxattr -1\n");
+//	}
+//
+//	if  (listxattr(path, NULL, 0, XATTR_NOFOLLOW) > 0)
+//	{
+//		printf("SECOND\n");
+//		*attr = '@';
+//	}
+//	else
+//	{
+//		printf("listxattr -1\n");
+//	}
+	xattr_size = listxattr(path, NULL, 0, XATTR_NOFOLLOW);
 	if (xattr_size == -1)
 	{
 		if (errno == ENOTSUP)
@@ -480,8 +215,6 @@ void	conf_nbytes(off_t st_size, char *bytes)
 	free(nbytes);
 	nbytes = NULL;
 }
-
-# define HALF_OF_YEAR_SECONDS	365.2422 * 0.5 * 24 * 60 * 60
 
 void	conf_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *time_year_lm, struct timespec *mtime)
 {
@@ -626,16 +359,36 @@ void	counter_of_spaces(t_fileinfo **info, t_spaces *spaces)
 	}
 }
 
+void	print_total(long long total)
+{
+	char	*stotal = ft_itoa(total);
+	if (stotal == NULL)
+	{
+		perror("malloc");
+		exit(1);
+	}
+	write(1, "total ", 6);
+	write(1, stotal, ft_strlen(stotal));
+	free(stotal);
+	stotal = NULL;
+	write(1, "\n", 1);
+}
+
 void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, int flag_l)
 {
 	size_t	i;
 
 	i = 0;
 	if (flag_l == 1 && len_2array((const void**)files) > 0)
-		printf("total %lld\n", total);
+		print_total(total);
 
-	while (files[i])
-		print_fileinfo(files[i++], maxs);
+	if (flag_l == 0)
+		print_without_full_info(files);
+	else
+	{
+		while (files[i])
+			print_fileinfo(files[i++], maxs);
+	}
 }
 
 void	print_files_from_files(t_fileinfo **files, t_spaces maxs, int flag_l)
@@ -643,8 +396,13 @@ void	print_files_from_files(t_fileinfo **files, t_spaces maxs, int flag_l)
 	size_t	i;
 
 	i = 0;
-	while (files[i])
-		print_fileinfo(files[i++], maxs);
+	if (flag_l == 0)
+		print_without_full_info(files);
+	else
+	{
+		while (files[i])
+			print_fileinfo(files[i++], maxs);
+	}
 }
 
 void	ispaces(t_spaces *spaces)
@@ -767,8 +525,6 @@ void rec_dirs(char *path, unsigned char flags, int counter, int possible_files)
 
 	char	**dirs = copy_dirs(files);
 
-//	printf("\n");
-
 	size_t i;
 	if (is_flag(flags, REC_FLAG_SHIFT, REC_FLAG_NUM) == 1)
 	{
@@ -842,6 +598,7 @@ void efiles(char **files, unsigned char flags)
 	print_files_from_files(f, spaces, is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM));
 
 	free_2array((void**)f);
+	f = NULL;
 }
 
 void	initialization(t_ls *ls)

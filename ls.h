@@ -3,7 +3,6 @@
 
 # define CSTDERR			2
 # define MAX_FLAGS			5
-//# define CONST_FLAGS		"Ralrt"
 # define FILETYPES_SIZE		8
 # define MAX_REPL_PATTERNS	16
 # define LONG_FORNAT_PARRERN_MAXS	6
@@ -49,6 +48,8 @@
 
 # define IF_DIRS_NO			0
 # define IF_DIRS_YES		1
+
+# define HALF_OF_YEAR_SECONDS	(365.2422 * 0.5 * 24 * 60 * 60)
 
 # include <unistd.h>
 /*

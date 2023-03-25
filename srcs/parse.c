@@ -40,9 +40,7 @@ int		add_flag(unsigned char *flags, char nf)
 			{.flag = 'a', .shift = A_FLAG_SHIFT, .shnum = A_FLAG_NUM},
 			{.flag = 'l', .shift = L_FLAG_SHIFT, .shnum = L_FLAG_NUM},
 			{.flag = 'r', .shift = R_FLAG_SHIFT, .shnum = R_FLAG_NUM},
-			{.flag = 't', .shift = T_FLAG_SHIFT, .shnum = T_FLAG_NUM},
-			0,
-	};
+			{.flag = 't', .shift = T_FLAG_SHIFT, .shnum = T_FLAG_NUM}};
 
 	i = 0;
 	while (i < MAX_FLAGS)
