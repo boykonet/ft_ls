@@ -214,11 +214,10 @@ void			execution(t_ls *ls);
 
 int				is_flag(unsigned char flags, int shift, int num);
 
-void 			rec_dirs(char *path, unsigned char flags, int counter, int possible_files);
+void 			handle_dirs(char *path, unsigned char flags, int counter, int possible_files);
+void			handle_files(char **files, unsigned char flags);
 
 void			get_fileinfo(t_fileinfo *finfo, long long *total);
-
-void			efiles(char **files, unsigned char flags);
 
 void	print_files_from_files(t_fileinfo **files, t_spaces maxs, int flag_l);
 void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, int flag_l);
@@ -230,5 +229,13 @@ int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int is_inverte
 void	max_spaces(size_t *first, size_t second);
 
 t_fileinfo	*new_fileinfo(char *path, char *filename, int type);
+
+void	sort_by_flags(t_fileinfo **files, unsigned char flags);
+void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a);
+void	print_files_from_files(t_fileinfo **files, t_spaces maxs, int flag_l);
+void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, int flag_l);
+
+void	ispaces(t_spaces *spaces);
+void	counter_of_spaces(t_fileinfo **info, t_spaces *spaces);
 
 #endif

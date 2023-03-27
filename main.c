@@ -109,6 +109,7 @@ void	print_without_full_info(t_fileinfo **files)
 		}
 		i++;
 	}
+	write(1, "\n", 1);
 }
 
 void	cstrmode(mode_t mode, char *buf)
@@ -146,56 +147,23 @@ void	set_filetype(char *filetype, int type)
 	}
 }
 
-# define XATTR_SIZE	1024
-
-void	set_file_attribute(char *path, char *attr, mode_t st_mode)
+void		is_extended_attributes(char *path, char *attr)
 {
-	ssize_t xattr_size;
-
-//	printf("SET FILE ATTRIBUTE\n");
-//
-//	if (getxattr(path, "com.apple.FinderInfo", NULL, 0, 0, XATTR_NOFOLLOW) != -1)
-//	{
-//		printf("FIRST\n");
-//		*attr = '+';
-//	}
-//	else
-//	{
-//		printf("getxattr -1\n");
-//	}
-//
-//	if  (listxattr(path, NULL, 0, XATTR_NOFOLLOW) > 0)
-//	{
-//		printf("SECOND\n");
-//		*attr = '@';
-//	}
-//	else
-//	{
-//		printf("listxattr -1\n");
-//	}
-	xattr_size = listxattr(path, NULL, 0, XATTR_NOFOLLOW);
-	if (xattr_size == -1)
-	{
-		if (errno == ENOTSUP)
-			return ;
-		else
-		{
-			perror("listxattr");
-			exit(1);
-		}
-	}
-	if (xattr_size > 0)
+	ssize_t	size = listxattr(path, NULL, 0, XATTR_NOFOLLOW);
+	if (size > 0)
 		*attr = '@';
-	if ((st_mode & S_IFMT) == S_IFLNK)
-		return ;
-	if (st_mode & S_ISVTX)
-		*attr = '+';
 }
 
-void	conf_filemode(mode_t mode, int filetype, char *filemode)
+void	set_file_attribute(char *path, char *attr)
+{
+	is_extended_attributes(path, attr);
+}
+
+void	conf_filemode(char *filepath, mode_t mode, int filetype, char *filemode)
 {
 	cstrmode(mode, &filemode[1]);
 	set_filetype(&filemode[0], filetype);
+	set_file_attribute(filepath, &filemode[10]);
 }
 
 void	conf_nlink(nlink_t st_nlink, char *links)
@@ -326,8 +294,7 @@ void	get_fileinfo(t_fileinfo *finfo, long long *total)
 	// filetype
 	conf_filetype(&finfo->type, st.st_mode);
 
-	conf_filemode(st.st_mode, finfo->type, finfo->filemode); // TODO: might be empty value
-	set_file_attribute(filepath, &finfo->filemode[10], st.st_mode);
+	conf_filemode(filepath, st.st_mode, finfo->type, finfo->filemode); // TODO: might be empty value
 	conf_nlink(st.st_nlink, finfo->nlinks);
 
 	conf_owner(finfo->oname, st.st_uid);
@@ -499,116 +466,27 @@ void	sort_by_flags(t_fileinfo **files, unsigned char flags)
 	}
 }
 
-void rec_dirs(char *path, unsigned char flags, int counter, int possible_files)
-{
-	t_fileinfo 		**files;
-	char			newdir[512 + 1];
-	long long		total;
-	t_spaces		spaces;
-
-	openreaddir(&files, path, is_flag(flags, A_FLAG_SHIFT, A_FLAG_NUM));
-
-	if (counter > 0 || possible_files > 1)
-		printf("%s:\n", path);
-
-	total = 0;
-	for (int i = 0; files[i]; i++)
-		get_fileinfo(files[i], &total);
-
-	// count of spaces
-	ispaces(&spaces);
-	counter_of_spaces(files, &spaces);
-
-	sort_by_flags(files, flags);
-
-	print_files_from_dirs(files, total, spaces, is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM));
-
-	char	**dirs = copy_dirs(files);
-
-	size_t i;
-	if (is_flag(flags, REC_FLAG_SHIFT, REC_FLAG_NUM) == 1)
-	{
-		i = 0;
-		while (dirs[i])
-		{
-			if (counter >= 0 && dirs[i] != NULL)
-				printf("\n");
-			if (is_flag(flags, A_FLAG_SHIFT, A_FLAG_NUM) == 0 \
-				&& ft_strncmp(dirs[i], ".", 1) == 0)
-			{
-				i++;
-				continue ;
-			}
-			size_t	ldname = ft_strlen(dirs[i]);
-			if (ft_strncmp(dirs[i], ".", ldname > 1 ? ldname : 1) != 0 \
-			&& ft_strncmp(dirs[i], "..", ldname > 2 ? ldname : 2) != 0)
-			{
-				ft_bzero(newdir, sizeof(char) * (512 + 1));
-				ft_strlcat(newdir, path, 512);
-				ft_strlcat(newdir, "/", 512);
-				ft_strlcat(newdir, dirs[i], 512);
-				rec_dirs(newdir, flags, counter + 1, possible_files);
-			}
-			i++;
-		}
-	}
-	free_2array((void**)dirs);
-	free_2array((void**)files);
-}
-
-
-void efiles(char **files, unsigned char flags)
-{
-	t_fileinfo 		**f;
-	size_t			i;
-
-	i = 0;
-	f = ft_calloc(1, sizeof(t_fileinfo*));
-	if (f == NULL)
-	{
-		perror("malloc");
-		exit(1);
-	}
-	while (files[i])
-	{
-		t_fileinfo *ff = new_fileinfo(".", files[i], 0);
-		if (ff == NULL)
-		{
-			perror("malloc");
-			exit(1);
-		}
-		if (add_2array((void***)&f, ff) != 0)
-		{
-			perror("malloc");
-			exit(1);
-		}
-		i++;
-	}
-
-	i = 0;
-	while (f[i])
-		get_fileinfo(f[i++], NULL);
-
-	t_spaces spaces;
-	ispaces(&spaces);
-	counter_of_spaces(f, &spaces);
-
-	sort_by_flags(f, flags);
-
-	print_files_from_files(f, spaces, is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM));
-
-	free_2array((void**)f);
-	f = NULL;
-}
-
 void	initialization(t_ls *ls)
 {
 	init_ls(ls);
 }
 
+# define MAX_COUNT_OF_ULL 20
+
+void	set_number(unsigned long long number, int base, char *value, char *c)
+{
+	if (number >= base)
+		set_number(number / base, base, value + 1, c);
+	value[ft_strlen(value)] = c[number % base];
+}
+
 int main(int argc, char **argv)
 {
 	t_ls	ls;
+	char	val[MAX_COUNT_OF_ULL + 1] = {0};
+
+	set_number(1234567891234567890, 10, val, "0123456789");
+	printf("[%s]\n", val);
 
 	(void)argc;
 	initialization(&ls);
