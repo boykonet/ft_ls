@@ -17,67 +17,129 @@ int		if_dir_or_file(char *filename)
 	return (0);
 }
 
-int		dir(t_list **listdirs, const char *dirname, char **emessage)
+//int		dir(t_list **listdirs, const char *dirname, char **emessage)
+//{
+//	t_list			*ptr;
+//	DIR				*pdir;
+//	struct dirent	*pDirent;
+//	int 			errcode;
+//
+//	if (!listdirs || !dirname || !emessage)
+//		return (-2);
+//
+//	// open directory
+//	pdir = opendir(dirname);
+//	if (pdir == NULL)
+//	{
+//		*emessage = strerror(errno);
+//		return (-4);
+//	}
+//
+//	// read directory and write to the t_list struct
+//	pDirent = readdir(pdir);
+//	if (pDirent == NULL)
+//	{
+//		closedir(pdir);
+//		*emessage = strerror(errno);
+//		return (-4);
+//	}
+//	*listdirs = ft_lstnew((void*)pDirent);
+//	if (!*listdirs)
+//	{
+//		errcode = closedir(pdir);
+//		*emessage = strerror(errno);
+//		return (errcode == -1 ? -4 : -1);
+//	}
+//	ptr = *listdirs;
+//	while ((pDirent = readdir(pdir)) != NULL)
+//	{
+//		ptr->next = ft_lstnew((void*)pDirent);
+//		if (!ptr->next)
+//		{
+//			ft_lstclear(listdirs, NULL);
+//			*listdirs = NULL;
+//			errcode = closedir(pdir);
+//			*emessage = strerror(errno);
+//			return (errcode == -1 ? -4 : -1);
+//		}
+//		ptr = ptr->next;
+//	}
+//	if (pDirent == NULL && errno)
+//	{
+//		ft_lstclear(listdirs, NULL);
+//		*listdirs = NULL;
+//		errcode = closedir(pdir);
+//		*emessage = strerror(errno);
+//		return (errcode == -1 ? -4 : -1);
+//	}
+//	if (closedir(pdir) == -1)
+//	{
+//		ft_lstclear(listdirs, NULL);
+//		*listdirs = NULL;
+//		*emessage = strerror(errno);
+//		return (-4);
+//	}
+//	return (0);
+//}
+
+
+void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
 {
-	t_list			*ptr;
-	DIR				*pdir;
-	struct dirent	*pDirent;
-	int 			errcode;
+	DIR				*dir;
+	struct dirent	*sd;
 
-	if (!listdirs || !dirname || !emessage)
-		return (-2);
-
-	// open directory
-	pdir = opendir(dirname);
-	if (pdir == NULL)
+	dir = opendir(dirpath);
+	if(!dir)
 	{
-		*emessage = strerror(errno);
-		return (-4);
+		char *s = ft_strjoin("ls: ", dirpath);
+		perror(s);
+		free(s);
+		s = NULL;
+		exit(1);
 	}
 
-	// read directory and write to the t_list struct
-	pDirent = readdir(pdir);
-	if (pDirent == NULL)
+	*files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
+	if (!*files)
 	{
-		closedir(pdir);
-		*emessage = strerror(errno);
-		return (-4);
+		char *s = ft_strjoin("ls: ", dirpath);
+		perror(s);
+		free(s);
+		s = NULL;
+		exit(1);
 	}
-	*listdirs = ft_lstnew((void*)pDirent);
-	if (!*listdirs)
+	while ((sd = readdir(dir)))
 	{
-		errcode = closedir(pdir);
-		*emessage = strerror(errno);
-		return (errcode == -1 ? -4 : -1);
-	}
-	ptr = *listdirs;
-	while ((pDirent = readdir(pdir)) != NULL)
-	{
-		ptr->next = ft_lstnew((void*)pDirent);
-		if (!ptr->next)
+		if (flag_a == 0 && ft_strncmp(sd->d_name, ".", 1) == 0)
+			continue ;
+		t_fileinfo *fi = new_fileinfo(dirpath, sd->d_name, sd->d_type);
+		if (fi == NULL)
 		{
-			ft_lstclear(listdirs, NULL);
-			*listdirs = NULL;
-			errcode = closedir(pdir);
-			*emessage = strerror(errno);
-			return (errcode == -1 ? -4 : -1);
+			perror("malloc");
+			exit(1);
 		}
-		ptr = ptr->next;
+		size_t flen = len_2array((const void**)(*files));
+		if (realloc_2array((void***)files, flen + 1) != 0)
+		{
+			perror("malloc");
+			exit(1);
+		}
+		flen = len_2array((const void**)(*files));
+		(*files)[flen] = fi;
 	}
-	if (pDirent == NULL && errno)
+	if (sd == NULL && errno != 0)
 	{
-		ft_lstclear(listdirs, NULL);
-		*listdirs = NULL;
-		errcode = closedir(pdir);
-		*emessage = strerror(errno);
-		return (errcode == -1 ? -4 : -1);
+		char *s = ft_strjoin("ls: ", dirpath);
+		perror(s);
+		free(s);
+		s = NULL;
+		exit(1);
 	}
-	if (closedir(pdir) == -1)
+	if (closedir(dir) == -1)
 	{
-		ft_lstclear(listdirs, NULL);
-		*listdirs = NULL;
-		*emessage = strerror(errno);
-		return (-4);
+		char *s = ft_strjoin("ls: ", dirpath);
+		perror(s);
+		free(s);
+		s = NULL;
+		exit(1);
 	}
-	return (0);
 }

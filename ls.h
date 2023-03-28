@@ -1,11 +1,12 @@
 #ifndef LS_H
 # define LS_H
 
-# define CSTDERR			2
-# define MAX_FLAGS			5
-# define FILETYPES_SIZE		8
-# define MAX_REPL_PATTERNS	16
+# define CSTDERR					2
+# define MAX_FLAGS					5
+# define FILETYPES_SIZE				8
+# define MAX_REPL_PATTERNS			16
 # define LONG_FORNAT_PARRERN_MAXS	6
+# define MAX_COUNT_OF_ULL			20
 
 
 # define ERR_HEADER					"ls: "
@@ -188,8 +189,8 @@ int				dir(t_list **listdirs, const char *dirname, char **emessage);
 int				if_dir_or_file(char *filename);
 int				clstat(t_list **l, char **dfiles, char **emessage);
 char			*creadlink(const char *link);
-char			*get_user(uid_t uid);
-char			*get_group(gid_t gid);
+void			get_owner(uid_t uid, char owner[255 + 1]);
+void			get_group(gid_t gid, char group[255 + 1]);
 
 int				len_2array(const void **darr);
 void			free_2array(void **arr);
@@ -217,7 +218,7 @@ int				is_flag(unsigned char flags, int shift, int num);
 void 			handle_dirs(char *path, unsigned char flags, int counter, int possible_files);
 void			handle_files(char **files, unsigned char flags);
 
-void			get_fileinfo(t_fileinfo *finfo, long long *total);
+void			set_fileinfo(t_fileinfo *finfo, long long *total);
 
 void	print_files_from_files(t_fileinfo **files, t_spaces maxs, int flag_l);
 void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, int flag_l);
@@ -236,6 +237,20 @@ void	print_files_from_files(t_fileinfo **files, t_spaces maxs, int flag_l);
 void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, int flag_l);
 
 void	ispaces(t_spaces *spaces);
+void	set_spaces(char spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1], t_fileinfo *finfo, t_spaces maxs);
 void	counter_of_spaces(t_fileinfo **info, t_spaces *spaces);
+
+
+void	set_group(char gname[255 + 1], gid_t st_gid);
+void	set_type(int *type, mode_t st_mode);
+void	set_owner(char oname[255 + 1], uid_t st_uid);
+void 	set_link(const char *filepath, char *link);
+void	set_number_of_bytes(off_t st_size, char *bytes);
+void	set_number_of_links(nlink_t st_nlinks, char *links);
+void	set_filemode(char *filepath, mode_t mode, int filetype, char *filemode);
+void	set_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *time_year_lm, struct timespec *mtime);
+
+
+void	rec_itoa_ull(char *numstr, unsigned long long number, int base, char *base_chars);
 
 #endif

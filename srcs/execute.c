@@ -15,7 +15,7 @@ void handle_dirs(char *path, unsigned char flags, int counter, int possible_file
 
 	total = 0;
 	for (int i = 0; files[i]; i++)
-		get_fileinfo(files[i], &total);
+		set_fileinfo(files[i], &total);
 
 	// count of spaces
 	ispaces(&spaces);
@@ -89,7 +89,7 @@ void handle_files(char **files, unsigned char flags)
 
 	i = 0;
 	while (f[i])
-		get_fileinfo(f[i++], NULL);
+		set_fileinfo(f[i++], NULL);
 
 	t_spaces spaces;
 	ispaces(&spaces);
