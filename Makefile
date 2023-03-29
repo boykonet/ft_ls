@@ -12,12 +12,12 @@ SRCS=		./main.c \
 			./srcs/set/owner.c \
 			./srcs/set/time.c \
 			./srcs/dir.c \
-			./srcs/execute.c \
+			./srcs/execution.c \
 			./srcs/fileinfo.c \
+			./srcs/initialization.c \
 			./srcs/ls_functions.c \
 			./srcs/lstat.c \
-			./srcs/owner_group.c \
-			./srcs/parse.c \
+			./srcs/parsing.c \
 			./srcs/readlink.c \
 			./srcs/sort.c \
 			./srcs/spaces.c \
@@ -25,6 +25,7 @@ SRCS=		./main.c \
 			./utils/copy.c \
 			./utils/double_array_utils.c \
 			./utils/error.c \
+			./utils/is_more_less.c \
 			./utils/max.c \
 			./utils/pattern.c \
 			./utils/printer.c \

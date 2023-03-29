@@ -11,18 +11,20 @@ static void	swap(void **first, void **second)
 
 int		order_cmp_by_filename(t_fileinfo *first, t_fileinfo *second, int is_inverted)
 {
-	int 	flen, slen;
 	int 	res;
 
-	flen = ft_strlen(first->filename);
-	slen = ft_strlen(second->filename);
-	res = ft_memcmp(first->filename, second->filename, flen > slen ? flen: slen);
-	return (is_inverted == FLAG_INVERTED_NO) ? (res > 0) : (res < 0);
+	res = ft_memcmp(first->filename, second->filename, \
+	max((int)ft_strlen(first->filename), (int)ft_strlen(second->filename)));
+	return (is_inverted == FLAG_INVERTED_NO) ? \
+	is_more(res, 0) : \
+	is_less(res, 0);
 }
 
 int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int is_inverted)
 {
-	return (is_inverted == FLAG_INVERTED_NO ? ((first->mtime.tv_sec < second->mtime.tv_sec)) : ((first->mtime.tv_sec > second->mtime.tv_sec)));
+	return (is_inverted == FLAG_INVERTED_NO ? \
+	is_less(first->mtime.tv_sec, second->mtime.tv_sec) : \
+	is_more(first->mtime.tv_sec, second->mtime.tv_sec));
 }
 
 void	sort_fileinfo(t_fileinfo ***array, int (*func)(t_fileinfo*, t_fileinfo*, int), int is_inverted)

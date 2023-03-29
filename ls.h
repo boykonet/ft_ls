@@ -180,7 +180,9 @@ typedef struct s_filetypes
 	char	replacement;
 } t_filetypes;
 
+void			initialization(t_ls *ls);
 void			parsing(t_ls *ls, char **data);
+void			execution(t_ls *ls);
 
 void 			init_ls(t_ls *ls);
 void			clear_ls(t_ls *ls);
@@ -211,8 +213,6 @@ t_list			*find_last_elem(t_list **head);
 
 void			handle_error(int errcode, t_list *epatterns);
 
-void			execution(t_ls *ls);
-
 int				is_flag(unsigned char flags, int shift, int num);
 
 void 			handle_dirs(char *path, unsigned char flags, int counter, int possible_files);
@@ -227,7 +227,10 @@ void	sort_fileinfo(t_fileinfo ***array, int (*func)(t_fileinfo*, t_fileinfo*, in
 int		order_cmp_by_filename(t_fileinfo *first, t_fileinfo *second, int is_inverted);
 int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int is_inverted);
 
+int		max(int first, int second);
 void	max_spaces(size_t *first, size_t second);
+int 	is_more(long first, long second);
+int 	is_less(long first, long second);
 
 t_fileinfo	*new_fileinfo(char *path, char *filename, int type);
 

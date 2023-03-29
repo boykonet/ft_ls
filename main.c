@@ -33,11 +33,6 @@ void	sort_by_flags(t_fileinfo **files, unsigned char flags)
 	}
 }
 
-void	initialization(t_ls *ls)
-{
-	init_ls(ls);
-}
-
 int main(int argc, char **argv)
 {
 	t_ls	ls;
@@ -64,9 +59,9 @@ int main(int argc, char **argv)
 //-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 six
 //-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 five
 //-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 first
-//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 second		(2)
-//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 third		(3)
-//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 fouth		(1)
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 second		(2) (115)
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 third		(3) (116)
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 fouth		(1) (102)
 //srwxr-xr-x  1 gkarina  piscine    0 Feb  3 23:52 socket.sock
 //prw-r--r--  1 gkarina  piscine    0 Feb  3 23:51 myfifo
 //drwxr-xr-x  7 gkarina  piscine  238 Feb  3 22:57 dir1
@@ -84,9 +79,9 @@ int main(int argc, char **argv)
 //-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 six
 //-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 five
 //-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 first
-//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 fouth		1
-//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 second		2
-//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 third		3
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 fouth		1 (102)
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 second		2 (115)
+//-rw-r--r--  1 gkarina  piscine    0 Mar 23 13:39 third		3 (116)
 //srwxr-xr-x  1 gkarina  piscine    0 Feb  3 23:52 socket.sock
 //prw-r--r--  1 gkarina  piscine    0 Feb  3 23:51 myfifo
 //drwxr-xr-x  7 gkarina  piscine  238 Feb  3 22:57 dir1
