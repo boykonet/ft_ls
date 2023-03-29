@@ -1,11 +1,5 @@
 #include "../ls.h"
 
-int		eprinter(char *s)
-{
-	write(CSTDERR, s, ft_strlen(s));
-	return (-1);
-}
-
 void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
 {
 	char	spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1];
@@ -37,7 +31,7 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
 	else
 		replace_pattern(pattern, PATTERN_WITHOUT_LINK, patterns);
 
-	write(1, pattern, ft_strlen(pattern));
+	ft_putstr_fd(pattern, 1);
 }
 
 int 	the_largest_filename(t_fileinfo **files)
@@ -71,36 +65,40 @@ void	print_without_full_info(t_fileinfo **files)
 	i = 0;
 	while (files[i])
 	{
-		size_t	lfilename = ft_strlen(files[i]->filename);
 		if (files[i + 1] == NULL)
-		{
-			write(1, files[i]->filename, lfilename);
-		}
+			ft_putstr_fd(files[i]->filename, 1);
 		else
 		{
 			ft_memset(buf, ' ', cos + 1);
 			buf[cos] = '\0';
 			ft_memcpy(buf, files[i]->filename, ft_strlen(files[i]->filename));
-			write(1, buf, ft_strlen(buf));
+			ft_putstr_fd(buf, 1);
 		}
 		i++;
 	}
-	write(1, "\n", 1);
+	ft_putchar_fd('\n', 1);
+}
+
+void	putnbr(long long number, int base, char *base_str)
+{
+	unsigned long long nn;
+
+	nn = number;
+	if (number < 0)
+	{
+		ft_putchar_fd('-', 1);
+		nn = number * (-1);
+	}
+	if (nn >= base)
+		putnbr(nn / base, base, base_str);
+	ft_putchar_fd(base_str[nn % base], 1);
 }
 
 void	print_total(long long total)
 {
-	char	*stotal = ft_itoa(total);
-	if (stotal == NULL)
-	{
-		perror("malloc");
-		exit(1);
-	}
-	write(1, "total ", 6);
-	write(1, stotal, ft_strlen(stotal));
-	free(stotal);
-	stotal = NULL;
-	write(1, "\n", 1);
+	ft_putstr_fd("total ", 1);
+	putnbr(total, 10, "0123456789");
+	ft_putchar_fd('\n', 1);
 }
 
 void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, int flag_l)

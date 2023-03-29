@@ -11,7 +11,10 @@ void handle_dirs(char *path, unsigned char flags, int counter, int possible_file
 	openreaddir(&files, path, is_flag(flags, A_FLAG_SHIFT, A_FLAG_NUM));
 
 	if (counter > 0 || possible_files > 1)
-		printf("%s:\n", path);
+	{
+		ft_putstr_fd(path, 1);
+		ft_putendl_fd(":", 1);
+	}
 
 	total = 0;
 	for (int i = 0; files[i]; i++)
@@ -34,7 +37,7 @@ void handle_dirs(char *path, unsigned char flags, int counter, int possible_file
 		while (dirs[i])
 		{
 			if (counter >= 0 && dirs[i] != NULL)
-				printf("\n");
+				ft_putchar_fd('\n', 1);
 			if (is_flag(flags, A_FLAG_SHIFT, A_FLAG_NUM) == 0 \
 				&& ft_strncmp(dirs[i], ".", 1) == 0)
 			{
@@ -122,7 +125,7 @@ static int	execute_dirs(char **dirs, unsigned char flags, int possible_files)
 	{
 		handle_dirs(dirs[i], flags, 0, possible_files);
 		if (dirs[i + 1] != NULL)
-			write(1, "\n", 1);
+			ft_putchar_fd('\n', 1);
 		i++;
 	}
 	return (0);
@@ -137,7 +140,7 @@ void	execution(t_ls *ls)
 	if (flen > 0)
 		execute_files(ls->files, ls->flags);
 	if (dlen > 0 && flen > 0)
-		printf("\n");
+		ft_putchar_fd('\n', 1);
 	if (dlen > 0)
 		execute_dirs(ls->dirs, ls->flags, ls->possible_files);
 }

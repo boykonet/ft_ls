@@ -116,8 +116,8 @@ void	handle_error(int errcode, t_list *params)
 		default:
 			replace_pattern(emessage, UNEXPECTED_ERROR, NULL);
 	}
-	write(CSTDERR, ERR_HEADER, ft_strlen(ERR_HEADER));
-	write(CSTDERR, emessage, ft_strlen(emessage));
-	write(CSTDERR, "\n", 1);
+	ft_putstr_fd(ERR_HEADER, CSTDERR);
+	ft_putstr_fd(emessage, CSTDERR);
+	ft_putchar_fd('\n', 1);
 	exit(1);
 }
