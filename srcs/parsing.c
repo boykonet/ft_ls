@@ -55,13 +55,16 @@ int		add_flag(unsigned char *flags, char nf)
 	return (-1);
 }
 
-static int	parse_flags(char ***data, unsigned char *flags, t_list **patterns)
+static void	parse_flags(char ***data, unsigned char *flags, char emessage[255 + 1])
 {
 	char	*param;
 	int 	errcode;
 
 	if (data == NULL || flags == NULL || patterns == NULL)
-		return (-2);
+	{
+		ft_strlcpy(emessage, NULL_PARAMETER, 255);
+		return (-1);
+	}
 	if (len_2array((const void**)(*data)) == 0)
 		return (0);
 	while (*data != NULL && **data != NULL)
@@ -74,8 +77,8 @@ static int	parse_flags(char ***data, unsigned char *flags, t_list **patterns)
 			{
 				if (add_flag(flags, *param) == -1)
 				{
-					errcode = add_pattern(patterns, PATTERN_FLAG_NOT_SUPPORT, (char[2]){*param, '\0'});
-					return (errcode != 0 ? errcode : -3);
+					replace_pattern(e, FLAG_NOT_SUPPORT, (t_pattern[1]){{.pattern = "{{flag}}", .replacement = (char[2]){*param, '\0'}}});
+					return (-1);
 				}
 				param++;
 			}
@@ -150,15 +153,15 @@ static int	separate_filenames(char **filenames, char ***files, char ***dirs, int
 void	parsing(t_ls *ls, char **data)
 {
 	char	**filenames;
-	int		errcode;
+	char 	emessage[255 + 1] = {0};
 
-	errcode = parse_flags(&data, &ls->flags, &ls->epatterns);
-	handle_error(errcode, ls->epatterns);
+	parse_flags(&data, &ls->flags, emessage);
+	handle_error(emessage);
 
-	errcode = parse_filenames(data, &filenames);
-	handle_error(errcode, ls->epatterns);
+	parse_filenames(data, &filenames);
+	handle_error(emessage);
 
 	errcode = separate_filenames(filenames, &ls->files, &ls->dirs, &ls->possible_files);
 	free_2array((void**)filenames);
-	handle_error(errcode, ls->epatterns);
+	handle_error(emessage);
 }

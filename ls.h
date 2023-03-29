@@ -129,8 +129,8 @@ typedef int		(*f) (void*);
 
 typedef struct s_pattern
 {
-	char	*pattern;
-	char	*replacement;
+	char	pattern[255 + 1];
+	char	replacement[255 + 1];
 } t_pattern;
 
 typedef struct	s_ls
@@ -138,7 +138,7 @@ typedef struct	s_ls
 	unsigned char	flags;
 	char			**files;
 	char			**dirs;
-	t_list			*epatterns;
+	t_pattern 		epatterns[1];
 	int 			possible_files;
 } t_ls;
 
@@ -211,7 +211,7 @@ void			replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_
 
 t_list			*find_last_elem(t_list **head);
 
-void			handle_error(int errcode, t_list *epatterns);
+void	handle_error(char emessage[255 + 1]);
 
 int				is_flag(unsigned char flags, int shift, int num);
 

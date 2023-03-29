@@ -5,7 +5,7 @@ void	init_ls(t_ls *ls)
 	ls->flags = 0;
 	ls->files = NULL;
 	ls->dirs = NULL;
-	ls->epatterns = NULL;
+	ft_bzero(ls->epatterns, sizeof(ls->epatterns));
 	ls->possible_files = 0;
 }
 
@@ -22,11 +22,7 @@ void	clear_ls(t_ls *ls)
 		free_2array((void **)ls->dirs);
 		ls->dirs = NULL;
 	}
-	if (ls->epatterns)
-	{
-		ft_lstclear(&ls->epatterns, del_pattern);
-		ls->epatterns = NULL;
-	}
+	ft_bzero(ls->epatterns, sizeof(ls->epatterns));
 	ls->possible_files = 0;
 }
 

@@ -92,30 +92,10 @@ void	cleaner(t_ls *ls, int exitcode)
 	exit(exitcode);
 }
 
-void	handle_error(int errcode, t_list *params)
+void	handle_error(char emessage[255 + 1])
 {
-	char	emessage[200];
-
-	ft_bzero(emessage, 200);
-	switch (errcode) {
-		case 0:
-			return ;
-		case -1:
-			replace_pattern(emessage, MALLOC_ERROR, NULL);
-			break ;
-		case -2:
-			replace_pattern(emessage, NULL_PARAMETER, NULL);
-			break ;
-		case -3:
-			replace_pattern(emessage, FLAG_NOT_SUPPORT, params);
-			break ;
-		case -4:
-			replace_pattern(emessage, STRERROR_MESSAGE, params);
-			break ;
-		// place for any another cases
-		default:
-			replace_pattern(emessage, UNEXPECTED_ERROR, NULL);
-	}
+	if (ft_strlen(emessage) == 0)
+		return ;
 	ft_putstr_fd(ERR_HEADER, CSTDERR);
 	ft_putstr_fd(emessage, CSTDERR);
 	ft_putchar_fd('\n', 1);
