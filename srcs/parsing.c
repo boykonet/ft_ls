@@ -55,16 +55,13 @@ int		add_flag(unsigned char *flags, char nf)
 	return (-1);
 }
 
-static void	parse_flags(char ***data, unsigned char *flags, char emessage[255 + 1])
+static int	parse_flags(char ***data, unsigned char *flags, t_pattern p[1])
 {
 	char	*param;
-	int 	errcode;
+	int 	ecode;
 
-	if (data == NULL || flags == NULL || patterns == NULL)
-	{
-		ft_strlcpy(emessage, NULL_PARAMETER, 255);
-		return (-1);
-	}
+	if (data == NULL || flags == NULL)
+		return (-2);
 	if (len_2array((const void**)(*data)) == 0)
 		return (0);
 	while (*data != NULL && **data != NULL)
@@ -75,10 +72,11 @@ static void	parse_flags(char ***data, unsigned char *flags, char emessage[255 + 
 			param++;
 			while (*param != '\0')
 			{
-				if (add_flag(flags, *param) == -1)
+				ecode = add_flag(flags, *param);
+				if (ecode == -1)
 				{
-					replace_pattern(e, FLAG_NOT_SUPPORT, (t_pattern[1]){{.pattern = "{{flag}}", .replacement = (char[2]){*param, '\0'}}});
-					return (-1);
+					add_pattern(p, "{{flag}}", (char[2]){*param, '\0'});
+					return (-4);
 				}
 				param++;
 			}
@@ -89,60 +87,45 @@ static void	parse_flags(char ***data, unsigned char *flags, char emessage[255 + 
 	return (0);
 }
 
-static int	parse_filenames(char **data, char ***filenames)
+static int	parse_filenames(char **data, char ***filenames, t_pattern p[1])
 {
 	if (!filenames || !data)
 		return (-2);
 	*filenames = copy_filenames(data);
 	if (*filenames == NULL)
+	{
+		add_pattern(p, PATTERN_MALLOC_ERROR, strerror(errno));
 		return (-1);
+	}
 	return (0);
 }
 
-static int	separate_filenames(char **filenames, char ***files, char ***dirs, int *count_possible_files_and_dirs)
+static int	separate_filenames(char **filenames, char ***files, char ***dirs, int *count_possible_files_and_dirs, t_pattern p[1])
 {
-	int		errcode;
+	int		errcode, a2ecode;
 	size_t	len, i;
 
 	if (files == NULL || dirs == NULL || filenames == NULL || count_possible_files_and_dirs == NULL)
 		return (-2);
-	len = len_2array((const void**)filenames);
+	len = len_2array((const void **)filenames);
 	i = 0;
-
-	(*files) = ft_calloc(1, sizeof(char*));
-	if (*files == NULL)
-	{
-		perror("malloc");
-		exit(1);
-	}
-	*dirs = ft_calloc(1, sizeof(char*));
-	if (*dirs == NULL)
-	{
-		perror("malloc");
-		exit(1);
-	}
 	while (i < len)
 	{
 		errcode = if_dir_or_file(filenames[i]);
 		if (errcode == 0) // directory
-		{
-			errcode = add_2array((void***)dirs, ft_strdup(filenames[i]));
-			if (errcode != 0)
-				return (errcode);
-		}
+			a2ecode = add_2array((void***)dirs, filenames[i]);
 		else if (errcode == 1) // files
-		{
-			errcode = add_2array((void***)files, ft_strdup(filenames[i]));
-			if (errcode != 0)
-				return (errcode);
-		}
+			a2ecode = add_2array((void***)files, filenames[i]);
 		else if (errcode < 0) // some unexpected error
 		{
-			char *s = ft_strjoin("ls: ", filenames[i]);
-			perror(s);
-			free(s);
-			s = NULL;
-			errno = 0;
+			add_pattern(p, PATTERN_STRERROR_MESSAGE, strerror(errno));
+			return (-3);
+		}
+		if (a2ecode != 0)
+		{
+			if (a2ecode == -1)
+				add_pattern(p, PATTERN_MALLOC_ERROR, strerror(errno));
+			return (a2ecode);
 		}
 		*count_possible_files_and_dirs += 1;
 		i++;
@@ -153,15 +136,18 @@ static int	separate_filenames(char **filenames, char ***files, char ***dirs, int
 void	parsing(t_ls *ls, char **data)
 {
 	char	**filenames;
-	char 	emessage[255 + 1] = {0};
+	int 	ecode;
 
-	parse_flags(&data, &ls->flags, emessage);
-	handle_error(emessage);
+	ecode = parse_flags(&data, &ls->flags, ls->epatterns);
+	if (handle_error(ecode, ls->epatterns) == -1)
+		cleaner(ls, 1);
 
-	parse_filenames(data, &filenames);
-	handle_error(emessage);
+	ecode = parse_filenames(data, &filenames, ls->epatterns);
+	if (handle_error(ecode, ls->epatterns) == -1)
+		cleaner(ls, 1);
 
-	errcode = separate_filenames(filenames, &ls->files, &ls->dirs, &ls->possible_files);
+	ecode = separate_filenames(filenames, &ls->files, &ls->dirs, &ls->possible_files, ls->epatterns);
 	free_2array((void**)filenames);
-	handle_error(emessage);
+	if (handle_error(ecode, ls->epatterns) == -1)
+		cleaner(ls, 1);
 }

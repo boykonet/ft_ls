@@ -12,21 +12,28 @@ int len_2array(const void **darr)
 	return len;
 }
 
+void	free_2array_content(void **arr)
+{
+	size_t	asize, i;
+
+	if (arr == NULL)
+		return ;
+	asize = sizeof(arr);
+	i = 0;
+	while (asize / sizeof(void*) > i)
+	{
+		if (arr[i] != NULL)
+		{
+			free(arr[i]);
+			arr[i] = NULL;
+		}
+		i++;
+	}
+}
+
 void	free_2array(void **arr)
 {
-	int alen;
-
-	alen = len_2array((const void **) arr);
-	if (alen == 0)
-		return ;
-	while (--alen >= 0)
-	{
-		if (arr[alen] != NULL)
-		{
-			free(arr[alen]);
-			arr[alen] = NULL;
-		}
-	}
+	free_2array_content(arr);
 	free(arr);
 	arr = NULL;
 }
@@ -56,15 +63,34 @@ int		realloc_2array(void ***data, size_t size)
 
 int	add_2array(void ***data, void *value)
 {
-	int		e;
+	int		ecode;
 	size_t	len;
+	void	*vcopy;
 
+	len = 0;
+	ecode = 0;
 	if (data == NULL || value == NULL)
 		return (-2);
-	len = len_2array((const void**)(*data));
-	e = realloc_2array(data, len + 1);
-	if (e != 0)
-		return (e);
-	(*data)[len] = value;
+	vcopy = ft_strdup(value);
+	if (vcopy == NULL)
+		return (-1);
+	if (*data == NULL)
+	{
+		*data = ft_calloc(2, sizeof(void*));
+		if (*data == NULL)
+			ecode = -1;
+	}
+	else
+	{
+		len = len_2array((const void**)(*data));
+		ecode = realloc_2array(data, len + 1);
+	}
+	if (ecode != 0)
+	{
+		free(vcopy);
+		vcopy = NULL;
+		return (ecode);
+	}
+	(*data)[len] = vcopy;
 	return (0);
 }

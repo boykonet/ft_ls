@@ -10,37 +10,19 @@ int		if_dir_or_file(char *filename)
 	if (dir == NULL)
 	{
 		if (errno == ENOTDIR)
+		{
+			errno = 0;
 			return (1);
+		}
 		return (-1);
 	}
-	closedir(dir);
-	return (0);
+	return (closedir(dir));
 }
 
-void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
+int	creaddir(t_fileinfo ***files, DIR *dir, char *dirpath, int flag_a)
 {
-	DIR				*dir;
 	struct dirent	*sd;
 
-	dir = opendir(dirpath);
-	if(!dir)
-	{
-		char *s = ft_strjoin("ls: ", dirpath);
-		perror(s);
-		free(s);
-		s = NULL;
-		exit(1);
-	}
-
-	*files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
-	if (!*files)
-	{
-		char *s = ft_strjoin("ls: ", dirpath);
-		perror(s);
-		free(s);
-		s = NULL;
-		exit(1);
-	}
 	while ((sd = readdir(dir)))
 	{
 		if (flag_a == 0 && ft_strncmp(sd->d_name, ".", 1) == 0)
@@ -48,32 +30,57 @@ void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
 		t_fileinfo *fi = new_fileinfo(dirpath, sd->d_name, sd->d_type);
 		if (fi == NULL)
 		{
-			perror("malloc");
-			exit(1);
+			free_2array_content((void**)*files);
+			return (-1);
 		}
 		size_t flen = len_2array((const void**)(*files));
 		if (realloc_2array((void***)files, flen + 1) != 0)
 		{
-			perror("malloc");
-			exit(1);
+			free(fi);
+			fi = NULL;
+			free_2array_content((void**)*files);
+			return (-1);
 		}
 		flen = len_2array((const void**)(*files));
 		(*files)[flen] = fi;
 	}
 	if (sd == NULL && errno != 0)
 	{
-		char *s = ft_strjoin("ls: ", dirpath);
-		perror(s);
-		free(s);
-		s = NULL;
-		exit(1);
+		free_2array_content((void**)*files);
+		return (-3);
+	}
+	return (0);
+}
+
+int	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
+{
+	DIR		*dir;
+	int		ecode;
+
+	dir = opendir(dirpath);
+	if(!dir)
+		return (-3);
+
+	*files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
+	if (*files == NULL)
+	{
+		if (closedir(dir) == -1)
+			return (-3);
+		return (-1);
+	}
+	ecode = creaddir(files, dir, dirpath, flag_a);
+	if (ecode != 0)
+	{
+		free(*files);
+		*files = NULL;
+		if (closedir(dir) == -1)
+			return (-3);
+		return (ecode);
 	}
 	if (closedir(dir) == -1)
 	{
-		char *s = ft_strjoin("ls: ", dirpath);
-		perror(s);
-		free(s);
-		s = NULL;
-		exit(1);
+		free_2array((void**)*files);
+		return (-3);
 	}
+	return (0);
 }

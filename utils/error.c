@@ -12,33 +12,10 @@ t_list	*find_last_elem(t_list **head)
 	return (curr);
 }
 
-int	add_pattern(t_list **head, char *pattern, char *replacement)
+void	add_pattern(t_pattern p[1], char *pattern, char *replacement)
 {
-	t_list		*last;
-	t_pattern	*p;
-
-	if (!head || !pattern || !replacement)
-		return (-2);
-	p = new_pattern(pattern, replacement);
-	if (!p)
-		return (-1);
-	if (!(*head))
-	{
-		last = ft_lstnew(p);
-		*head = last;
-	}
-	else
-	{
-		last = find_last_elem(head);
-		last->next = ft_lstnew(p);
-		last = last->next;
-	}
-	if (!last)
-	{
-		del_pattern(p);
-		return (-1);
-	}
-	return (0);
+	ft_strlcpy(p->pattern, pattern, 255);
+	ft_strlcpy(p->replacement, replacement, 255);
 }
 
 //int	flag_not_support_error(t_err *err, char flag)
@@ -52,38 +29,6 @@ int	add_pattern(t_list **head, char *pattern, char *replacement)
 //	return (add_pattern(&err->patterns, "{{flag}}", ch));
 //}
 
-void		replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PATTERNS + 1])
-{
-	char	*pbegin, *pend;
-	int		bsize, asize;
-	size_t	i;
-
-	i = 0;
-	ft_memcpy(dest, src, ft_strlen(src));
-	while (i < MAX_REPL_PATTERNS)
-	{
-		char	*pattern, *replacement;
-
-		pattern = patterns[i].pattern;
-		replacement = patterns[i].replacement;
-
-		pbegin = ft_strnstr(dest, pattern, ft_strlen(dest));
-		if (!pbegin)
-		{
-			i++;
-			continue ;
-		}
-		pend = pbegin + ft_strlen(pattern);
-
-		bsize = (int)(pbegin - dest);
-		asize = (int)((dest + ft_strlen(dest)) - pend);
-		ft_memmove(pbegin + ft_strlen(replacement), pbegin + ft_strlen(pattern), asize);
-		ft_memcpy(pbegin, replacement, ft_strlen(replacement));
-		dest[bsize + ft_strlen(replacement) + asize] = '\0';
-		i++;
-	}
-}
-
 void	cleaner(t_ls *ls, int exitcode)
 {
 	if (!ls || !exitcode)
@@ -92,12 +37,24 @@ void	cleaner(t_ls *ls, int exitcode)
 	exit(exitcode);
 }
 
-void	handle_error(char emessage[255 + 1])
+int	handle_error(int errcode, t_pattern p[1])
 {
-	if (ft_strlen(emessage) == 0)
-		return ;
+	char	emessage[255 + 1] = {0};
+
+	switch (errcode) {
+		case 0:
+			return (0);
+		case -1:
+			replace_pattern(emessage, MALLOC_ERROR, p);
+		case -2:
+			ft_strlcat(emessage, NULL_PARAMETER, 255);
+		case -3: // strerror
+			replace_pattern(emessage, STRERROR_MESSAGE, p);
+		case -4:
+			replace_pattern(emessage, FLAG_NOT_SUPPORT, p);
+	}
 	ft_putstr_fd(ERR_HEADER, CSTDERR);
 	ft_putstr_fd(emessage, CSTDERR);
 	ft_putchar_fd('\n', 1);
-	exit(1);
+	return (-1);
 }

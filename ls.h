@@ -10,18 +10,26 @@
 
 
 # define ERR_HEADER					"ls: "
-# define MALLOC_ERROR				"malloc error"
+
+# define MALLOC_ERROR				"malloc: {{error}}"
+# define PATTERN_MALLOC_ERROR		"{{error}}"
+
 # define NULL_PARAMETER				"null parameter"
+
 # define FLAG_NOT_SUPPORT			"illegal option -- {{flag}}\nusage: ls [-Ralrt] [file ...]"
+# define PATTERN_FLAG_NOT_SUPPORT	"{{flag}}"
+
 //# define UNSUPPORTED_ASCII			"unsupported symbol: only ascii printable characters"
 # define STRERROR_MESSAGE			"{{message}}"
-# define UNEXPECTED_ERROR			"unexpected error"
-
-# define PATTERN_FLAG_NOT_SUPPORT	"{{flag}}"
 # define PATTERN_STRERROR_MESSAGE	"{{message}}"
 
-# define PATTERN_WITHOUT_LINK	"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}}\n"
-# define PATTERN_WITH_LINK		"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}} -> {{link}}\n"
+
+# define UNEXPECTED_ERROR			"unexpected error: {{error}}"
+# define PATTERN_UNEXPECTED_ERROR	"{{error}}"
+
+
+# define PATTERN_WITHOUT_LINK		"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}}\n"
+# define PATTERN_WITH_LINK			"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}} -> {{link}}\n"
 
 # define REC_FLAG		'R'
 # define REC_FLAG_SHIFT	7
@@ -125,7 +133,7 @@
 # include "libs/libft/libft.h"
 
 
-typedef int		(*f) (void*);
+//typedef int		(*f) (void*);
 
 typedef struct s_pattern
 {
@@ -196,6 +204,7 @@ void			get_group(gid_t gid, char group[255 + 1]);
 
 int				len_2array(const void **darr);
 void			free_2array(void **arr);
+void			free_2array_content(void **arr);
 int				realloc_2array(void ***data, size_t size);
 int 			add_2array(void ***data, void *value);
 void			cleaner(t_ls *ls, int exitcode);
@@ -203,15 +212,16 @@ void			**calloca_to_2d(size_t size);
 char			**copy(const char **srcs, size_t len);
 char			**copy_dirs(t_fileinfo **files);
 
-t_pattern		*new_pattern(char *pattern, char *replacement);
-void			clear_pattern(t_pattern *pattern);
-void			del_pattern(void *node);
-int				add_pattern(t_list **head, char *pattern, char *replacement);
-void			replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PATTERNS + 1]);
+//t_pattern		*new_pattern(char *pattern, char *replacement);
+//void			clear_pattern(t_pattern *pattern);
+//void			del_pattern(void *node);
+void 			add_pattern(t_pattern p[1], char *pattern, char *replacement);
+void			replace_one_pattern(char *dest, t_pattern pattern[1]);
+void			replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PATTERNS]);
 
 t_list			*find_last_elem(t_list **head);
 
-void	handle_error(char emessage[255 + 1]);
+int 			handle_error(int ecode, t_pattern p[1]);
 
 int				is_flag(unsigned char flags, int shift, int num);
 
@@ -235,7 +245,7 @@ int 	is_less(long first, long second);
 t_fileinfo	*new_fileinfo(char *path, char *filename, int type);
 
 void	sort_by_flags(t_fileinfo **files, unsigned char flags);
-void	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a);
+int 	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a);
 void	print_files_from_files(t_fileinfo **files, t_spaces maxs, int flag_l);
 void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, int flag_l);
 
