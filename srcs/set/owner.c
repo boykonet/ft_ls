@@ -6,7 +6,7 @@ void	set_owner(char owner[255 + 1], uid_t st_uid)
 
 	pwd = getpwuid(st_uid);
 	if (pwd == NULL)
-		rec_itoa_ull(owner, st_uid, 10, "0123456789");
+		rec_itoa_ull(owner, st_uid, 10, DECIMAL_BASE_STR);
 	else
 		ft_strlcpy(owner, pwd->pw_name, 255);
 }

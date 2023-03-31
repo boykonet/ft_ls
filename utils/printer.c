@@ -1,42 +1,31 @@
 #include "../ls.h"
 
-void	add_spaces(t_pattern pattern[6], char **spaces)
-{
-	int	i;
-
-	i = 0;
-	while (i < 6)
-	{
-
-	}
-}
-
 void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
 {
-	char	spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1];
-	char	pattern[1024] = {0};
+	t_pattern	patterns[MAX_REPL_PATTERNS];
+	char		spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1];
+	char		pattern[1024] = {0};
 
 	ft_bzero(spaces, LONG_FORNAT_PARRERN_MAXS * (254 + 1) * sizeof(char));
 	set_spaces(spaces, finfo, maxs);
 
-	t_pattern	patterns[MAX_REPL_PATTERNS]; //= {
-//			{.pattern = "{{filemode}}", .replacement = finfo->filemode},
-//			{.pattern = "{{s1}}", .replacement = spaces[0]},
-//			{.pattern = "{{nlinks}}", .replacement = finfo->nlinks},
-//			{.pattern = "{{s2}}", .replacement = spaces[1]},
-//			{.pattern = "{{oname}}", .replacement = finfo->oname},
-//			{.pattern = "{{s3}}", .replacement = spaces[2]},
-//			{.pattern = "{{gname}}", .replacement = finfo->gname},
-//			{.pattern = "{{s4}}", .replacement = spaces[3]},
-//			{.pattern = "{{nbytes}}", .replacement = finfo->nbytes},
-//			{.pattern = "{{amonth}}", .replacement = finfo->amonth},
-//			{.pattern = "{{s5}}", .replacement = spaces[4]},
-//			{.pattern = "{{day}}", .replacement = finfo->day_lm},
-//			{.pattern = "{{s6}}", .replacement = spaces[5]},
-//			{.pattern = "{{time_year}}", .replacement = finfo->time_year_lm},
-//			{.pattern = "{{filename}}", .replacement = finfo->filename},
-//			{.pattern = "{{link}}", .replacement = finfo->link}};
-	add_pattern(p[0], "{{filemode}}", finfo->filemode);
+	add_pattern(&patterns[0], "{{filemode}}", finfo->filemode);
+	add_pattern(&patterns[1], "{{s1}}", spaces[0]);
+	add_pattern(&patterns[2], "{{nlinks}}", finfo->nlinks);
+	add_pattern(&patterns[3], "{{s2}}", spaces[1]);
+	add_pattern(&patterns[4], "{{oname}}", finfo->oname);
+	add_pattern(&patterns[5], "{{s3}}", spaces[2]);
+	add_pattern(&patterns[6], "{{gname}}", finfo->gname);
+	add_pattern(&patterns[7], "{{s4}}", spaces[3]);
+	add_pattern(&patterns[8], "{{nbytes}}", finfo->nbytes);
+	add_pattern(&patterns[9], "{{amonth}}", finfo->amonth);
+	add_pattern(&patterns[10], "{{s5}}", spaces[4]);
+	add_pattern(&patterns[11], "{{day}}", finfo->day_lm);
+	add_pattern(&patterns[12], "{{s6}}", spaces[5]);
+	add_pattern(&patterns[13], "{{time_year}}", finfo->time_year_lm);
+	add_pattern(&patterns[14], "{{filename}}", finfo->filename);
+	add_pattern(&patterns[15], "{{link}}", finfo->link);
+
 
 	if (finfo->type == S_IFLNK)
 		replace_pattern(pattern, PATTERN_WITH_LINK, patterns);
@@ -61,7 +50,7 @@ int 	the_largest_filename(t_fileinfo **files)
 			max = clen;
 		i++;
 	}
-	return (i);
+	return (max);
 }
 
 void	print_without_full_info(t_fileinfo **files)
@@ -73,7 +62,7 @@ void	print_without_full_info(t_fileinfo **files)
 	largest = the_largest_filename(files);
 	if (largest == 0)
 		return ;
-	cos = largest + (largest % 8) + (8 - (largest % 8));
+	cos = ((largest / 8) + 1) * 8;
 	i = 0;
 	while (files[i])
 	{
@@ -101,7 +90,7 @@ void	putnbr(long long number, int base, char *base_str)
 		ft_putchar_fd('-', 1);
 		nn = number * (-1);
 	}
-	if (nn >= base)
+	if (nn >= (unsigned long long)base)
 		putnbr(nn / base, base, base_str);
 	ft_putchar_fd(base_str[nn % base], 1);
 }
@@ -109,7 +98,7 @@ void	putnbr(long long number, int base, char *base_str)
 void	print_total(long long total)
 {
 	ft_putstr_fd("total ", 1);
-	putnbr(total, 10, "0123456789");
+	putnbr(total, 10, DECIMAL_BASE_STR);
 	ft_putchar_fd('\n', 1);
 }
 

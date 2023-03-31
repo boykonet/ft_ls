@@ -8,6 +8,8 @@
 # define LONG_FORNAT_PARRERN_MAXS	6
 # define MAX_COUNT_OF_ULL			20
 
+# define DECIMAL_BASE_STR			"0123456789"
+
 
 # define ERR_HEADER					"ls: "
 
