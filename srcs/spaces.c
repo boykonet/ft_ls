@@ -12,9 +12,10 @@ void	ispaces(t_spaces *spaces)
 
 void	set_spaces(char spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1], t_fileinfo *finfo, t_spaces maxs)
 {
-	int		cos[LONG_FORNAT_PARRERN_MAXS] = {0}; // count of spaces
+	size_t	cos[LONG_FORNAT_PARRERN_MAXS]; // count of spaces
 	size_t	i;
 
+	ft_bzero(cos, sizeof(size_t) * LONG_FORNAT_PARRERN_MAXS);
 	cos[0] = maxs.s_link - ft_strlen(finfo->nlinks);
 	cos[1] = maxs.s_oname - ft_strlen(finfo->oname);
 	cos[2] = maxs.s_gname - ft_strlen(finfo->gname);

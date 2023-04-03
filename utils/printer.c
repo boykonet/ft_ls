@@ -102,11 +102,17 @@ void	print_total(long long total)
 	ft_putchar_fd('\n', 1);
 }
 
-void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, int flag_l)
+void	print_files_from_dirs(t_fileinfo **files, long long total, int flag_l)
 {
-	size_t	i;
+	t_spaces	maxs;
+	size_t		i;
 
 	i = 0;
+	if (files == NULL)
+		return ;
+	ispaces(&maxs);
+	counter_of_spaces(files, &maxs);
+
 	if (flag_l == 1 && len_2array((const void**)files) > 0)
 		print_total(total);
 
@@ -119,11 +125,16 @@ void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, i
 	}
 }
 
-void	print_files_from_files(t_fileinfo **files, t_spaces maxs, int flag_l)
+void	print_files_from_files(t_fileinfo **files, int flag_l)
 {
+	t_spaces	maxs;
 	size_t	i;
 
 	i = 0;
+	if (files == NULL)
+		return ;
+	ispaces(&maxs);
+	counter_of_spaces(files, &maxs);
 	if (flag_l == 0)
 		print_without_full_info(files);
 	else

@@ -18,12 +18,11 @@
 
 # define NULL_PARAMETER				"null parameter"
 
-# define FLAG_NOT_SUPPORT			"illegal option -- {{flag}}\nusage: ls [-Ralrt] [file ...]"
-# define PATTERN_FLAG_NOT_SUPPORT	"{{flag}}"
-
-//# define UNSUPPORTED_ASCII			"unsupported symbol: only ascii printable characters"
 # define STRERROR_MESSAGE			"{{message}}"
 # define PATTERN_STRERROR_MESSAGE	"{{message}}"
+
+# define FLAG_NOT_SUPPORT			"illegal option -- {{flag}}\nusage: ls [-Ralrt] [file ...]"
+# define PATTERN_FLAG_NOT_SUPPORT	"{{flag}}"
 
 
 # define UNEXPECTED_ERROR			"unexpected error: {{error}}"
@@ -61,6 +60,7 @@
 # define IF_DIRS_YES		1
 
 # define HALF_OF_YEAR_SECONDS	(365.2422 * 0.5 * 24 * 60 * 60)
+# define LEN_PRINTABLE_LINE		128
 
 # include <unistd.h>
 /*
@@ -171,7 +171,7 @@ typedef struct s_fileinfo
 {
 	char				path[3841 + 1];
 	char				filename[255 + 1];
-	int					type;
+	unsigned int		type;
 	char				filemode[11 + 1];
 	char				nlinks[5 + 1];			// because nlinks_t type is cast for unsigned short, maximum value is 65535
 	char				oname[255 + 1];			// owner filename
@@ -186,8 +186,8 @@ typedef struct s_fileinfo
 
 typedef struct s_filetypes
 {
-	int		filetype;
-	char	replacement;
+	unsigned int	filetype;
+	char			replacement;
 } t_filetypes;
 
 void			initialization(t_ls *ls);
@@ -200,7 +200,7 @@ void			clear_ls(t_ls *ls);
 int				dir(t_list **listdirs, const char *dirname, char **emessage);
 int				if_dir_or_file(char *filename);
 int				clstat(t_list **l, char **dfiles, char **emessage);
-char			*creadlink(const char *link);
+int				creadlink(const char *link, char *file);
 void			get_owner(uid_t uid, char owner[255 + 1]);
 void			get_group(gid_t gid, char group[255 + 1]);
 
@@ -227,13 +227,13 @@ int 			handle_error(int ecode, t_pattern p[1]);
 
 int				is_flag(unsigned char flags, int shift, int num);
 
-void 			handle_dirs(char *path, unsigned char flags, int counter, int possible_files);
-void			handle_files(char **files, unsigned char flags);
+int 			handle_dirs(char *path, unsigned char flags, int counter, int possible_files);
+int 			handle_files(char **files, unsigned char flags);
 
-void			set_fileinfo(t_fileinfo *finfo, long long *total);
+int 			set_fileinfo(t_fileinfo *finfo, long long *total);
 
-void	print_files_from_files(t_fileinfo **files, t_spaces maxs, int flag_l);
-void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, int flag_l);
+void	print_files_from_files(t_fileinfo **files, int flag_l);
+void	print_files_from_dirs(t_fileinfo **files, long long total, int flag_l);
 
 void	sort_fileinfo(t_fileinfo ***array, int (*func)(t_fileinfo*, t_fileinfo*, int), int is_inverted);
 int		order_cmp_by_filename(t_fileinfo *first, t_fileinfo *second, int is_inverted);
@@ -244,12 +244,12 @@ void	max_spaces(size_t *first, size_t second);
 int 	is_more(long first, long second);
 int 	is_less(long first, long second);
 
-t_fileinfo	*new_fileinfo(char *path, char *filename, int type);
+t_fileinfo	*new_fileinfo(char *path, char *filename);
 
 void	sort_by_flags(t_fileinfo **files, unsigned char flags);
-int 	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a);
-void	print_files_from_files(t_fileinfo **files, t_spaces maxs, int flag_l);
-void	print_files_from_dirs(t_fileinfo **files, long long total, t_spaces maxs, int flag_l);
+int 	openreaddir(char ***files, char *dirpath, int flag_a);
+void	print_files_from_files(t_fileinfo **files, int flag_l);
+void	print_files_from_dirs(t_fileinfo **files, long long total, int flag_l);
 
 void	ispaces(t_spaces *spaces);
 void	set_spaces(char spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1], t_fileinfo *finfo, t_spaces maxs);
@@ -257,13 +257,13 @@ void	counter_of_spaces(t_fileinfo **info, t_spaces *spaces);
 
 
 void	set_group(char gname[255 + 1], gid_t st_gid);
-void	set_type(int *type, mode_t st_mode);
+void	set_type(unsigned int *type, mode_t st_mode);
 void	set_owner(char oname[255 + 1], uid_t st_uid);
-void 	set_link(const char *filepath, char *link);
+int 	set_link(const char *filepath, char *link);
 void	set_number_of_bytes(off_t st_size, char *bytes);
 void	set_number_of_links(nlink_t st_nlinks, char *links);
-void	set_filemode(char *filepath, mode_t mode, int filetype, char *filemode);
-void	set_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *time_year_lm, struct timespec *mtime);
+void	set_filemode(char *filepath, mode_t mode, unsigned int filetype, char *filemode);
+int 	set_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *time_year_lm, struct timespec *mtime);
 
 
 void	rec_itoa_ull(char *numstr, unsigned long long number, int base, char *base_chars);

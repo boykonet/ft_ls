@@ -49,3 +49,28 @@ void	sort_fileinfo(t_fileinfo ***array, int (*func)(t_fileinfo*, t_fileinfo*, in
 		i++;
 	}
 }
+
+void	sort_by_flags(t_fileinfo **files, unsigned char flags)
+{
+	if (files == NULL)
+		return ;
+	if (is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 0)
+	{
+		sort_fileinfo(&files, order_cmp_by_filename, FLAG_INVERTED_NO);
+	}
+	else if (is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 1)
+	{
+		sort_fileinfo(&files, order_cmp_by_filename, FLAG_INVERTED_YES);
+	}
+
+	if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 1 \
+		&& is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 0)
+	{
+		sort_fileinfo(&files, order_cmp_by_tlastmod, FLAG_INVERTED_NO);
+	}
+	else if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 1 \
+		&& is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM) == 1)
+	{
+		sort_fileinfo(&files, order_cmp_by_tlastmod, FLAG_INVERTED_YES);
+	}
+}

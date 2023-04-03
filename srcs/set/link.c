@@ -1,12 +1,13 @@
 #include "../../ls.h"
 
-void set_link(const char *filepath, char *link)
+int set_link(const char *filepath, char *link)
 {
-	char	*new_link = creadlink(filepath);
-	if (!new_link)
-	{
-		perror("malloc");
-		exit(1);
-	}
-	ft_memcpy(link, new_link, ft_strlen(new_link));
+	int	ecode;
+
+	if (filepath == NULL)
+		return (-2);
+	ecode = creadlink(filepath, link);
+	if (ecode != 0)
+		return (ecode);
+	return (0);
 }

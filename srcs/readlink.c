@@ -1,14 +1,10 @@
 #include "../ls.h"
 
-char	*creadlink(const char *link)
+int	creadlink(const char *link, char file[255 + 1])
 {
-	char	file[255 + 1];
-
-	ft_bzero(file, sizeof(file));
-	if (readlink(link, file, sizeof(file)) < 0)
-	{
-		perror("readlink"); // TODO: remove
-		return (NULL);
-	}
-	return (ft_strdup(file));
+	if (link == NULL)
+		return (-2);
+	if (readlink(link, file, 255) < 0)
+		return (-3);
+	return (0);
 }

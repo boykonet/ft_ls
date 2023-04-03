@@ -19,7 +19,7 @@ int		if_dir_or_file(char *filename)
 	return (closedir(dir));
 }
 
-int	creaddir(t_fileinfo ***files, DIR *dir, char *dirpath, int flag_a)
+int	creaddir(char ***files, DIR *dir, int flag_a)
 {
 	struct dirent	*sd;
 
@@ -27,7 +27,7 @@ int	creaddir(t_fileinfo ***files, DIR *dir, char *dirpath, int flag_a)
 	{
 		if (flag_a == 0 && ft_strncmp(sd->d_name, ".", 1) == 0)
 			continue ;
-		t_fileinfo *fi = new_fileinfo(dirpath, sd->d_name, sd->d_type);
+		char *fi = ft_strdup(sd->d_name);
 		if (fi == NULL)
 		{
 			free_2array_content((void**)*files);
@@ -52,7 +52,7 @@ int	creaddir(t_fileinfo ***files, DIR *dir, char *dirpath, int flag_a)
 	return (0);
 }
 
-int	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
+int	openreaddir(char ***nfiles, char *dirpath, int flag_a)
 {
 	DIR		*dir;
 	int		ecode;
@@ -61,26 +61,59 @@ int	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
 	if(!dir)
 		return (-3);
 
-	*files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
-	if (*files == NULL)
+	*nfiles = ft_calloc(1, sizeof(char*));
+	if (*nfiles == NULL)
 	{
 		if (closedir(dir) == -1)
 			return (-3);
 		return (-1);
 	}
-	ecode = creaddir(files, dir, dirpath, flag_a);
+	ecode = creaddir(nfiles, dir, flag_a);
 	if (ecode != 0)
 	{
-		free(*files);
-		*files = NULL;
+		free(*nfiles);
+		*nfiles = NULL;
 		if (closedir(dir) == -1)
 			return (-3);
 		return (ecode);
 	}
 	if (closedir(dir) == -1)
 	{
-		free_2array((void**)*files);
+		free_2array((void**)*nfiles);
 		return (-3);
 	}
 	return (0);
 }
+
+//int	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
+//{
+//	DIR		*dir;
+//	int		ecode;
+//
+//	dir = opendir(dirpath);
+//	if(!dir)
+//		return (-3);
+//
+//	*files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
+//	if (*files == NULL)
+//	{
+//		if (closedir(dir) == -1)
+//			return (-3);
+//		return (-1);
+//	}
+//	ecode = creaddir(files, dir, dirpath, flag_a);
+//	if (ecode != 0)
+//	{
+//		free(*files);
+//		*files = NULL;
+//		if (closedir(dir) == -1)
+//			return (-3);
+//		return (ecode);
+//	}
+//	if (closedir(dir) == -1)
+//	{
+//		free_2array((void**)*files);
+//		return (-3);
+//	}
+//	return (0);
+//}

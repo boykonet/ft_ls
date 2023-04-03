@@ -13,7 +13,7 @@ void	cstrmode(mode_t st_mode, char *filemode)
 	}
 }
 
-void	set_filetype(char *filetype, int type)
+void	set_filetype(char *filetype, unsigned int type)
 {
 	t_filetypes	filetypes[FILETYPES_SIZE + 1] = {
 			{.filetype = S_IFBLK, .replacement = 'b'},
@@ -51,7 +51,7 @@ void	set_file_attribute(char *path, char *attr)
 	is_extended_attributes(path, attr);
 }
 
-void	set_filemode(char *filepath, mode_t mode, int filetype, char *filemode)
+void	set_filemode(char *filepath, mode_t mode, unsigned int filetype, char *filemode)
 {
 	cstrmode(mode, &filemode[1]);
 	set_filetype(&filemode[0], filetype);
