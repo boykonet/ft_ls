@@ -219,7 +219,7 @@ char			**copy_dirs(t_fileinfo **files);
 //void			del_pattern(void *node);
 void 			add_pattern(t_pattern p[1], char *pattern, char *replacement);
 void			replace_one_pattern(char *dest, t_pattern pattern[1]);
-void			replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PATTERNS]);
+void			replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PATTERNS], size_t count);
 
 t_list			*find_last_elem(t_list **head);
 

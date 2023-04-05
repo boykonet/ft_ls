@@ -41,18 +41,16 @@ int	handle_error(int errcode, t_pattern p[1])
 {
 	char	emessage[255 + 1] = {0};
 
-	switch (errcode) {
-		case 0:
-			return (0);
-		case -1:
-			replace_pattern(emessage, MALLOC_ERROR, p);
-		case -2:
-			ft_strlcat(emessage, NULL_PARAMETER, 255);
-		case -3: // strerror
-			replace_pattern(emessage, STRERROR_MESSAGE, p);
-		case -4:
-			replace_pattern(emessage, FLAG_NOT_SUPPORT, p);
-	}
+	if (errcode == 0)
+		return (0);
+	else if (errcode == -1)
+		replace_pattern(emessage, MALLOC_ERROR, p, 1);
+	else if (errcode == -2)
+		ft_strlcat(emessage, NULL_PARAMETER, 255);
+	else if (errcode == -3) // strerror
+		replace_pattern(emessage, STRERROR_MESSAGE, p, 1);
+	else if (errcode == -4)
+		replace_pattern(emessage, FLAG_NOT_SUPPORT, p, 1);
 	ft_putstr_fd(ERR_HEADER, CSTDERR);
 	ft_putstr_fd(emessage, CSTDERR);
 	ft_putchar_fd('\n', 1);

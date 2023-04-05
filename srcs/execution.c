@@ -21,7 +21,7 @@ void	set_path(char *path, char *dir, char newdir[512 + 1])
 	ft_strlcat(newdir, dir, 512);
 }
 
-int	filenames_to_fileinfo(t_fileinfo ***files, char **filenames)
+int	filenames_to_fileinfo(t_fileinfo ***files, char **filenames, char *path)
 {
 	size_t	i;
 	int		ecode;
@@ -31,7 +31,8 @@ int	filenames_to_fileinfo(t_fileinfo ***files, char **filenames)
 		return (-2);
 	while (filenames[i])
 	{
-		t_fileinfo *file = new_fileinfo(".", filenames[i]);
+		printf("filenames [%s] OK\n", filenames[i]);
+		t_fileinfo *file = new_fileinfo(path, filenames[i]);
 		if (file == NULL)
 		{
 			free_2array_content((void **)(*files));
@@ -64,7 +65,7 @@ int handle_dirs(char *path, unsigned char flags, int counter, int possible_files
 	if (ecode != 0)
 		return (ecode);
 
-	ecode = filenames_to_fileinfo(&files, filenames);
+	ecode = filenames_to_fileinfo(&files, filenames, path);
 	free_2array((void**)filenames);
 	filenames = NULL;
 	if (ecode != 0)
@@ -131,10 +132,12 @@ int handle_files(char **filenames, unsigned char flags)
 	size_t			i;
 	int				ecode;
 
-	files = ft_calloc(1, sizeof(t_fileinfo*));
+	if (filenames == NULL)
+		return (-2);
+	files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
 	if (files == NULL)
 		return (-1);
-	ecode = filenames_to_fileinfo(&files, filenames);
+	ecode = filenames_to_fileinfo(&files, filenames, ".");
 	if (ecode != 0)
 	{
 		free_2array((void**)files);

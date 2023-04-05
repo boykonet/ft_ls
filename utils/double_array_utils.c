@@ -76,7 +76,8 @@ int	add_2array(void ***data, void *value)
 		return (-1);
 	if (*data == NULL)
 	{
-		*data = ft_calloc(2, sizeof(void*));
+		printf("I'm here\n");
+		*data = (void**)ft_calloc(2, sizeof(void*));
 		if (*data == NULL)
 			ecode = -1;
 	}

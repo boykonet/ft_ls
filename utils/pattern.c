@@ -70,13 +70,13 @@ void		replace_one_pattern(char *dest, t_pattern pattern[1])
 	dest[bsize + lrepl + asize] = '\0';
 }
 
-void		replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PATTERNS])
+void		replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PATTERNS], size_t count)
 {
 	size_t	i;
 
 	i = 0;
 	ft_memcpy(dest, src, ft_strlen(src));
-	while (i < MAX_REPL_PATTERNS)
+	while (i < count && i < MAX_REPL_PATTERNS)
 	{
 		replace_one_pattern(dest, &patterns[i]);
 		i++;
