@@ -7,6 +7,7 @@ void	init_ls(t_ls *ls)
 	ls->dirs = NULL;
 	ft_bzero(ls->epatterns, sizeof(ls->epatterns));
 	ls->possible_files = 0;
+	ls->global_ecode = 0;
 }
 
 void	clear_ls(t_ls *ls)
@@ -24,5 +25,6 @@ void	clear_ls(t_ls *ls)
 	}
 	ft_bzero(ls->epatterns, sizeof(ls->epatterns));
 	ls->possible_files = 0;
+	ls->global_ecode = 0;
 }
 

@@ -65,33 +65,24 @@ int	add_2array(void ***data, void *value)
 {
 	int		ecode;
 	size_t	len;
-	void	*vcopy;
 
 	len = 0;
 	ecode = 0;
 	if (data == NULL || value == NULL)
 		return (-2);
-	vcopy = ft_strdup(value);
-	if (vcopy == NULL)
-		return (-1);
 	if (*data == NULL)
 	{
-		printf("I'm here\n");
 		*data = (void**)ft_calloc(2, sizeof(void*));
 		if (*data == NULL)
 			ecode = -1;
 	}
 	else
 	{
-		len = len_2array((const void**)(*data));
+		len = len_2array((const void **)(*data));
 		ecode = realloc_2array(data, len + 1);
 	}
 	if (ecode != 0)
-	{
-		free(vcopy);
-		vcopy = NULL;
 		return (ecode);
-	}
-	(*data)[len] = vcopy;
+	(*data)[len] = value;
 	return (0);
 }

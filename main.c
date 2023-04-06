@@ -13,13 +13,15 @@
 int main(int argc, char **argv)
 {
 	t_ls	ls;
+	int 	ecode;
 
 	(void)argc;
 	initialization(&ls);
 	parsing(&ls, argv + 1);
 	execution(&ls);
+	ecode = ls.global_ecode;
 	cleaner(&ls, 0);
-	return (0);
+	return (ecode);
 }
 
 

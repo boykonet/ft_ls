@@ -5,6 +5,7 @@
 # define MAX_FLAGS					5
 # define FILETYPES_SIZE				8
 # define MAX_REPL_PATTERNS			16
+# define MAX_ERROR_PATTERNS			2
 # define LONG_FORNAT_PARRERN_MAXS	6
 # define MAX_COUNT_OF_ULL			20
 
@@ -23,6 +24,10 @@
 
 # define FLAG_NOT_SUPPORT			"illegal option -- {{flag}}\nusage: ls [-Ralrt] [file ...]"
 # define PATTERN_FLAG_NOT_SUPPORT	"{{flag}}"
+
+# define FILE_ERROR					"{{filename}}: {{message}}"
+# define PATTERN_FILE_ERROR_FILENAME	"{{filename}}"
+# define PATTERN_FILE_ERROR_MESSAGE	"{{message}}"
 
 
 # define UNEXPECTED_ERROR			"unexpected error: {{error}}"
@@ -150,6 +155,7 @@ typedef struct	s_ls
 	char			**dirs;
 	t_pattern 		epatterns[1];
 	int 			possible_files;
+	int 			global_ecode;
 } t_ls;
 
 typedef struct s_flags {
@@ -223,7 +229,7 @@ void			replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_
 
 t_list			*find_last_elem(t_list **head);
 
-int 			handle_error(int ecode, t_pattern p[1]);
+int 			handle_error(int ecode, t_pattern p[MAX_ERROR_PATTERNS], int *gcode);
 
 int				is_flag(unsigned char flags, int shift, int num);
 
@@ -267,5 +273,7 @@ int 	set_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *ti
 
 
 void	rec_itoa_ull(char *numstr, unsigned long long number, int base, char *base_chars);
+
+void	handle_ecodes(int ecode, char *filename, t_pattern p[MAX_ERROR_PATTERNS]);
 
 #endif

@@ -1,5 +1,5 @@
 NAME=ft_ls
-CC=gcc
+CC=clang
 CFLAGS= -g -Wall -Wextra -Werror -fsanitize=address
 
 SRCS=		./main.c \
