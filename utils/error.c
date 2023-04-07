@@ -20,17 +20,6 @@ void	add_pattern(t_pattern p[1], char *pattern, char *replacement)
 	ft_strlcpy(p->replacement, replacement, 255);
 }
 
-//int	flag_not_support_error(t_err *err, char flag)
-//{
-//	char		ch[2] = {flag, '\0'};
-//
-//	if (!err)
-//		return (-1);
-//	ft_memcpy(err->message, FLAG_NOT_SUPPORT, ft_strlen(FLAG_NOT_SUPPORT));
-//	err->exitcode = 1;
-//	return (add_pattern(&err->patterns, "{{flag}}", ch));
-//}
-
 void	cleaner(t_ls *ls, int exitcode)
 {
 	if (!ls || !exitcode)

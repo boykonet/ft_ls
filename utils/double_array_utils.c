@@ -14,13 +14,12 @@ int len_2array(const void **darr)
 
 void	free_2array_content(void **arr)
 {
-	size_t	asize, i;
+	size_t	i;
 
 	if (arr == NULL)
 		return ;
-	asize = sizeof(arr);
 	i = 0;
-	while (asize / sizeof(void*) > i)
+	while (arr[i])
 	{
 		if (arr[i] != NULL)
 		{

@@ -134,9 +134,19 @@ static int	separate_filenames(char ***filenames, char ***files, char ***dirs, in
 
 	if (files == NULL || dirs == NULL || filenames == NULL || count_possible_files_and_dirs == NULL)
 		return (-2);
+	*files = (char**)ft_calloc(1, sizeof(char*));
+	if (*files == NULL)
+		return (-1);
+	*dirs = (char**)ft_calloc(1, sizeof(char*));
+	if (*dirs == NULL)
+	{
+		free(*files);
+		*files = NULL;
+		return (-1);
+	}
 	while (*filenames && **filenames)
 	{
-		a2ecode = sort_by_dir_or_file(dirs, files, **filenames);
+		a2ecode = sort_by_dir_or_file(dirs, files, *(*filenames));
 		if (a2ecode != 0)
 		{
 			handle_ecodes(a2ecode, **filenames, p);
@@ -150,21 +160,19 @@ static int	separate_filenames(char ***filenames, char ***files, char ***dirs, in
 
 void	ehandler(char **filenames, t_ls *ls, int (*func)(char***, char***, char***, int*, t_pattern[MAX_ERROR_PATTERNS]))
 {
-	char **p;
+	char **f;
 	int 	ecode;
 
-	ecode = 0;
-	p = filenames;
-	while (p && *p)
+	f = filenames;
+	while (f && *f)
 	{
-		ecode = func(&p, &ls->files, &ls->dirs, &ls->possible_files, ls->epatterns);
+		ecode = func(&f, &ls->files, &ls->dirs, &ls->possible_files, ls->epatterns);
 		if (ecode != 0)
 		{
 			handle_error(ecode, ls->epatterns, &ls->global_ecode);
-			p++;
+			f++;
 		}
 	}
-
 }
 
 void	parsing(t_ls *ls, char **data)
@@ -177,14 +185,25 @@ void	parsing(t_ls *ls, char **data)
 		cleaner(ls, 1);
 
 	ecode = parse_filenames(data, &filenames, ls->epatterns);
-	handle_error(ecode, ls->epatterns, &ls->global_ecode);
 	if (handle_error(ecode, ls->epatterns, NULL) == -1)
 		cleaner(ls, 1);
 
-	ehandler(filenames, ls, separate_filenames);
+	char **f = filenames;
+	while (f && *f)
+	{
+		ecode = separate_filenames(&f, &ls->files, &ls->dirs, &ls->possible_files, ls->epatterns);
+		if (ecode != 0)
+		{
+			handle_error(ecode, ls->epatterns, &ls->global_ecode);
+			f++;
+		}
+	}
+
+//	ehandler(filenames, ls, separate_filenames);
 
 //	ecode = separate_filenames(filenames, &ls->files, &ls->dirs, &ls->possible_files, ls->epatterns);
-//	free_2array((void**)filenames);
+	free_2array((void**)filenames);
+	filenames = NULL;
 //	if (handle_error(ecode, ls->epatterns, NULL) == -1)
 //		cleaner(ls, 1);
 }

@@ -153,7 +153,7 @@ typedef struct	s_ls
 	unsigned char	flags;
 	char			**files;
 	char			**dirs;
-	t_pattern 		epatterns[1];
+	t_pattern 		epatterns[MAX_ERROR_PATTERNS];
 	int 			possible_files;
 	int 			global_ecode;
 } t_ls;

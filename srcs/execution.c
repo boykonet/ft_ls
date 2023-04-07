@@ -221,12 +221,8 @@ void	execution(t_ls *ls)
 	size_t	flen, dlen;
 	int 	ecode;
 
-	flen = 0;
-	dlen = 0;
-	if (ls->files != NULL)
-		flen = len_2array((const void**)ls->files);
-	if (ls->dirs != NULL)
-		dlen = len_2array((const void**)ls->dirs);
+	flen = len_2array((const void**)ls->files);
+	dlen = len_2array((const void**)ls->dirs);
 	if (flen > 0)
 	{
 		ecode = execute_files(ls->files, ls->flags, ls->epatterns);

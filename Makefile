@@ -1,6 +1,6 @@
 NAME=ft_ls
 CC=clang
-CFLAGS= -g -Wall -Wextra -Werror -fsanitize=address
+CFLAGS= -g -Wall -Wextra -Werror -fsanitize=address -fsanitize=leak
 
 SRCS=		./main.c \
 			./srcs/set/filemode.c \

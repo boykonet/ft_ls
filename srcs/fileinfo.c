@@ -5,7 +5,7 @@ t_fileinfo	*new_fileinfo(char *path, char *filename)
 	t_fileinfo *f;
 
 	f = ft_calloc(1, sizeof(t_fileinfo));
-	if (!f)
+	if (f == NULL)
 		return (NULL);
 	ft_memcpy(f->path, path, ft_strlen(path));
 	ft_memcpy(f->filename, filename, ft_strlen(filename));

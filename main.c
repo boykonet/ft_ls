@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 	parsing(&ls, argv + 1);
 	execution(&ls);
 	ecode = ls.global_ecode;
-	cleaner(&ls, 0);
+	clear_ls(&ls);
 	return (ecode);
 }
 
