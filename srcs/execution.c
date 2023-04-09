@@ -176,6 +176,7 @@ void	handle_ecodes(int ecode, char *filename, t_pattern p[MAX_ERROR_PATTERNS])
 		add_pattern(&p[0], PATTERN_FILE_ERROR_FILENAME, filename);
 		add_pattern(&p[1], PATTERN_FILE_ERROR_MESSAGE, strerror(errno));
 	}
+	errno = 0;
 }
 
 static int	execute_files(char **files, unsigned char flags, t_pattern p[MAX_ERROR_PATTERNS])

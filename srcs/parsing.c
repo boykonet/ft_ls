@@ -13,11 +13,11 @@ static char	**copy_filenames(char **data)
 	return (filenames);
 }
 
-/*   second 4 bytes        first 4 bytes
-**   0 |  0 |  0 |  0  ||  0 | 0 | 0 | 0
-**   R |  a |  l |  r  ||  t | - | - | -
-**   7 |  6 |  5 |  4  ||  3 | 2 | 1 | 0
-** 128 | 64 | 32 | 16  ||  8 | 4 | 2 | 1
+/*            second 4 bytes        first 4 bytes
+** byte   |   0 |  0 |  0 |  0  ||  0 | 0 | 0 | 0
+** flag   |   R |  a |  l |  r  ||  t | - | - | -
+** shift  |   7 |  6 |  5 |  4  ||  3 | 2 | 1 | 0
+** number | 128 | 64 | 32 | 16  ||  8 | 4 | 2 | 1
 */
 void	set_flag(unsigned char *flags, int shift, int num)
 {
@@ -134,25 +134,15 @@ static int	separate_filenames(char ***filenames, char ***files, char ***dirs, in
 
 	if (files == NULL || dirs == NULL || filenames == NULL || count_possible_files_and_dirs == NULL)
 		return (-2);
-	*files = (char**)ft_calloc(1, sizeof(char*));
-	if (*files == NULL)
-		return (-1);
-	*dirs = (char**)ft_calloc(1, sizeof(char*));
-	if (*dirs == NULL)
-	{
-		free(*files);
-		*files = NULL;
-		return (-1);
-	}
 	while (*filenames && **filenames)
 	{
+		*count_possible_files_and_dirs += 1;
 		a2ecode = sort_by_dir_or_file(dirs, files, *(*filenames));
 		if (a2ecode != 0)
 		{
 			handle_ecodes(a2ecode, **filenames, p);
 			return (a2ecode);
 		}
-		*count_possible_files_and_dirs += 1;
 		(*filenames)++;
 	}
 	return (0);
@@ -188,22 +178,7 @@ void	parsing(t_ls *ls, char **data)
 	if (handle_error(ecode, ls->epatterns, NULL) == -1)
 		cleaner(ls, 1);
 
-	char **f = filenames;
-	while (f && *f)
-	{
-		ecode = separate_filenames(&f, &ls->files, &ls->dirs, &ls->possible_files, ls->epatterns);
-		if (ecode != 0)
-		{
-			handle_error(ecode, ls->epatterns, &ls->global_ecode);
-			f++;
-		}
-	}
-
-//	ehandler(filenames, ls, separate_filenames);
-
-//	ecode = separate_filenames(filenames, &ls->files, &ls->dirs, &ls->possible_files, ls->epatterns);
+	ehandler(filenames, ls, separate_filenames);
 	free_2array((void**)filenames);
 	filenames = NULL;
-//	if (handle_error(ecode, ls->epatterns, NULL) == -1)
-//		cleaner(ls, 1);
 }

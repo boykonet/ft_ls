@@ -84,36 +84,3 @@ int	openreaddir(char ***nfiles, char *dirpath, int flag_a)
 	}
 	return (0);
 }
-
-//int	openreaddir(t_fileinfo ***files, char *dirpath, int flag_a)
-//{
-//	DIR		*dir;
-//	int		ecode;
-//
-//	dir = opendir(dirpath);
-//	if(!dir)
-//		return (-3);
-//
-//	*files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
-//	if (*files == NULL)
-//	{
-//		if (closedir(dir) == -1)
-//			return (-3);
-//		return (-1);
-//	}
-//	ecode = creaddir(files, dir, dirpath, flag_a);
-//	if (ecode != 0)
-//	{
-//		free(*files);
-//		*files = NULL;
-//		if (closedir(dir) == -1)
-//			return (-3);
-//		return (ecode);
-//	}
-//	if (closedir(dir) == -1)
-//	{
-//		free_2array((void**)*files);
-//		return (-3);
-//	}
-//	return (0);
-//}

@@ -241,7 +241,7 @@ int 			set_fileinfo(t_fileinfo *finfo, long long *total);
 void	print_files_from_files(t_fileinfo **files, int flag_l);
 void	print_files_from_dirs(t_fileinfo **files, long long total, int flag_l);
 
-void	sort_fileinfo(t_fileinfo ***array, int (*func)(t_fileinfo*, t_fileinfo*, int), int is_inverted);
+void	sort_fileinfo(t_fileinfo **array, size_t count_elems, int (*func)(t_fileinfo*, t_fileinfo*, int), int is_inverted);
 int		order_cmp_by_filename(t_fileinfo *first, t_fileinfo *second, int is_inverted);
 int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int is_inverted);
 

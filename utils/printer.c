@@ -53,31 +53,40 @@ int 	the_largest_filename(t_fileinfo **files)
 	return (max);
 }
 
+//void	print_without_full_info(t_fileinfo **files)
+//{
+//	char	buf[255 + 1];
+//	int		largest;
+//	size_t	cos, i; // count of symbols
+//
+//	largest = the_largest_filename(files);
+//	if (largest == 0)
+//		return ;
+//	cos = ((largest / 8) + 1) * 8;
+//	i = 0;
+//	while (files[i])
+//	{
+//		if (files[i + 1] == NULL)
+//			ft_putstr_fd(files[i]->filename, 1);
+//		else
+//		{
+//			ft_memset(buf, ' ', cos + 1);
+//			buf[cos] = '\0';
+//			ft_memcpy(buf, files[i]->filename, ft_strlen(files[i]->filename));
+//			ft_putstr_fd(buf, 1);
+//		}
+//		i++;
+//	}
+//	ft_putchar_fd('\n', 1);
+//}
+
 void	print_without_full_info(t_fileinfo **files)
 {
-	char	buf[255 + 1];
-	int		largest;
-	size_t	cos, i; // count of symbols
+	size_t	i;
 
-	largest = the_largest_filename(files);
-	if (largest == 0)
-		return ;
-	cos = ((largest / 8) + 1) * 8;
 	i = 0;
 	while (files[i])
-	{
-		if (files[i + 1] == NULL)
-			ft_putstr_fd(files[i]->filename, 1);
-		else
-		{
-			ft_memset(buf, ' ', cos + 1);
-			buf[cos] = '\0';
-			ft_memcpy(buf, files[i]->filename, ft_strlen(files[i]->filename));
-			ft_putstr_fd(buf, 1);
-		}
-		i++;
-	}
-	ft_putchar_fd('\n', 1);
+		ft_putendl_fd(files[i++]->filename, 1);
 }
 
 void	putnbr(long long number, int base, char *base_str)
