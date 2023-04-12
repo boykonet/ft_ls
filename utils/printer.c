@@ -28,9 +28,9 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
 
 
 	if (finfo->type == S_IFLNK)
-		replace_pattern(pattern, PATTERN_WITH_LINK, patterns, 15);
+		replace_pattern(pattern, PATTERN_WITH_LINK, patterns, MAX_REPL_PATTERNS);
 	else
-		replace_pattern(pattern, PATTERN_WITHOUT_LINK, patterns, 16);
+		replace_pattern(pattern, PATTERN_WITHOUT_LINK, patterns, 15);
 
 	ft_putstr_fd(pattern, 1);
 }

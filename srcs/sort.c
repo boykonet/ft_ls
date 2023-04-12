@@ -51,17 +51,6 @@ void	sort_fileinfo(t_fileinfo **array, size_t count_elems, int (*func)(t_fileinf
 	}
 }
 
-int		is_date_equal(t_fileinfo *first, t_fileinfo *second)
-{
-	if (first == NULL || second == NULL)
-		return (-2);
-	if (ft_strncmp(first->amonth, second->amonth, 3) == 0 \
-	&& ft_strncmp(first->day_lm, second->day_lm, 2) == 0 \
-	&& ft_strncmp(first->time_year_lm, second->time_year_lm, 5) == 0)
-		return (1);
-	return (0);
-}
-
 void	sort_by_flags(t_fileinfo **files, unsigned char flags)
 {
 	size_t		i;
@@ -69,7 +58,9 @@ void	sort_by_flags(t_fileinfo **files, unsigned char flags)
 	if (files == NULL)
 		return ;
 
-	if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 1)
+	if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 0)
+		sort_fileinfo(files, len_2array((const void **)files), order_cmp_by_filename, is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM));
+	else
 	{
 		sort_fileinfo(files, len_2array((const void **)files), order_cmp_by_tlastmod, is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM));
 		i = 0;
@@ -77,7 +68,7 @@ void	sort_by_flags(t_fileinfo **files, unsigned char flags)
 		while (i < flen)
 		{
 			size_t j = i + 1;
-			while (j < flen && is_date_equal(files[i], files[j]) == 1)
+			while (j < flen && files[i]->mtime.tv_sec == files[j]->mtime.tv_sec)
 				j++;
 			if (j - i > 1)
 				sort_fileinfo(&files[i], j - i, order_cmp_by_filename, is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM));

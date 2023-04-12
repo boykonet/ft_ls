@@ -20,7 +20,7 @@ void	set_spaces(char spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1], t_fileinfo *finf
 	cos[1] = maxs.s_oname - ft_strlen(finfo->oname);
 	cos[2] = maxs.s_gname - ft_strlen(finfo->gname);
 	cos[3] = maxs.s_bytes - ft_strlen(finfo->nbytes);
-	cos[4] = maxs.s_day - ft_strlen(finfo->day_lm);
+	cos[4] = (maxs.s_day == 1 || ft_strlen(finfo->day_lm) == 1) ? 1 : 0;
 	cos[5] = maxs.s_time_year - ft_strlen(finfo->time_year_lm);
 
 	i = 0;

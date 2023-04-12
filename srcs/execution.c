@@ -58,6 +58,7 @@ int handle_dirs(char *path, unsigned char flags, int counter, int possible_files
 	long long		total;
 	int				ecode;
 	char			**dirs;
+	size_t			i, flen;
 
 	files = NULL;
 	ecode = openreaddir(&filenames, path, is_flag(flags, A_FLAG_SHIFT, A_FLAG_NUM));
@@ -81,7 +82,9 @@ int handle_dirs(char *path, unsigned char flags, int counter, int possible_files
 	}
 
 	total = 0;
-	for (int i = 0; files[i]; i++)
+	i = 0;
+	flen = len_2array((const void **)files);
+	while (i < flen)
 	{
 		ecode = set_fileinfo(files[i], &total);
 		if (ecode != 0)
@@ -90,6 +93,7 @@ int handle_dirs(char *path, unsigned char flags, int counter, int possible_files
 			files = NULL;
 			return (ecode);
 		}
+		i++;
 	}
 
 	sort_by_flags(files, flags);
@@ -102,7 +106,7 @@ int handle_dirs(char *path, unsigned char flags, int counter, int possible_files
 	if (dirs == NULL)
 		return (-1);
 
-	size_t i;
+	i = 0;
 	if (is_flag(flags, REC_FLAG_SHIFT, REC_FLAG_NUM) == 1)
 	{
 		i = 0;
