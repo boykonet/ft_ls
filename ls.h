@@ -247,7 +247,9 @@ int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int is_inverte
 
 int		max(int first, int second);
 void	max_spaces(size_t *first, size_t second);
+int 	is_more_equal(long first, long second);
 int 	is_more(long first, long second);
+int 	is_less_equal(long first, long second);
 int 	is_less(long first, long second);
 
 t_fileinfo	*new_fileinfo(char *path, char *filename);
