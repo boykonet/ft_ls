@@ -29,49 +29,61 @@ int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int is_inverte
 
 void	sort_fileinfo(t_fileinfo **array, size_t count_elems, int (*func)(t_fileinfo*, t_fileinfo*, int), int is_inverted)
 {
-	t_fileinfo	**p;
 	size_t		i, j, len;
 
 	if (array == NULL)
 		return ;
-	p = array;
-	len = len_2array((const void**)p);
-	len = len < count_elems ? len : count_elems;
+	len = len_2array((const void**)array);
+	len = len > count_elems ? count_elems : len;
 	i = 0;
 	while (i < len)
 	{
 		j = i + 1;
 		while (j < len)
 		{
-			if (func(p[i], p[j], is_inverted))
-				swap((void**)&p[i], (void**)&p[j]);
+			if (func(array[i], array[j], is_inverted))
+				swap((void**)&array[i], (void**)&array[j]);
 			j++;
 		}
 		i++;
 	}
 }
 
+//int		is_time_equal(t_fileinfo *f, t_fileinfo *s)
+//{
+//	if (ft_strncmp(f->amonth, s->amonth, 3) == 0 \
+//	&& ft_strncmp(f->day_lm, s->day_lm, 2) == 0 \
+//	&& ft_strncmp(f->time_year_lm, s->time_year_lm, 5) == 0)
+//		return (1);
+//	return (0);
+//}
+
 void	sort_by_flags(t_fileinfo **files, unsigned char flags)
 {
-	size_t		i;
+	size_t		i, j;
 
 	if (files == NULL)
 		return ;
 
 	if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 0)
 		sort_fileinfo(files, len_2array((const void **)files), order_cmp_by_filename, is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM));
-	else
+	if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 1)
 	{
 		sort_fileinfo(files, len_2array((const void **)files), order_cmp_by_tlastmod, is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM));
-		i = 0;
 		size_t	flen = len_2array((const void**)files);
+		i = 0;
 		while (i < flen)
 		{
-			size_t j = i + 1;
+			j = i + 1;
 			while (j < flen && files[i]->mtime.tv_sec == files[j]->mtime.tv_sec)
 				j++;
-			if (j - i > 1)
-				sort_fileinfo(&files[i], j - i, order_cmp_by_filename, is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM));
+//			printf("REVERSE FLAG [%d], j = [%zu]\n", is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM), j);
+//			if (j - i > 1)
+//			{
+//				printf("JJJJJJJ [%zu]\n", j);
+//				printf("FIRST [%s %s %s], SECOND [%s %s %s]\n", files[i]->amonth, files[i]->day_lm, files[i]->time_year_lm, files[j - 1]->amonth, files[j - 1]->day_lm, files[j - 1]->time_year_lm);
+			sort_fileinfo(&files[i], j - i, order_cmp_by_filename, is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM));
+//			}
 			i += j;
 		}
 	}
