@@ -106,20 +106,18 @@ int handle_dirs(char *path, unsigned char flags, int counter, int possible_files
 	if (dirs == NULL)
 		return (-1);
 
-	i = 0;
 	if (is_flag(flags, REC_FLAG_SHIFT, REC_FLAG_NUM) == 1)
 	{
 		i = 0;
 		while (dirs[i])
 		{
-			if (counter >= 0 && dirs[i] != NULL)
-				ft_putchar_fd('\n', 1);
 			if (rec_checks(dirs[i], flags) != 0)
 			{
 				i++;
 				continue ;
 			}
 			set_path(path, dirs[i], newdir);
+			ft_putchar_fd('\n', 1);
 			handle_dirs(newdir, flags, counter + 1, possible_files);
 			i++;
 		}
