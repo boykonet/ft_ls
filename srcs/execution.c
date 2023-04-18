@@ -226,13 +226,16 @@ void	execution(t_ls *ls)
 
 	flen = len_2array((const void**)ls->files);
 	dlen = len_2array((const void**)ls->dirs);
+	printf("1\n");
 	if (flen > 0)
 	{
 		ecode = execute_files(ls->files, ls->flags, ls->epatterns);
 		handle_error(ecode, ls->epatterns, &ls->global_ecode);
 	}
+	printf("2\n");
 	if (dlen > 0 && flen > 0)
 		ft_putchar_fd('\n', 1);
+	printf("3\n");
 	if (dlen > 0)
 	{
 		ecode = execute_dirs(ls->dirs, ls->flags, ls->possible_files, ls->epatterns);

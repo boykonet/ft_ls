@@ -17,8 +17,11 @@ int main(int argc, char **argv)
 
 	(void)argc;
 	initialization(&ls);
+	printf("init\n");
 	parsing(&ls, argv + 1);
+	printf("parse\n");
 	execution(&ls);
+	printf("exec\n");
 	ecode = ls.global_ecode;
 	clear_ls(&ls);
 	return (ecode);
