@@ -229,9 +229,9 @@ void rec_dirs(char *path, int flag_r, int flag_a, int flag_l) {
 	i = 0;
 
 	sort_files(&files);
-	printf("before\n");
+//	printf("before\n");
 	char	**dirs = copy_dirs(files);
-	printf("after\n");
+//	printf("after\n");
 
 	p = files;
 	while(p != NULL)

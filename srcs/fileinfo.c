@@ -25,9 +25,14 @@ int	set_fileinfo(t_fileinfo *finfo, long long *total)
 	filepath = ft_calloc(flen, sizeof(char));
 	if (!filepath)
 		return (-1);
-	ft_strlcat(filepath, finfo->path, flen);
-	ft_strlcat(filepath, "/", flen);
-	ft_strlcat(filepath, finfo->filename, flen);
+	if (ft_strlen(finfo->path) == 0)
+		ft_strlcat(filepath, finfo->filename, flen);
+	else
+	{
+		ft_strlcat(filepath, finfo->path, flen);
+		ft_strlcat(filepath, "/", flen);
+		ft_strlcat(filepath, finfo->filename, flen);
+	}
 
 	if (lstat(filepath, &st) == -1)
 	{

@@ -21,7 +21,7 @@ void	set_path(char *path, char *dir, char newdir[512 + 1])
 	ft_strlcat(newdir, dir, 512);
 }
 
-int	filenames_to_fileinfo(t_fileinfo ***files, char **filenames, char *path)
+int	to_fileinfo(t_fileinfo ***files, char **filenames, char *path)
 {
 	size_t	i;
 	int		ecode;
@@ -65,7 +65,7 @@ int handle_dirs(char *path, unsigned char flags, int counter, int possible_files
 	if (ecode != 0)
 		return (ecode);
 
-	ecode = filenames_to_fileinfo(&files, filenames, path);
+	ecode = to_fileinfo(&files, filenames, path);
 	free_2array((void**)filenames);
 	filenames = NULL;
 	if (ecode != 0)
@@ -138,7 +138,7 @@ int handle_files(char **filenames, unsigned char flags)
 	files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
 	if (files == NULL)
 		return (-1);
-	ecode = filenames_to_fileinfo(&files, filenames, ".");
+	ecode = to_fileinfo(&files, filenames, "");
 	if (ecode != 0)
 	{
 		free_2array((void**)files);
@@ -196,19 +196,70 @@ static int	execute_files(char **files, unsigned char flags, t_pattern p[MAX_ERRO
 	return (0);
 }
 
-static int	execute_dirs(char **dirs, unsigned char flags, int possible_files, t_pattern p[MAX_ERROR_PATTERNS])
+int	set_to_fileinfo(t_fileinfo ***files, char **filenames, char *path, unsigned char flags)
 {
-	size_t	i;
 	int		ecode;
+	size_t	i;
 
-	i = 0;
-	if (dirs == NULL)
-		return (-2);
-	while (dirs[i])
+	*files = (t_fileinfo**)ft_calloc(1, sizeof(t_fileinfo*));
+	if (*files == NULL)
+		return (-1);
+	ecode = to_fileinfo(files, filenames, path);
+	if (ecode != 0)
 	{
-		ecode = handle_dirs(dirs[i], flags, 0, possible_files);
+		free_2array((void**)*files);
+		files = NULL;
+		return (ecode);
+	}
+	i = 0;
+	while ((*files)[i])
+	{
+		ecode = set_fileinfo((*files)[i], NULL);
 		if (ecode != 0)
 		{
+			free_2array((void**)*files);
+			files = NULL;
+			return (ecode);
+		}
+		i++;
+	}
+
+	sort_by_flags(*files, flags);
+	return (0);
+}
+
+static int	execute_dirs(char **dirs, unsigned char flags, int possible_files, t_pattern p[MAX_ERROR_PATTERNS])
+{
+	t_fileinfo	**dirinfo;
+	char 		**sorted_dirs;
+	size_t		i;
+	int			ecode;
+
+	i = 0;
+	dirinfo = NULL;
+	if (dirs == NULL)
+		return (-2);
+	ecode = set_to_fileinfo(&dirinfo, dirs, "", flags);
+	if (ecode != 0)
+	{
+		handle_ecodes(ecode, NULL, p);
+		return (ecode);
+	}
+	sorted_dirs = copy_dirs(dirinfo);
+	if (sorted_dirs == NULL)
+	{
+		free_2array((void**)dirinfo);
+		dirinfo = NULL;
+		handle_ecodes(ecode, NULL, p);
+		return (-1);
+	}
+	while (sorted_dirs[i])
+	{
+		ecode = handle_dirs(sorted_dirs[i], flags, 0, possible_files);
+		if (ecode != 0)
+		{
+			free_2array((void**)sorted_dirs);
+			sorted_dirs = NULL;
 			handle_ecodes(ecode, NULL, p);
 			return (ecode);
 		}
@@ -216,6 +267,8 @@ static int	execute_dirs(char **dirs, unsigned char flags, int possible_files, t_
 			ft_putchar_fd('\n', 1);
 		i++;
 	}
+	free_2array((void**)sorted_dirs);
+	sorted_dirs = NULL;
 	return (0);
 }
 
@@ -226,16 +279,13 @@ void	execution(t_ls *ls)
 
 	flen = len_2array((const void**)ls->files);
 	dlen = len_2array((const void**)ls->dirs);
-	printf("1\n");
 	if (flen > 0)
 	{
 		ecode = execute_files(ls->files, ls->flags, ls->epatterns);
 		handle_error(ecode, ls->epatterns, &ls->global_ecode);
 	}
-	printf("2\n");
 	if (dlen > 0 && flen > 0)
 		ft_putchar_fd('\n', 1);
-	printf("3\n");
 	if (dlen > 0)
 	{
 		ecode = execute_dirs(ls->dirs, ls->flags, ls->possible_files, ls->epatterns);
