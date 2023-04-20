@@ -15,6 +15,8 @@ void	cstrmode(mode_t st_mode, char *filemode)
 
 void	set_filetype(char *filetype, unsigned int type)
 {
+	if (filetype == NULL)
+		return ;
 	t_filetypes	filetypes[FILETYPES_SIZE + 1] = {
 			{.filetype = S_IFBLK, .replacement = 'b'},
 			{.filetype = S_IFCHR, .replacement = 'c'},
@@ -23,7 +25,7 @@ void	set_filetype(char *filetype, unsigned int type)
 			{.filetype = S_IFSOCK, .replacement = 's'},
 			{.filetype = S_IFIFO, .replacement = 'p'},
 			{.filetype = S_IFREG, .replacement = '-'},
-			{.filetype = S_IFWHT, .replacement = '?'}}; // TODO: check the information about unknown file
+			{.filetype = S_IFWHT, .replacement = '?'}};
 
 	for (int i = 0; i < FILETYPES_SIZE; i++)
 	{
@@ -53,6 +55,8 @@ void	set_file_attribute(char *path, char *attr)
 
 void	set_filemode(char *filepath, mode_t mode, unsigned int filetype, char *filemode)
 {
+	if (filepath == NULL || filemode == NULL)
+		return ;
 	cstrmode(mode, &filemode[1]);
 	set_filetype(&filemode[0], filetype);
 	set_file_attribute(filepath, &filemode[10]);

@@ -1,53 +1,14 @@
 #include "../ls.h"
 
-//t_pattern	*new_pattern(char *pattern, char *replacement)
-//{
-//	t_pattern	*p;
-//
-//	p = ft_calloc(1, sizeof(t_pattern));
-//	if (!p)
-//		return (NULL);
-//	p->pattern = ft_strdup(pattern);
-//	if (!p->pattern)
-//	{
-//		del_pattern(p);
-//		return (NULL);
-//	}
-//	p->replacement = ft_strdup(replacement);
-//	if (!p->replacement)
-//	{
-//		del_pattern(p);
-//		return (NULL);
-//	}
-//	return (p);
-//}
+void	add_pattern(t_pattern p[1], char *pattern, char *replacement)
+{
+	ft_bzero(p->pattern, sizeof(p->pattern));
+	ft_bzero(p->replacement, sizeof(p->replacement));
+	ft_strlcpy(p->pattern, pattern, STRING_SIZE);
+	ft_strlcpy(p->replacement, replacement, STRING_SIZE);
+}
 
-//void	clear_pattern(t_pattern *p)
-//{
-//	if (!p)
-//		return ;
-//	if (p->pattern)
-//	{
-//		free(p->pattern);
-//		p->pattern = NULL;
-//	}
-//	if (p->replacement)
-//	{
-//		free(p->replacement);
-//		p->replacement = NULL;
-//	}
-//}
-//
-//void	del_pattern(void *node)
-//{
-//	if (!node)
-//		return ;
-//	clear_pattern((t_pattern*)node);
-//	free(node);
-//	node = NULL;
-//}
-
-void		replace_one_pattern(char *dest, t_pattern pattern[1])
+void	replace_one_pattern(char *dest, t_pattern pattern[1])
 {
 	char	*pbegin, *pend;
 	int		bsize, asize;
@@ -70,7 +31,7 @@ void		replace_one_pattern(char *dest, t_pattern pattern[1])
 	dest[bsize + lrepl + asize] = '\0';
 }
 
-void		replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PATTERNS], size_t count)
+void	replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PATTERNS], size_t count)
 {
 	size_t	i;
 

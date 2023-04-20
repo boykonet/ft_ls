@@ -5,7 +5,7 @@ int set_link(const char *filepath, char *link)
 	int	ecode;
 
 	if (filepath == NULL)
-		return (-2);
+		return (ERR_CODE_NULL_PARAMETER);
 	ecode = creadlink(filepath, link);
 	if (ecode != 0)
 		return (ecode);

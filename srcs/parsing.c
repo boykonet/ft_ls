@@ -5,7 +5,7 @@ static char	**copy_filenames(char **data)
 	char	**filenames;
 	char	*base_dirs[2] = {".", NULL};
 
-	// If no filenames, returns NULL in each case
+	/* If no filenames, returns NULL in each case */
 	if (len_2array((const void**)data) > 0)
 		filenames = copy((const char**)data, len_2array((const void **) data));
 	else
@@ -36,11 +36,11 @@ int		add_flag(unsigned char *flags, char nf)
 {
 	size_t	i;
 	t_flags f[MAX_FLAGS + 1] = {
-			{.flag = 'R', .shift = REC_FLAG_SHIFT, .shnum = REC_FLAG_NUM},
-			{.flag = 'a', .shift = A_FLAG_SHIFT, .shnum = A_FLAG_NUM},
-			{.flag = 'l', .shift = L_FLAG_SHIFT, .shnum = L_FLAG_NUM},
-			{.flag = 'r', .shift = R_FLAG_SHIFT, .shnum = R_FLAG_NUM},
-			{.flag = 't', .shift = T_FLAG_SHIFT, .shnum = T_FLAG_NUM}};
+			{.flag = REC_FLAG, .shift = REC_FLAG_SHIFT, .shnum = REC_FLAG_NUM},
+			{.flag = A_FLAG, .shift = A_FLAG_SHIFT, .shnum = A_FLAG_NUM},
+			{.flag = L_FLAG, .shift = L_FLAG_SHIFT, .shnum = L_FLAG_NUM},
+			{.flag = R_FLAG, .shift = R_FLAG_SHIFT, .shnum = R_FLAG_NUM},
+			{.flag = T_FLAG, .shift = T_FLAG_SHIFT, .shnum = T_FLAG_NUM}};
 
 	i = 0;
 	while (i < MAX_FLAGS)
@@ -61,7 +61,7 @@ static int	parse_flags(char ***data, unsigned char *flags, t_pattern p[MAX_ERROR
 	int 	ecode;
 
 	if (data == NULL || flags == NULL)
-		return (-2);
+		return (ERR_CODE_NULL_PARAMETER);
 	if (len_2array((const void**)(*data)) == 0)
 		return (0);
 	while (*data != NULL && **data != NULL)
@@ -76,7 +76,7 @@ static int	parse_flags(char ***data, unsigned char *flags, t_pattern p[MAX_ERROR
 				if (ecode == -1)
 				{
 					add_pattern(p, PATTERN_FLAG_NOT_SUPPORT, (char[2]){*param, '\0'});
-					return (-4);
+					return (ERR_CODE_FLAG_NOT_SUPPORT);
 				}
 				param++;
 			}
@@ -90,12 +90,12 @@ static int	parse_flags(char ***data, unsigned char *flags, t_pattern p[MAX_ERROR
 static int	parse_filenames(char **data, char ***filenames, t_pattern p[MAX_ERROR_PATTERNS])
 {
 	if (!filenames || !data)
-		return (-2);
+		return (ERR_CODE_NULL_PARAMETER);
 	*filenames = copy_filenames(data);
 	if (*filenames == NULL)
 	{
 		add_pattern(p, PATTERN_MALLOC_ERROR, strerror(errno));
-		return (-1);
+		return (ERR_CODE_MALLOC_ERROR);
 	}
 	return (0);
 }
@@ -108,17 +108,17 @@ int	sort_by_dir_or_file(char ***dirs, char ***files, char *filename)
 	a2ecode = 0;
 	cfilename = ft_strdup(filename);
 	if (cfilename == NULL)
-		return (-1);
+		return (ERR_CODE_MALLOC_ERROR);
 	ecode = if_dir_or_file(filename);
-	if (ecode == 0) // directory
+	if (ecode == 0) /* directory */
 		a2ecode = add_2array((void***)dirs, cfilename);
-	else if (ecode == 1) // files
+	else if (ecode == 1) /* files */
 		a2ecode = add_2array((void***)files, cfilename);
-	else if (ecode < 0) // some unexpected error
+	else if (ecode < 0) /* some unexpected error */
 	{
 		free(cfilename);
 		cfilename = NULL;
-		return (-5);
+		return (ERR_CODE_FILE_ERROR);
 	}
 	if (a2ecode != 0)
 	{
@@ -133,7 +133,7 @@ static int	separate_filenames(char ***filenames, char ***files, char ***dirs, in
 	int		a2ecode;
 
 	if (files == NULL || dirs == NULL || filenames == NULL || count_possible_files_and_dirs == NULL)
-		return (-2);
+		return (ERR_CODE_NULL_PARAMETER);
 	while (*filenames && **filenames)
 	{
 		*count_possible_files_and_dirs += 1;
@@ -148,7 +148,7 @@ static int	separate_filenames(char ***filenames, char ***files, char ***dirs, in
 	return (0);
 }
 
-void	ehandler(char **filenames, t_ls *ls, int (*func)(char***, char***, char***, int*, t_pattern[MAX_ERROR_PATTERNS]))
+void	ehandler_filenames(char **filenames, t_ls *ls, int (*func)(char***, char***, char***, int*, t_pattern[MAX_ERROR_PATTERNS]))
 {
 	char **f;
 	int 	ecode;
@@ -178,7 +178,7 @@ void	parsing(t_ls *ls, char **data)
 	if (handle_error(ecode, ls->epatterns, NULL) == -1)
 		cleaner(ls, 1);
 
-	ehandler(filenames, ls, separate_filenames);
+	ehandler_filenames(filenames, ls, separate_filenames);
 	free_2array((void**)filenames);
 	filenames = NULL;
 }

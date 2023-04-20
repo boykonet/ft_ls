@@ -26,59 +26,12 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
 	add_pattern(&patterns[14], "{{filename}}", finfo->filename);
 	add_pattern(&patterns[15], "{{link}}", finfo->link);
 
-
 	if (finfo->type == S_IFLNK)
 		replace_pattern(pattern, PATTERN_WITH_LINK, patterns, MAX_REPL_PATTERNS);
 	else
 		replace_pattern(pattern, PATTERN_WITHOUT_LINK, patterns, 15);
-
 	ft_putstr_fd(pattern, 1);
 }
-
-int 	the_largest_filename(t_fileinfo **files)
-{
-	size_t	max, i, clen;
-
-	max = 0;
-	if (files == NULL)
-		return (0);
-	i = 0;
-	while (files[i])
-	{
-		clen = ft_strlen(files[i]->filename); // current len
-		if (max < clen)
-			max = clen;
-		i++;
-	}
-	return (max);
-}
-
-//void	print_without_full_info(t_fileinfo **files)
-//{
-//	char	buf[255 + 1];
-//	int		largest;
-//	size_t	cos, i; // count of symbols
-//
-//	largest = the_largest_filename(files);
-//	if (largest == 0)
-//		return ;
-//	cos = ((largest / 8) + 1) * 8;
-//	i = 0;
-//	while (files[i])
-//	{
-//		if (files[i + 1] == NULL)
-//			ft_putstr_fd(files[i]->filename, 1);
-//		else
-//		{
-//			ft_memset(buf, ' ', cos + 1);
-//			buf[cos] = '\0';
-//			ft_memcpy(buf, files[i]->filename, ft_strlen(files[i]->filename));
-//			ft_putstr_fd(buf, 1);
-//		}
-//		i++;
-//	}
-//	ft_putchar_fd('\n', 1);
-//}
 
 void	print_without_full_info(t_fileinfo **files)
 {
@@ -87,21 +40,6 @@ void	print_without_full_info(t_fileinfo **files)
 	i = 0;
 	while (files[i])
 		ft_putendl_fd(files[i++]->filename, 1);
-}
-
-void	putnbr(long long number, int base, char *base_str)
-{
-	unsigned long long nn;
-
-	nn = number;
-	if (number < 0)
-	{
-		ft_putchar_fd('-', 1);
-		nn = number * (-1);
-	}
-	if (nn >= (unsigned long long)base)
-		putnbr(nn / base, base, base_str);
-	ft_putchar_fd(base_str[nn % base], 1);
 }
 
 void	print_total(long long total)

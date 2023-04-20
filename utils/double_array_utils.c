@@ -44,11 +44,11 @@ int		realloc_2array(void ***data, size_t size)
 	size_t	i;
 
 	if (!data)
-		return (-2);
+		return (ERR_CODE_NULL_PARAMETER);
 	p = *data;
 	res = (void**)ft_calloc(size + 1, sizeof(void*));
 	if (!res)
-		return (-1);
+		return (ERR_CODE_MALLOC_ERROR);
 	i = 0;
 	while (p && p[i] != NULL)
 	{
@@ -68,12 +68,12 @@ int	add_2array(void ***data, void *value)
 	len = 0;
 	ecode = 0;
 	if (data == NULL || value == NULL)
-		return (-2);
+		return (ERR_CODE_NULL_PARAMETER);
 	if (*data == NULL)
 	{
 		*data = (void**)ft_calloc(2, sizeof(void*));
 		if (*data == NULL)
-			ecode = -1;
+			ecode = ERR_CODE_MALLOC_ERROR;
 	}
 	else
 	{

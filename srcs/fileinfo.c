@@ -24,7 +24,7 @@ int	set_fileinfo(t_fileinfo *finfo, long long *total)
 	flen = ft_strlen(finfo->path) + 1 + ft_strlen(finfo->filename) + 1;
 	filepath = ft_calloc(flen, sizeof(char));
 	if (!filepath)
-		return (-1);
+		return (ERR_CODE_MALLOC_ERROR);
 	if (ft_strlen(finfo->path) == 0)
 		ft_strlcat(filepath, finfo->filename, flen);
 	else
@@ -38,7 +38,7 @@ int	set_fileinfo(t_fileinfo *finfo, long long *total)
 	{
 		free(filepath);
 		filepath = NULL;
-		return (-3);
+		return (ERR_CODE_STRERROR);
 	}
 
 	if (total != NULL)
@@ -47,7 +47,7 @@ int	set_fileinfo(t_fileinfo *finfo, long long *total)
 	// file type
 	set_type(&finfo->type, st.st_mode);
 
-	set_filemode(filepath, st.st_mode, finfo->type, finfo->filemode); // TODO: might be empty value
+	set_filemode(filepath, st.st_mode, finfo->type, finfo->filemode);
 	set_number_of_links(st.st_nlink, finfo->nlinks);
 
 	set_owner(finfo->oname, st.st_uid);

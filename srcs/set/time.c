@@ -11,18 +11,18 @@ int	set_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *tim
 
 	t = ft_split(ctime((const time_t*)&st_mtimespec.tv_sec), ' ');
 	if (!t)
-		return (-1);
+		return (ERR_CODE_MALLOC_ERROR);
 
 	ft_memcpy(amonth, t[1], ft_strlen(t[1]));
 	ft_memcpy(day_lm, t[2], ft_strlen(t[2]));
 
-	// get current time
+	/* get current time */
 	sts = time(NULL);
 	if (sts == -1)
 	{
 		free_2array((void **)t);
 		t = NULL;
-		return (-3);
+		return (ERR_CODE_STRERROR);
 	}
 	diff = sts - (const time_t)st_mtimespec.tv_sec;
 	if (diff >= 0 && (double)diff < HALF_OF_YEAR_SECONDS)

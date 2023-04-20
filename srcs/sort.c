@@ -51,7 +51,8 @@ void	sort_fileinfo(t_fileinfo **array, size_t count_elems, int (*func)(t_fileinf
 
 void	sort_by_flags(t_fileinfo **files, unsigned char flags)
 {
-	size_t		i, j;
+	size_t	i, j;
+	size_t	flen;
 
 	if (files == NULL)
 		return ;
@@ -61,25 +62,13 @@ void	sort_by_flags(t_fileinfo **files, unsigned char flags)
 	if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_NUM) == 1)
 	{
 		sort_fileinfo(files, len_2array((const void **)files), order_cmp_by_tlastmod, is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM));
-
-		size_t	flen = len_2array((const void**)files);
-
-//		for (size_t k = 0; k < flen; k++)
-//			printf("file [%10s], index [%2.zu], time last modified [%10.ld]\n", files[k]->filename, k, files[k]->mtime.tv_sec);
-
-
+		flen = len_2array((const void**)files);
 		i = 0;
 		while (i < flen)
 		{
 			j = 0;
 			while (i + j < flen && files[i]->mtime.tv_sec == files[i + j]->mtime.tv_sec)
 				j++;
-//			printf("i = [%zu] j = [%zu], count elems [%zu]\n", i, i + j, j);
-////			printf("REVERSE FLAG [%d], j = [%zu]\n", is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM), j);
-////			if (j - i > 1)
-////			{
-////				printf("JJJJJJJ [%zu]\n", j);
-////				printf("FIRST [%s %s %s], SECOND [%s %s %s]\n", files[i]->amonth, files[i]->day_lm, files[i]->time_year_lm, files[j - 1]->amonth, files[j - 1]->day_lm, files[j - 1]->time_year_lm);
 			if (j > 1)
 				sort_fileinfo(&files[i], j, order_cmp_by_filename, is_flag(flags, R_FLAG_SHIFT, R_FLAG_NUM));
 			i += j;

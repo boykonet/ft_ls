@@ -16,7 +16,6 @@ SRCS=		./main.c \
 			./srcs/fileinfo.c \
 			./srcs/initialization.c \
 			./srcs/ls_functions.c \
-			./srcs/lstat.c \
 			./srcs/parsing.c \
 			./srcs/readlink.c \
 			./srcs/sort.c \
@@ -29,7 +28,8 @@ SRCS=		./main.c \
 			./utils/max.c \
 			./utils/pattern.c \
 			./utils/printer.c \
-			./utils/rec_itoa.c
+			./utils/rec_itoa.c \
+			./utils/rec_putnbr.c
 
 OBJS= $(SRCS:%.c=%.o)
 

@@ -1,41 +1,43 @@
 #ifndef LS_H
 # define LS_H
 
-# define CSTDERR					2
-# define MAX_FLAGS					5
-# define FILETYPES_SIZE				8
-# define MAX_REPL_PATTERNS			16
-# define MAX_ERROR_PATTERNS			2
-# define LONG_FORNAT_PARRERN_MAXS	6
-# define MAX_COUNT_OF_ULL			20
+# define CSTDERR						2
+# define MAX_FLAGS						5
+# define FILETYPES_SIZE					8
+# define MAX_REPL_PATTERNS				16
+# define MAX_ERROR_PATTERNS				2
+# define LONG_FORNAT_PARRERN_MAXS		6
+# define MAX_COUNT_OF_ULL				20
+# define STRING_SIZE					255
 
-# define DECIMAL_BASE_STR			"0123456789"
+# define ERR_CODE_MALLOC_ERROR			(-1)
+# define ERR_CODE_NULL_PARAMETER		(-2)
+# define ERR_CODE_STRERROR				(-3)
+# define ERR_CODE_FLAG_NOT_SUPPORT		(-4)
+# define ERR_CODE_FILE_ERROR			(-5)
+
+# define DECIMAL_BASE_STR				"0123456789"
 
 
-# define ERR_HEADER					"ls: "
+# define ERR_HEADER						"ls: "
 
-# define MALLOC_ERROR				"malloc: {{error}}"
-# define PATTERN_MALLOC_ERROR		"{{error}}"
+# define MALLOC_ERROR					"malloc: {{error}}"
+# define PATTERN_MALLOC_ERROR			"{{error}}"
 
-# define NULL_PARAMETER				"null parameter"
+# define NULL_PARAMETER					"null parameter"
 
-# define STRERROR_MESSAGE			"{{message}}"
-# define PATTERN_STRERROR_MESSAGE	"{{message}}"
+# define STRERROR_MESSAGE				"{{message}}"
+# define PATTERN_STRERROR_MESSAGE		"{{message}}"
 
-# define FLAG_NOT_SUPPORT			"illegal option -- {{flag}}\nusage: ls [-Ralrt] [file ...]"
-# define PATTERN_FLAG_NOT_SUPPORT	"{{flag}}"
+# define FLAG_NOT_SUPPORT				"illegal option -- {{flag}}\nusage: ls [-Ralrt] [file ...]"
+# define PATTERN_FLAG_NOT_SUPPORT		"{{flag}}"
 
-# define FILE_ERROR					"{{filename}}: {{message}}"
+# define FILE_ERROR						"{{filename}}: {{message}}"
 # define PATTERN_FILE_ERROR_FILENAME	"{{filename}}"
-# define PATTERN_FILE_ERROR_MESSAGE	"{{message}}"
+# define PATTERN_FILE_ERROR_MESSAGE		"{{message}}"
 
-
-# define UNEXPECTED_ERROR			"unexpected error: {{error}}"
-# define PATTERN_UNEXPECTED_ERROR	"{{error}}"
-
-
-# define PATTERN_WITHOUT_LINK		"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}}\n"
-# define PATTERN_WITH_LINK			"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}} -> {{link}}\n"
+# define PATTERN_WITHOUT_LINK			"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}}\n"
+# define PATTERN_WITH_LINK				"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}} -> {{link}}\n"
 
 # define REC_FLAG		'R'
 # define REC_FLAG_SHIFT	7
@@ -58,14 +60,9 @@
 # define T_FLAG_NUM		8
 
 
-# define FLAG_INVERTED_NO	0
-# define FLAG_INVERTED_YES	1
-
-# define IF_DIRS_NO			0
-# define IF_DIRS_YES		1
+# define FLAG_INVERTED_NO		0
 
 # define HALF_OF_YEAR_SECONDS	(365.2422 * 0.5 * 24 * 60 * 60)
-# define LEN_PRINTABLE_LINE		128
 
 # include <unistd.h>
 /*
@@ -139,13 +136,10 @@
 
 # include "libs/libft/libft.h"
 
-
-//typedef int		(*f) (void*);
-
 typedef struct s_pattern
 {
-	char	pattern[255 + 1];
-	char	replacement[255 + 1];
+	char	pattern[STRING_SIZE + 1];
+	char	replacement[STRING_SIZE + 1];
 } t_pattern;
 
 typedef struct	s_ls
@@ -176,18 +170,18 @@ typedef struct s_spaces {
 typedef struct s_fileinfo
 {
 	char				path[3841 + 1];
-	char				filename[255 + 1];
+	char				filename[STRING_SIZE + 1];
 	unsigned int		type;
 	char				filemode[11 + 1];
-	char				nlinks[5 + 1];			// because nlinks_t type is cast for unsigned short, maximum value is 65535
-	char				oname[255 + 1];			// owner filename
-	char				gname[255 + 1];			// group filename
-	char 				nbytes[11 + 1];			// number of bytes
-	char				amonth[3 + 1];			// abbreviated month ---> Jan
-	char				day_lm[2 + 1];			// day last modified ---> 31
-	char				time_year_lm[5 + 1];	// time last modified or year if mote than 6 months or the date in the future ---> 12:23
-	char				link[255 + 1];			// only if type == S_IFLNK
-	struct timespec		mtime;					// time last modified
+	char				nlinks[5 + 1];			/* because nlinks_t type is cast for unsigned short, maximum value is 65535 */
+	char				oname[STRING_SIZE + 1];	/* owner filename */
+	char				gname[STRING_SIZE + 1];	/* group filename */
+	char 				nbytes[11 + 1];			/* number of bytes */
+	char				amonth[3 + 1];			/* abbreviated month ---> Jan */
+	char				day_lm[2 + 1];			/* day last modified ---> 31 */
+	char				time_year_lm[5 + 1];	/* time last modified or year if mote than 6 months or the date in the future ---> 12:23 */
+	char				link[STRING_SIZE + 1];	/* only if type == S_IFLNK */
+	struct timespec		mtime;					/* time last modified */
 } t_fileinfo;
 
 typedef struct s_filetypes
@@ -196,47 +190,37 @@ typedef struct s_filetypes
 	char			replacement;
 } t_filetypes;
 
-void			initialization(t_ls *ls);
-void			parsing(t_ls *ls, char **data);
-void			execution(t_ls *ls);
+void	initialization(t_ls *ls);
+void	parsing(t_ls *ls, char **data);
+void	execution(t_ls *ls);
 
-void 			init_ls(t_ls *ls);
-void			clear_ls(t_ls *ls);
+void 	init_ls(t_ls *ls);
+void	clear_ls(t_ls *ls);
 
-int				dir(t_list **listdirs, const char *dirname, char **emessage);
-int				if_dir_or_file(char *filename);
-int				clstat(t_list **l, char **dfiles, char **emessage);
-int				creadlink(const char *link, char *file);
-void			get_owner(uid_t uid, char owner[255 + 1]);
-void			get_group(gid_t gid, char group[255 + 1]);
+int		if_dir_or_file(char *filename);
+int		creadlink(const char *link, char *file);
 
-int				len_2array(const void **darr);
-void			free_2array(void **arr);
-void			free_2array_content(void **arr);
-int				realloc_2array(void ***data, size_t size);
-int 			add_2array(void ***data, void *value);
-void			cleaner(t_ls *ls, int exitcode);
-void			**calloca_to_2d(size_t size);
-char			**copy(const char **srcs, size_t len);
-char			**copy_dirs(t_fileinfo **files);
+int		len_2array(const void **darr);
+void	free_2array(void **arr);
+void	free_2array_content(void **arr);
+int		realloc_2array(void ***data, size_t size);
+int 	add_2array(void ***data, void *value);
 
-//t_pattern		*new_pattern(char *pattern, char *replacement);
-//void			clear_pattern(t_pattern *pattern);
-//void			del_pattern(void *node);
-void 			add_pattern(t_pattern p[1], char *pattern, char *replacement);
-void			replace_one_pattern(char *dest, t_pattern pattern[1]);
-void			replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PATTERNS], size_t count);
+void	cleaner(t_ls *ls, int exitcode);
 
-t_list			*find_last_elem(t_list **head);
+void	**calloca_to_2d(size_t size);
+char	**copy(const char **srcs, size_t len);
+char	**copy_dirs(t_fileinfo **files);
 
-int 			handle_error(int ecode, t_pattern p[MAX_ERROR_PATTERNS], int *gcode);
+void 	add_pattern(t_pattern p[1], char *pattern, char *replacement);
+void	replace_one_pattern(char *dest, t_pattern pattern[1]);
+void	replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PATTERNS], size_t count);
 
-int				is_flag(unsigned char flags, int shift, int num);
+int 	handle_error(int ecode, t_pattern p[MAX_ERROR_PATTERNS], int *gcode);
 
-int 			handle_dirs(char *path, unsigned char flags, int counter, int possible_files);
-int 			handle_files(char **files, unsigned char flags);
+int		is_flag(unsigned char flags, int shift, int num);
 
-int 			set_fileinfo(t_fileinfo *finfo, long long *total);
+int 	set_fileinfo(t_fileinfo *finfo, long long *total);
 
 void	print_files_from_files(t_fileinfo **files, int flag_l);
 void	print_files_from_dirs(t_fileinfo **files, long long total, int flag_l);
@@ -248,9 +232,7 @@ int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int is_inverte
 int		max(int first, int second);
 void	max_spaces(size_t *first, size_t second);
 int 	is_more_equal(long first, long second);
-int 	is_more(long first, long second);
 int 	is_less_equal(long first, long second);
-int 	is_less(long first, long second);
 
 t_fileinfo	*new_fileinfo(char *path, char *filename);
 
@@ -264,9 +246,9 @@ void	set_spaces(char spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1], t_fileinfo *finf
 void	counter_of_spaces(t_fileinfo **info, t_spaces *spaces);
 
 
-void	set_group(char gname[255 + 1], gid_t st_gid);
+void	set_group(char gname[STRING_SIZE + 1], gid_t st_gid);
 void	set_type(unsigned int *type, mode_t st_mode);
-void	set_owner(char oname[255 + 1], uid_t st_uid);
+void	set_owner(char oname[STRING_SIZE + 1], uid_t st_uid);
 int 	set_link(const char *filepath, char *link);
 void	set_number_of_bytes(off_t st_size, char *bytes);
 void	set_number_of_links(nlink_t st_nlinks, char *links);
@@ -275,6 +257,7 @@ int 	set_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *ti
 
 
 void	rec_itoa_ull(char *numstr, unsigned long long number, int base, char *base_chars);
+void	putnbr(long long number, int base, char *base_str);
 
 void	handle_ecodes(int ecode, char *filename, t_pattern p[MAX_ERROR_PATTERNS]);
 

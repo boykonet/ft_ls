@@ -25,7 +25,8 @@ char	**copy(const char **srcs, size_t len)
 
 static int	count_of_dirs(t_fileinfo **files)
 {
-	size_t	i, count;
+	size_t	i;
+	int		count;
 
 	count = 0;
 	i = 0;

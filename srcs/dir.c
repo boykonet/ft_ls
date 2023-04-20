@@ -5,7 +5,7 @@ int		if_dir_or_file(char *filename)
 	DIR *dir;
 
 	if (!filename)
-		return (-2);
+		return (ERR_CODE_NULL_PARAMETER);
 	dir = opendir(filename);
 	if (dir == NULL)
 	{
@@ -31,7 +31,7 @@ int	creaddir(char ***files, DIR *dir, int flag_a)
 		if (fi == NULL)
 		{
 			free_2array_content((void**)*files);
-			return (-1);
+			return (ERR_CODE_MALLOC_ERROR);
 		}
 		size_t flen = len_2array((const void**)(*files));
 		if (realloc_2array((void***)files, flen + 1) != 0)
@@ -39,7 +39,7 @@ int	creaddir(char ***files, DIR *dir, int flag_a)
 			free(fi);
 			fi = NULL;
 			free_2array_content((void**)*files);
-			return (-1);
+			return (ERR_CODE_MALLOC_ERROR);
 		}
 		flen = len_2array((const void**)(*files));
 		(*files)[flen] = fi;
@@ -47,7 +47,7 @@ int	creaddir(char ***files, DIR *dir, int flag_a)
 	if (sd == NULL && errno != 0)
 	{
 		free_2array_content((void**)*files);
-		return (-3);
+		return (ERR_CODE_STRERROR);
 	}
 	return (0);
 }
@@ -59,14 +59,14 @@ int	openreaddir(char ***nfiles, char *dirpath, int flag_a)
 
 	dir = opendir(dirpath);
 	if(!dir)
-		return (-3);
+		return (ERR_CODE_STRERROR);
 
 	*nfiles = ft_calloc(1, sizeof(char*));
 	if (*nfiles == NULL)
 	{
 		if (closedir(dir) == -1)
-			return (-3);
-		return (-1);
+			return (ERR_CODE_STRERROR);
+		return (ERR_CODE_MALLOC_ERROR);
 	}
 	ecode = creaddir(nfiles, dir, flag_a);
 	if (ecode != 0)
@@ -74,13 +74,13 @@ int	openreaddir(char ***nfiles, char *dirpath, int flag_a)
 		free(*nfiles);
 		*nfiles = NULL;
 		if (closedir(dir) == -1)
-			return (-3);
+			return (ERR_CODE_STRERROR);
 		return (ecode);
 	}
 	if (closedir(dir) == -1)
 	{
 		free_2array((void**)*nfiles);
-		return (-3);
+		return (ERR_CODE_STRERROR);
 	}
 	return (0);
 }

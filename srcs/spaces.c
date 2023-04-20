@@ -12,7 +12,7 @@ void	ispaces(t_spaces *spaces)
 
 void	set_spaces(char spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1], t_fileinfo *finfo, t_spaces maxs)
 {
-	size_t	cos[LONG_FORNAT_PARRERN_MAXS]; // count of spaces
+	size_t	cos[LONG_FORNAT_PARRERN_MAXS]; /* count of spaces */
 	size_t	i;
 
 	ft_bzero(cos, sizeof(size_t) * LONG_FORNAT_PARRERN_MAXS);
