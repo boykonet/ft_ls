@@ -44,10 +44,10 @@ for i in `seq $sz`; do
   DIR_PATH=${TEST_DIRECTORY_PATH}${dirs[$i]}
   mkdir -p ${DIR_PATH}
   if [ -z "${flags[$i]}" ]; then
-    ./ft_ls "/Users/gkarina/Desktop" "ex" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+    ASAN_OPTIONS=detect_leaks=1 ./ft_ls "/Users/gkarina/Desktop" "ex" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
     ls "/Users/gkarina/Desktop" "ex" "../ft_ping" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
   else
-    ./ft_ls ${flags[$i]} "/Users/gkarina/Desktop" "ex" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${flags[$i]} "/Users/gkarina/Desktop" "ex" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
     ls ${flags[$i]} "/Users/gkarina/Desktop" "ex" "../ft_ping" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
   fi
 
@@ -78,10 +78,10 @@ for i in `seq $sz`; do
   DIR_PATH=${TEST_DIRECTORY_PATH}${dirs[$i]}
   mkdir -p ${DIR_PATH}
   if [ -z "${flags[$i]}" ]; then
-    ./ft_ls ${F3} ${F2} ${F4} ${F1} ${F7} ${F6} ${F5} "main.c" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${F3} ${F2} ${F4} ${F1} ${F7} ${F6} ${F5} "main.c" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
     ls ${F3} ${F2} ${F4} ${F1} ${F7} ${F6} ${F5} "main.c" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
   else
-    ./ft_ls ${flags[$i]} ${F3} ${F2} ${F4} ${F1} ${F7} ${F6} ${F5} "main.c" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${flags[$i]} ${F3} ${F2} ${F4} ${F1} ${F7} ${F6} ${F5} "main.c" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
     ls ${flags[$i]} ${F3} ${F2} ${F4} ${F1} ${F7} ${F6} ${F5} "main.c" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
   fi
 
@@ -112,10 +112,10 @@ for i in `seq $sz`; do
   DIR_PATH=${TEST_DIRECTORY_PATH}${dirs[$i]}
   mkdir -p ${DIR_PATH}
   if [ -z "${flags[$i]}" ]; then
-    ./ft_ls "ex" ${F3} ${F2} ${F4} ${F1} ${F7} "/Users/gkarina/Desktop" ${F6} ${F5} "main.c" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+    ASAN_OPTIONS=detect_leaks=1 ./ft_ls "ex" ${F3} ${F2} ${F4} ${F1} ${F7} "/Users/gkarina/Desktop" ${F6} ${F5} "main.c" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
     ls "ex" ${F3} ${F2} ${F4} ${F1} ${F7} "/Users/gkarina/Desktop" ${F6} ${F5} "main.c" "../ft_ping" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
   else
-    ./ft_ls ${flags[$i]} "ex" ${F3} ${F2} ${F4} ${F1} ${F7} "/Users/gkarina/Desktop" ${F6} ${F5} "main.c" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${flags[$i]} "ex" ${F3} ${F2} ${F4} ${F1} ${F7} "/Users/gkarina/Desktop" ${F6} ${F5} "main.c" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
     ls ${flags[$i]} "ex" ${F3} ${F2} ${F4} ${F1} ${F7} "/Users/gkarina/Desktop" ${F6} ${F5} "main.c" "../ft_ping" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
   fi
 
@@ -149,10 +149,10 @@ for i in `seq $sz`; do
   DIR_PATH=${TEST_DIRECTORY_PATH}${dirs[$i]}
   mkdir -p ${DIR_PATH}
   if [ -z "${flags[$i]}" ]; then
-    ./ft_ls ${FILE_NOT_FOUND} > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${FILE_NOT_FOUND} > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
     ls ${FILE_NOT_FOUND} > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
   else
-    ./ft_ls ${flags[$i]} ${FILE_NOT_FOUND} > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${flags[$i]} ${FILE_NOT_FOUND} > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
     ls ${flags[$i]} ${FILE_NOT_FOUND} > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
   fi
 
@@ -180,7 +180,7 @@ echo "\n${GREEN}TEST INCORRECT FLAG${NC}\n"
 i=0
 DIR_PATH=${TEST_DIRECTORY_PATH}"incorrect_flag"
 mkdir -p ${DIR_PATH}
-./ft_ls -, "main.c" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+ASAN_OPTIONS=detect_leaks=1 ./ft_ls -, "main.c" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
 ls -, "main.c" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
 
 DIFF_OUTPUT=$(diff ${DIR_PATH}/${FT_LS_OUT} ${DIR_PATH}/${LS_OUT})

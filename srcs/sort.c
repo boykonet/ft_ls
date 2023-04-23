@@ -1,52 +1,45 @@
 #include "../ls.h"
 
-static void	swap(void **first, void **second)
+int		order_cmp_by_filename(void *first, void *second, int is_inverted)
 {
-	char *tmp;
-
-	tmp = *first;
-	*first = *second;
-	*second = tmp;
-}
-
-int		order_cmp_by_filename(t_fileinfo *first, t_fileinfo *second, int is_inverted)
-{
+	t_fileinfo	*f;
+	t_fileinfo	*s;
 	int 	res;
 
-	res = ft_memcmp(first->filename, second->filename, \
-	max((int)ft_strlen(first->filename), (int)ft_strlen(second->filename)));
+	if (first == NULL || second == NULL)
+		return (-2);
+	f = (t_fileinfo*)first;
+	s = (t_fileinfo*)second;
+	res = ft_memcmp(f->filename, s->filename, \
+	max((int)ft_strlen(f->filename), (int)ft_strlen(s->filename)));
 	return (is_inverted == FLAG_INVERTED_NO) ? \
 	res > 0 : \
 	res < 0;
 }
 
-int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int is_inverted)
+int		order_cmp_by_tlastmod(void *first, void *second, int is_inverted)
 {
+	t_fileinfo	*f;
+	t_fileinfo	*s;
+
+	if (first == NULL || second == NULL)
+		return (-2);
+	f = (t_fileinfo*)first;
+	s = (t_fileinfo*)second;
 	return (is_inverted == FLAG_INVERTED_NO ? \
-	is_less_equal(first->mtime.tv_sec, second->mtime.tv_sec) : \
-	is_more_equal(first->mtime.tv_sec, second->mtime.tv_sec));
+	is_less_equal(f->mtime.tv_sec, s->mtime.tv_sec) : \
+	is_more_equal(f->mtime.tv_sec, s->mtime.tv_sec));
 }
 
-void	sort_fileinfo(t_fileinfo **array, size_t count_elems, int (*func)(t_fileinfo*, t_fileinfo*, int), int is_inverted)
+void	sort_fileinfo(t_fileinfo **array, size_t count_elems, int (*func)(void*, void*, int), int is_inverted)
 {
-	size_t		i, j, len;
+	size_t		/*i, j, */count;
 
 	if (array == NULL)
 		return ;
-	len = len_2array((const void**)array);
-	len = len > count_elems ? count_elems : len;
-	i = 0;
-	while (i < len)
-	{
-		j = i + 1;
-		while (j < len)
-		{
-			if (func(array[i], array[j], is_inverted))
-				swap((void**)&array[i], (void**)&array[j]);
-			j++;
-		}
-		i++;
-	}
+	count = len_2array((const void**)array);
+	count = count > count_elems ? count_elems : count;
+	quick_sort((void***)&array, count, func, is_inverted);
 }
 
 void	sort_by_flags(t_fileinfo **files, unsigned char flags)

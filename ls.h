@@ -2,7 +2,6 @@
 # define LS_H
 
 # define CSTDERR						2
-# define MAX_FLAGS						5
 # define FILETYPES_SIZE					8
 # define MAX_REPL_PATTERNS				16
 # define MAX_ERROR_PATTERNS				2
@@ -39,6 +38,9 @@
 # define PATTERN_WITHOUT_LINK			"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}}\n"
 # define PATTERN_WITH_LINK				"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}} -> {{link}}\n"
 
+
+# define MAX_FLAGS		6
+
 # define REC_FLAG		'R'
 # define REC_FLAG_SHIFT	7
 # define REC_FLAG_NUM	128
@@ -59,8 +61,12 @@
 # define T_FLAG_SHIFT	3
 # define T_FLAG_NUM		8
 
+# define D_FLAG			'd'
+# define D_FLAG_SHIFT	2
+# define D_FLAG_NUM		4
 
-# define FLAG_INVERTED_NO		0
+
+# define FLAG_INVERTED_NO	0
 
 # define HALF_OF_YEAR_SECONDS	(365.2422 * 0.5 * 24 * 60 * 60)
 
@@ -225,9 +231,10 @@ int 	set_fileinfo(t_fileinfo *finfo, long long *total);
 void	print_files_from_files(t_fileinfo **files, int flag_l);
 void	print_files_from_dirs(t_fileinfo **files, long long total, int flag_l);
 
-void	sort_fileinfo(t_fileinfo **array, size_t count_elems, int (*func)(t_fileinfo*, t_fileinfo*, int), int is_inverted);
-int		order_cmp_by_filename(t_fileinfo *first, t_fileinfo *second, int is_inverted);
-int		order_cmp_by_tlastmod(t_fileinfo *first, t_fileinfo *second, int is_inverted);
+void	sort_fileinfo(t_fileinfo **array, size_t count_elems, int (*func)(void*, void*, int), int is_inverted);
+int		order_cmp_by_filename(void *first, void *second, int is_inverted);
+int		order_cmp_by_tlastmod(void *first, void *second, int is_inverted);
+void	quick_sort(void ***elems, size_t count, int (*compare_func)(void*, void*, int), int is_inverted);
 
 int		max(int first, int second);
 void	max_spaces(size_t *first, size_t second);

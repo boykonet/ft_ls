@@ -206,10 +206,10 @@ static int	execute_dirs(char **dirs, unsigned char flags, int possible_files, t_
 		return (ecode);
 	}
 	sorted_dirs = copy_dirs(dirinfo);
+	free_2array((void**)dirinfo);
+	dirinfo = NULL;
 	if (sorted_dirs == NULL)
 	{
-		free_2array((void**)dirinfo);
-		dirinfo = NULL;
 		handle_ecodes(ecode, NULL, p);
 		return (ERR_CODE_MALLOC_ERROR);
 	}

@@ -14,8 +14,8 @@ static char	**copy_filenames(char **data)
 }
 
 /*            second 4 bytes        first 4 bytes
-** byte   |   0 |  0 |  0 |  0  ||  0 | 0 | 0 | 0
-** flag   |   R |  a |  l |  r  ||  t | - | - | -
+** bits   |   0 |  0 |  0 |  0  ||  0 | 0 | 0 | 0
+** flag   |   R |  a |  l |  r  ||  t | d | - | -
 ** shift  |   7 |  6 |  5 |  4  ||  3 | 2 | 1 | 0
 ** number | 128 | 64 | 32 | 16  ||  8 | 4 | 2 | 1
 */
@@ -27,6 +27,15 @@ void	set_flag(unsigned char *flags, int shift, int num)
 
 int		is_flag(unsigned char flags, int shift, int num)
 {
+	t_flags f[MAX_FLAGS + 1] = {
+			{.flag = REC_FLAG, .shift = REC_FLAG_SHIFT, .shnum = REC_FLAG_NUM},
+			{.flag = A_FLAG, .shift = A_FLAG_SHIFT, .shnum = A_FLAG_NUM},
+			{.flag = L_FLAG, .shift = L_FLAG_SHIFT, .shnum = L_FLAG_NUM},
+			{.flag = R_FLAG, .shift = R_FLAG_SHIFT, .shnum = R_FLAG_NUM},
+			{.flag = T_FLAG, .shift = T_FLAG_SHIFT, .shnum = T_FLAG_NUM},
+			{.flag = D_FLAG, .shift = D_FLAG_SHIFT, .shnum = D_FLAG_NUM}};
+
+
 	if ((flags & (1 << shift)) == num)
 		return (1);
 	return (0);
@@ -40,7 +49,8 @@ int		add_flag(unsigned char *flags, char nf)
 			{.flag = A_FLAG, .shift = A_FLAG_SHIFT, .shnum = A_FLAG_NUM},
 			{.flag = L_FLAG, .shift = L_FLAG_SHIFT, .shnum = L_FLAG_NUM},
 			{.flag = R_FLAG, .shift = R_FLAG_SHIFT, .shnum = R_FLAG_NUM},
-			{.flag = T_FLAG, .shift = T_FLAG_SHIFT, .shnum = T_FLAG_NUM}};
+			{.flag = T_FLAG, .shift = T_FLAG_SHIFT, .shnum = T_FLAG_NUM},
+			{.flag = D_FLAG, .shift = D_FLAG_SHIFT, .shnum = D_FLAG_NUM}};
 
 	i = 0;
 	while (i < MAX_FLAGS)
@@ -100,7 +110,7 @@ static int	parse_filenames(char **data, char ***filenames, t_pattern p[MAX_ERROR
 	return (0);
 }
 
-int	sort_by_dir_or_file(char ***dirs, char ***files, char *filename)
+int	sort_by_dir_or_file(char ***dirs, char ***files, char *filename, int d_flag)
 {
 	int 	ecode, a2ecode;
 	char	*cfilename;
@@ -110,8 +120,10 @@ int	sort_by_dir_or_file(char ***dirs, char ***files, char *filename)
 	if (cfilename == NULL)
 		return (ERR_CODE_MALLOC_ERROR);
 	ecode = if_dir_or_file(filename);
+	if (ecode == 0 && d_flag)
+		ecode = 1;
 	if (ecode == 0) /* directory */
-		a2ecode = add_2array((void***)dirs, cfilename);
+		a2ecode = add_2array((void ***) dirs, cfilename);
 	else if (ecode == 1) /* files */
 		a2ecode = add_2array((void***)files, cfilename);
 	else if (ecode < 0) /* some unexpected error */
@@ -128,7 +140,7 @@ int	sort_by_dir_or_file(char ***dirs, char ***files, char *filename)
 	return (a2ecode);
 }
 
-static int	separate_filenames(char ***filenames, char ***files, char ***dirs, int *count_possible_files_and_dirs, t_pattern p[MAX_ERROR_PATTERNS])
+static int	separate_filenames(char ***filenames, char ***files, char ***dirs, int *count_possible_files_and_dirs, unsigned char flags, t_pattern p[MAX_ERROR_PATTERNS])
 {
 	int		a2ecode;
 
@@ -137,7 +149,7 @@ static int	separate_filenames(char ***filenames, char ***files, char ***dirs, in
 	while (*filenames && **filenames)
 	{
 		*count_possible_files_and_dirs += 1;
-		a2ecode = sort_by_dir_or_file(dirs, files, *(*filenames));
+		a2ecode = sort_by_dir_or_file(dirs, files, *(*filenames), is_flag(flags, D_FLAG));
 		if (a2ecode != 0)
 		{
 			handle_ecodes(a2ecode, **filenames, p);
@@ -148,7 +160,7 @@ static int	separate_filenames(char ***filenames, char ***files, char ***dirs, in
 	return (0);
 }
 
-void	ehandler_filenames(char **filenames, t_ls *ls, int (*func)(char***, char***, char***, int*, t_pattern[MAX_ERROR_PATTERNS]))
+void	ehandler_filenames(char **filenames, t_ls *ls, int (*func)(char***, char***, char***, int*, unsigned char, t_pattern[MAX_ERROR_PATTERNS]))
 {
 	char **f;
 	int 	ecode;
@@ -156,7 +168,7 @@ void	ehandler_filenames(char **filenames, t_ls *ls, int (*func)(char***, char***
 	f = filenames;
 	while (f && *f)
 	{
-		ecode = func(&f, &ls->files, &ls->dirs, &ls->possible_files, ls->epatterns);
+		ecode = func(&f, &ls->files, &ls->dirs, &ls->possible_files, ls->flags, ls->epatterns);
 		if (ecode != 0)
 		{
 			handle_error(ecode, ls->epatterns, &ls->global_ecode);

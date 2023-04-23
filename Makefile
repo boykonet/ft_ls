@@ -1,39 +1,41 @@
 NAME=ft_ls
 CC=clang
-CFLAGS= -g -Wall -Wextra -Werror -fsanitize=address -fsanitize=leak
+CFLAGS= -g -Wall -Wextra -Werror -fsanitize=address
 
-SRCS=		./main.c \
-			./srcs/set/filemode.c \
-			./srcs/set/filetype.c \
-			./srcs/set/group.c \
-			./srcs/set/link.c \
-			./srcs/set/number_of_bytes.c \
-			./srcs/set/number_of_links.c \
-			./srcs/set/owner.c \
-			./srcs/set/time.c \
-			./srcs/dir.c \
-			./srcs/execution.c \
-			./srcs/fileinfo.c \
-			./srcs/initialization.c \
-			./srcs/ls_functions.c \
-			./srcs/parsing.c \
-			./srcs/readlink.c \
-			./srcs/sort.c \
-			./srcs/spaces.c \
-			./utils/calloca_to_2d.c \
-			./utils/copy.c \
-			./utils/double_array_utils.c \
-			./utils/error.c \
-			./utils/is_more_less.c \
-			./utils/max.c \
-			./utils/pattern.c \
-			./utils/printer.c \
-			./utils/rec_itoa.c \
-			./utils/rec_putnbr.c
+SRCS=	./main.c \
+		./srcs/set/filemode.c \
+		./srcs/set/filetype.c \
+		./srcs/set/group.c \
+		./srcs/set/link.c \
+		./srcs/set/number_of_bytes.c \
+		./srcs/set/number_of_links.c \
+		./srcs/set/owner.c \
+		./srcs/set/time.c \
+		./srcs/dir.c \
+		./srcs/execution.c \
+		./srcs/fileinfo.c \
+		./srcs/initialization.c \
+		./srcs/ls_functions.c \
+		./srcs/parsing.c \
+		./srcs/quick_sort.c \
+		./srcs/readlink.c \
+		./srcs/sort.c \
+		./srcs/spaces.c \
+		./utils/calloca_to_2d.c \
+		./utils/copy.c \
+		./utils/double_array_utils.c \
+		./utils/error.c \
+		./utils/is_more_less.c \
+		./utils/max.c \
+		./utils/pattern.c \
+		./utils/printer.c \
+		./utils/rec_itoa.c \
+		./utils/rec_putnbr.c
 
 OBJS= $(SRCS:%.c=%.o)
 
-HEADERS =	./ls.h
+HEADERS =	./ls.h \
+			./libs/libft/libft.h
 
 INCLUDEDIR= ./
 
@@ -51,7 +53,7 @@ libft.a:
 
 clean:
 	$(MAKE) clean -C ./libs/libft
-	rm $(OBJS)
+	rm -rf $(OBJS)
 
 fclean: clean
 	$(MAKE) fclean -C ./libs/libft
@@ -59,4 +61,7 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+run:
+	ASAN_OPTIONS=detect_leaks=1 ./$(NAME)
+
+.PHONY: all clean fclean re run
