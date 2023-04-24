@@ -14,12 +14,12 @@ static char	**copy_filenames(char **data)
 }
 
 /*            second 4 bytes        first 4 bytes
-** bits   |   0 |  0 |  0 |  0  ||  0 | 0 | 0 | 0
+** bits   |   1 |  1 |  1 |  1  ||  1 | 1 | 0 | 0
 ** flag   |   R |  a |  l |  r  ||  t | d | - | -
 ** shift  |   7 |  6 |  5 |  4  ||  3 | 2 | 1 | 0
 ** number | 128 | 64 | 32 | 16  ||  8 | 4 | 2 | 1
 */
-void	set_flag(unsigned char *flags, int shift, int num)
+static void	set_flag(unsigned char *flags, int shift, int num)
 {
 	if (((*flags) & (1 << shift)) != num)
 		(*flags) |= (1 << shift);
@@ -27,13 +27,13 @@ void	set_flag(unsigned char *flags, int shift, int num)
 
 int		is_flag(unsigned char flags, int shift, int num)
 {
-	t_flags f[MAX_FLAGS + 1] = {
-			{.flag = REC_FLAG, .shift = REC_FLAG_SHIFT, .shnum = REC_FLAG_NUM},
-			{.flag = A_FLAG, .shift = A_FLAG_SHIFT, .shnum = A_FLAG_NUM},
-			{.flag = L_FLAG, .shift = L_FLAG_SHIFT, .shnum = L_FLAG_NUM},
-			{.flag = R_FLAG, .shift = R_FLAG_SHIFT, .shnum = R_FLAG_NUM},
-			{.flag = T_FLAG, .shift = T_FLAG_SHIFT, .shnum = T_FLAG_NUM},
-			{.flag = D_FLAG, .shift = D_FLAG_SHIFT, .shnum = D_FLAG_NUM}};
+//	t_flags f[MAX_FLAGS + 1] = {
+//			{.flag = REC_FLAG, .shift = REC_FLAG_SHIFT, .shnum = REC_FLAG_NUM},
+//			{.flag = A_FLAG, .shift = A_FLAG_SHIFT, .shnum = A_FLAG_NUM},
+//			{.flag = L_FLAG, .shift = L_FLAG_SHIFT, .shnum = L_FLAG_NUM},
+//			{.flag = R_FLAG, .shift = R_FLAG_SHIFT, .shnum = R_FLAG_NUM},
+//			{.flag = T_FLAG, .shift = T_FLAG_SHIFT, .shnum = T_FLAG_NUM},
+//			{.flag = D_FLAG, .shift = D_FLAG_SHIFT, .shnum = D_FLAG_NUM}};
 
 
 	if ((flags & (1 << shift)) == num)
@@ -120,12 +120,12 @@ int	sort_by_dir_or_file(char ***dirs, char ***files, char *filename, int d_flag)
 	if (cfilename == NULL)
 		return (ERR_CODE_MALLOC_ERROR);
 	ecode = if_dir_or_file(filename);
-	if (ecode == 0 && d_flag)
+	if (ecode == 0 && d_flag == 1)
 		ecode = 1;
 	if (ecode == 0) /* directory */
-		a2ecode = add_2array((void ***) dirs, cfilename);
+		a2ecode = add_2array((void ***)dirs, cfilename);
 	else if (ecode == 1) /* files */
-		a2ecode = add_2array((void***)files, cfilename);
+		a2ecode = add_2array((void ***)files, cfilename);
 	else if (ecode < 0) /* some unexpected error */
 	{
 		free(cfilename);
@@ -149,7 +149,7 @@ static int	separate_filenames(char ***filenames, char ***files, char ***dirs, in
 	while (*filenames && **filenames)
 	{
 		*count_possible_files_and_dirs += 1;
-		a2ecode = sort_by_dir_or_file(dirs, files, *(*filenames), is_flag(flags, D_FLAG));
+		a2ecode = sort_by_dir_or_file(dirs, files, *(*filenames), is_flag(flags, D_FLAG_SHIFT, D_FLAG_NUM));
 		if (a2ecode != 0)
 		{
 			handle_ecodes(a2ecode, **filenames, p);
