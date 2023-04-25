@@ -1,15 +1,12 @@
 #include "../../ls.h"
 
-int	set_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *time_year_lm, struct timespec *mtime)
+int	set_time(struct timespec st_time, char *amonth, char *day_lm, char *time_year_lm)
 {
 	char	**t;
 	time_t	sts;
 	long	diff;
 
-	mtime->tv_sec = st_mtimespec.tv_sec;
-	mtime->tv_nsec = st_mtimespec.tv_nsec;
-
-	t = ft_split(ctime((const time_t*)&st_mtimespec.tv_sec), ' ');
+	t = ft_split(ctime((const time_t*)&st_time.tv_sec), ' ');
 	if (!t)
 		return (ERR_CODE_MALLOC_ERROR);
 
@@ -24,7 +21,7 @@ int	set_time(struct timespec st_mtimespec, char *amonth, char *day_lm, char *tim
 		t = NULL;
 		return (ERR_CODE_STRERROR);
 	}
-	diff = sts - (const time_t)st_mtimespec.tv_sec;
+	diff = sts - (const time_t)st_time.tv_sec;
 	if (diff >= 0 && (double)diff < HALF_OF_YEAR_SECONDS)
 	{
 		*ft_strrchr(t[3], ':') = '\0';

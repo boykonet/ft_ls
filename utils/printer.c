@@ -1,6 +1,6 @@
 #include "../ls.h"
 
-void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
+void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs, int g_flag)
 {
 	t_pattern	patterns[MAX_REPL_PATTERNS];
 	char		spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1];
@@ -26,10 +26,20 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs)
 	add_pattern(&patterns[14], "{{filename}}", finfo->filename);
 	add_pattern(&patterns[15], "{{link}}", finfo->link);
 
-	if (finfo->type == S_IFLNK)
-		replace_pattern(pattern, PATTERN_WITH_LINK, patterns, MAX_REPL_PATTERNS);
+	if (g_flag == 0)
+	{
+		if (finfo->type == S_IFLNK)
+			replace_pattern(pattern, PATTERN_WITH_LINK, patterns, MAX_REPL_PATTERNS);
+		else
+			replace_pattern(pattern, PATTERN_WITHOUT_LINK, patterns, 15);
+	}
 	else
-		replace_pattern(pattern, PATTERN_WITHOUT_LINK, patterns, 15);
+	{
+		if (finfo->type == S_IFLNK)
+			replace_pattern(pattern, PATTERN_WITH_LINK_GROUP_NAME, patterns, MAX_REPL_PATTERNS);
+		else
+			replace_pattern(pattern, PATTERN_WITHOUT_LINK_GROUP_NAME, patterns, 15);
+	}
 	ft_putstr_fd(pattern, 1);
 }
 
@@ -49,7 +59,7 @@ void	print_total(long long total)
 	ft_putchar_fd('\n', 1);
 }
 
-void	print_files_from_dirs(t_fileinfo **files, long long total, int flag_l)
+void	print_files_from_dirs(t_fileinfo **files, long long total, unsigned short flags)
 {
 	t_spaces	maxs;
 	size_t		i;
@@ -60,19 +70,19 @@ void	print_files_from_dirs(t_fileinfo **files, long long total, int flag_l)
 	ispaces(&maxs);
 	counter_of_spaces(files, &maxs);
 
-	if (flag_l == 1 && len_2array((const void**)files) > 0)
+	if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_VALUE) == 1 && len_2array((const void**)files) > 0)
 		print_total(total);
 
-	if (flag_l == 0)
+	if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_VALUE) == 0)
 		print_without_full_info(files);
 	else
 	{
 		while (files[i])
-			print_fileinfo(files[i++], maxs);
+			print_fileinfo(files[i++], maxs, is_flag(flags, G_FLAG_SHIFT, G_FLAG_VALUE));
 	}
 }
 
-void	print_files_from_files(t_fileinfo **files, int flag_l)
+void	print_files_from_files(t_fileinfo **files, unsigned short flags)
 {
 	t_spaces	maxs;
 	size_t	i;
@@ -82,11 +92,11 @@ void	print_files_from_files(t_fileinfo **files, int flag_l)
 		return ;
 	ispaces(&maxs);
 	counter_of_spaces(files, &maxs);
-	if (flag_l == 0)
+	if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_VALUE) == 0)
 		print_without_full_info(files);
 	else
 	{
 		while (files[i])
-			print_fileinfo(files[i++], maxs);
+			print_fileinfo(files[i++], maxs, is_flag(flags, G_FLAG_SHIFT, G_FLAG_VALUE));
 	}
 }

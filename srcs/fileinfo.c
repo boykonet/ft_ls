@@ -13,7 +13,7 @@ t_fileinfo	*new_fileinfo(char *path, char *filename)
 	return (f);
 }
 
-int	set_fileinfo(t_fileinfo *finfo, long long *total)
+int	set_fileinfo(t_fileinfo *finfo, unsigned short flags, long long *total)
 {
 	struct stat		st;
 	char			*filepath;
@@ -55,7 +55,18 @@ int	set_fileinfo(t_fileinfo *finfo, long long *total)
 
 	set_number_of_bytes(st.st_size, finfo->nbytes);
 
-	ecode = set_time(st.st_mtimespec, finfo->amonth, finfo->day_lm, finfo->time_year_lm, &finfo->mtime);
+	if (is_flag(flags, U_FLAG_SHIFT, U_FLAG_VALUE) == 0)
+	{ // time of last modified
+		finfo->filetime.tv_sec = st.st_mtimespec.tv_sec;
+		finfo->filetime.tv_nsec = st.st_mtimespec.tv_nsec;
+	}
+	else
+	{ // time of last access
+		finfo->filetime.tv_sec = st.st_atimespec.tv_sec;
+		finfo->filetime.tv_nsec = st.st_atimespec.tv_nsec;
+	}
+
+	ecode = set_time(finfo->filetime, finfo->amonth, finfo->day_lm, finfo->time_year_lm);
 	if (ecode != 0)
 	{
 		free(filepath);

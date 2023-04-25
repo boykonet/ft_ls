@@ -1,11 +1,11 @@
 #include "../ls.h"
 
-int	rec_checks(char *dir, unsigned char flags)
+int	rec_checks(char *dir, unsigned short flags)
 {
 	size_t	ldname;
 
 	ldname = ft_strlen(dir);
-	if (is_flag(flags, A_FLAG_SHIFT, A_FLAG_NUM) == 0 && ft_strncmp(dir, ".", 1) == 0)
+	if (is_flag(flags, A_FLAG_SHIFT, A_FLAG_VALUE) == 0 && ft_strncmp(dir, ".", 1) == 0)
 		return (1);
 	if (ft_strncmp(dir, ".", ldname > 1 ? ldname : 1) == 0 || ft_strncmp(dir, "..", ldname > 2 ? ldname : 2) == 0)
 		return (1);
@@ -49,7 +49,7 @@ int	to_fileinfo(t_fileinfo ***files, char **filenames, char *path)
 	return (0);
 }
 
-static int	set_to_fileinfo(t_fileinfo ***files, char **filenames, char *path, unsigned char flags)
+static int	set_to_fileinfo(t_fileinfo ***files, char **filenames, char *path, unsigned short flags)
 {
 	int		ecode;
 	size_t	i;
@@ -67,7 +67,7 @@ static int	set_to_fileinfo(t_fileinfo ***files, char **filenames, char *path, un
 	i = 0;
 	while ((*files)[i])
 	{
-		ecode = set_fileinfo((*files)[i], NULL);
+		ecode = set_fileinfo((*files)[i], flags, NULL);
 		if (ecode != 0)
 		{
 			free_2array((void**)*files);
@@ -81,7 +81,7 @@ static int	set_to_fileinfo(t_fileinfo ***files, char **filenames, char *path, un
 	return (0);
 }
 
-static int handle_dirs(char *path, unsigned char flags, int counter, int possible_files)
+static int handle_dirs(char *path, unsigned short flags, int counter, int possible_files)
 {
 	t_fileinfo 		**files;
 	char 			**filenames;
@@ -92,7 +92,7 @@ static int handle_dirs(char *path, unsigned char flags, int counter, int possibl
 	size_t			i, flen;
 
 	files = NULL;
-	ecode = openreaddir(&filenames, path, is_flag(flags, A_FLAG_SHIFT, A_FLAG_NUM));
+	ecode = openreaddir(&filenames, path, is_flag(flags, A_FLAG_SHIFT, A_FLAG_VALUE));
 	if (ecode != 0)
 		return (ecode);
 
@@ -117,7 +117,7 @@ static int handle_dirs(char *path, unsigned char flags, int counter, int possibl
 	flen = len_2array((const void **)files);
 	while (i < flen)
 	{
-		ecode = set_fileinfo(files[i], &total);
+		ecode = set_fileinfo(files[i], flags, &total);
 		if (ecode != 0)
 		{
 			free_2array((void**)files);
@@ -128,7 +128,7 @@ static int handle_dirs(char *path, unsigned char flags, int counter, int possibl
 	}
 	sort_by_flags(files, flags);
 
-	print_files_from_dirs(files, total, is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM));
+	print_files_from_dirs(files, total, flags);
 
 	dirs = copy_dirs(files);
 	free_2array((void**)files);
@@ -136,7 +136,7 @@ static int handle_dirs(char *path, unsigned char flags, int counter, int possibl
 	if (dirs == NULL)
 		return (ERR_CODE_MALLOC_ERROR);
 
-	if (is_flag(flags, REC_FLAG_SHIFT, REC_FLAG_NUM) == 1)
+	if (is_flag(flags, REC_FLAG_SHIFT, REC_FLAG_VALUE) == 1)
 	{
 		i = 0;
 		while (dirs[i])
@@ -157,7 +157,7 @@ static int handle_dirs(char *path, unsigned char flags, int counter, int possibl
 	return (0);
 }
 
-static int handle_files(char **filenames, unsigned char flags)
+static int handle_files(char **filenames, unsigned short flags)
 {
 	t_fileinfo 		**files;
 	int				ecode;
@@ -167,13 +167,13 @@ static int handle_files(char **filenames, unsigned char flags)
 	ecode = set_to_fileinfo(&files, filenames, "", flags);
 	if (ecode != 0)
 		return (ecode);
-	print_files_from_files(files, is_flag(flags, L_FLAG_SHIFT, L_FLAG_NUM));
+	print_files_from_files(files, flags);
 	free_2array((void**)files);
 	files = NULL;
 	return (0);
 }
 
-static int	execute_files(char **files, unsigned char flags, t_pattern p[MAX_ERROR_PATTERNS])
+static int	execute_files(char **files, unsigned short flags, t_pattern p[MAX_ERROR_PATTERNS])
 {
 	int		ecode;
 
@@ -188,7 +188,7 @@ static int	execute_files(char **files, unsigned char flags, t_pattern p[MAX_ERRO
 	return (0);
 }
 
-static int	execute_dirs(char **dirs, unsigned char flags, int possible_files, t_pattern p[MAX_ERROR_PATTERNS])
+static int	execute_dirs(char **dirs, unsigned short flags, int possible_files, t_pattern p[MAX_ERROR_PATTERNS])
 {
 	t_fileinfo	**dirinfo;
 	char 		**sorted_dirs;
