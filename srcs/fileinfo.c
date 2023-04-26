@@ -13,6 +13,26 @@ t_fileinfo	*new_fileinfo(char *path, char *filename)
 	return (f);
 }
 
+int	set_color_type(mode_t mode)
+{
+	switch (mode & S_IFMT) {
+		case S_IFREG:
+			if (mode & S_IXUSR)
+				return (EXECUTABLE_FILE_TYPE);
+		case S_IFIFO:
+			return (PIPE_TYPE);
+		case S_IFSOCK:
+			return (SOCKET_TYPE);
+		case S_IFLNK:
+			return (SYMBOLIC_LINK_TYPE);
+		case S_IFCHR:
+			return (CHARACTER_SPECIAL_TYPE);
+		case S_IFBLK:
+			return (BLOCK_SPECIAL_TYPE);
+	}
+	return (0);
+}
+
 int	set_fileinfo(t_fileinfo *finfo, unsigned short flags, long long *total)
 {
 	struct stat		st;
@@ -46,6 +66,8 @@ int	set_fileinfo(t_fileinfo *finfo, unsigned short flags, long long *total)
 
 	// file type
 	set_type(&finfo->type, st.st_mode);
+
+	finfo->color_type = set_color_type(st.st_mode);
 
 	set_filemode(filepath, st.st_mode, finfo->type, finfo->filemode);
 	set_number_of_links(st.st_nlink, finfo->nlinks);

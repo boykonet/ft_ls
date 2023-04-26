@@ -30,6 +30,7 @@ static int	add_flag(unsigned short *flags, char nf)
 {
 	size_t	i;
 	t_flags f[MAX_FLAGS + 1] = {
+			{.flag = COLOR_FLAG, .shift = COLOR_FLAG_SHIFT, .value = COLOR_FLAG_VALUE},
 			{.flag = REC_FLAG, .shift = REC_FLAG_SHIFT, .value = REC_FLAG_VALUE},
 			{.flag = A_FLAG, .shift = A_FLAG_SHIFT, .value = A_FLAG_VALUE},
 			{.flag = L_FLAG, .shift = L_FLAG_SHIFT, .value = L_FLAG_VALUE},

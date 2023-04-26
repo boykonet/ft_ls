@@ -3,10 +3,9 @@
 
 # define CSTDERR						2
 # define FILETYPES_SIZE					8
-# define MAX_REPL_PATTERNS				16
+# define MAX_REPL_PATTERNS				19
 # define MAX_ERROR_PATTERNS				2
-# define LONG_FORNAT_PARRERN_MAXS		6
-# define MAX_COUNT_OF_ULL				20
+# define COUNT_REGULAR_SPACES		6
 # define STRING_SIZE					255
 
 # define ERR_CODE_MALLOC_ERROR			(-1)
@@ -35,60 +34,95 @@
 # define PATTERN_FILE_ERROR_FILENAME	"{{filename}}"
 # define PATTERN_FILE_ERROR_MESSAGE		"{{message}}"
 
-# define PATTERN_WITHOUT_LINK			"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}}\n"
-# define PATTERN_WITH_LINK				"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}  {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}} -> {{link}}\n"
-
-# define PATTERN_WITHOUT_LINK_GROUP_NAME	"{{filemode}} {{s1}}{{nlinks}} {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}}\n"
-# define PATTERN_WITH_LINK_GROUP_NAME		"{{filemode}} {{s1}}{{nlinks}} {{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}} -> {{link}}\n"
+# define PATTERN_WITHOUT_LINK			"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}{{two_spaces}}{{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{color}}{{filename}}{{reset_color}}\n"
+# define PATTERN_WITH_LINK				"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}{{two_spaces}}{{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{color}}{{filename}}{{reset_color}} -> {{link}}\n"
 
 /*                  fourth 4 bytes                 third 4 bytes            second 4 bytes        first 4 bytes
 ** bits    |     0 |     0 |    0 |    0  ||     0 |    0 |   0 |   1  ||   1 |  1 |  1 |  1  ||  1 | 1 | 1 | 1
-** flag    |     - |     - |    - |    -  ||     - |    - |   - |   g  ||   R |  a |  l |  r  ||  t | d | f | u
+** flag    |     - |     - |    - |    -  ||     - |    - |   G |   g  ||   R |  a |  l |  r  ||  t | d | f | u
 ** shift   |    15 |    14 |   13 |   12  ||    11 |   10 |   9 |   8  ||   7 |  6 |  5 |  4  ||  3 | 2 | 1 | 0
 ** value   | 32768 | 16384 | 8192 | 4096  ||  2048 | 1024 | 512 | 256  || 128 | 64 | 32 | 16  ||  8 | 4 | 2 | 1
 */
-# define MAX_FLAGS		9
+# define MAX_FLAGS		10
 
-# define G_FLAG			'g'
-# define G_FLAG_SHIFT	8
-# define G_FLAG_VALUE	256
+# define COLOR_FLAG			'G'
+# define COLOR_FLAG_SHIFT	9
+# define COLOR_FLAG_VALUE	512
 
-# define REC_FLAG		'R'
-# define REC_FLAG_SHIFT	7
-# define REC_FLAG_VALUE	128
+# define G_FLAG				'g'
+# define G_FLAG_SHIFT		8
+# define G_FLAG_VALUE		256
 
-# define A_FLAG			'a'
-# define A_FLAG_SHIFT	6
-# define A_FLAG_VALUE	64
+# define REC_FLAG			'R'
+# define REC_FLAG_SHIFT		7
+# define REC_FLAG_VALUE		128
 
-# define L_FLAG			'l'
-# define L_FLAG_SHIFT	5
-# define L_FLAG_VALUE	32
+# define A_FLAG				'a'
+# define A_FLAG_SHIFT		6
+# define A_FLAG_VALUE		64
 
-# define R_FLAG			'r'
-# define R_FLAG_SHIFT	4
-# define R_FLAG_VALUE	16
+# define L_FLAG				'l'
+# define L_FLAG_SHIFT		5
+# define L_FLAG_VALUE		32
 
-# define T_FLAG			't'
-# define T_FLAG_SHIFT	3
-# define T_FLAG_VALUE	8
+# define R_FLAG				'r'
+# define R_FLAG_SHIFT		4
+# define R_FLAG_VALUE		16
 
-# define D_FLAG			'd'
-# define D_FLAG_SHIFT	2
-# define D_FLAG_VALUE	4
+# define T_FLAG				't'
+# define T_FLAG_SHIFT		3
+# define T_FLAG_VALUE		8
 
-# define F_FLAG			'f'
-# define F_FLAG_SHIFT	1
-# define F_FLAG_VALUE	2
+# define D_FLAG				'd'
+# define D_FLAG_SHIFT		2
+# define D_FLAG_VALUE		4
 
-# define U_FLAG			'u'
-# define U_FLAG_SHIFT	0
-# define U_FLAG_VALUE	1
+# define F_FLAG				'f'
+# define F_FLAG_SHIFT		1
+# define F_FLAG_VALUE		2
+
+# define U_FLAG				'u'
+# define U_FLAG_SHIFT		0
+# define U_FLAG_VALUE		1
 
 
 # define FLAG_INVERTED_NO	0
 
 # define HALF_OF_YEAR_SECONDS	(365.2422 * 0.5 * 24 * 60 * 60)
+
+# define COUNT_OF_COLOR		10
+
+# define BLACK_COLOR		"\033[0;30m"
+# define RED_COLOR			"\033[0;31m"
+# define GREEN_COLOR		"\033[0;32m"
+# define BROWN_COLOR		"\033[0;33m"
+# define BLUE_COLOR			"\033[0;34m"
+# define PURPLE_COLOR		"\033[0;35m"
+# define CYAN_COLOR			"\033[0;36m"
+# define LIGHT_GREY_COLOR	"\033[0;37m"
+
+# define BOLD_BLACK_COLOR	"\033[1;30m"
+# define BOLD_RED_COLOR		"\033[1;31m"
+# define BOLD_GREEN_COLOR	"\033[1;32m"
+# define BOLD_BROWN			"\033[1;33m"
+# define BOLD_BLUE			"\033[1;34m"
+# define BOLD_PURPLE		"\033[1;35m"
+# define BOLD_CYAN			"\033[1;36m"
+# define BOLD_LIGHT_GREY	"\033[1;37m"
+
+# define RESET_COLOR		"\033[0m"
+
+# define DIR_TYPE										1
+# define SYMBOLIC_LINK_TYPE								2
+# define SOCKET_TYPE									3
+# define PIPE_TYPE										4
+# define EXECUTABLE_FILE_TYPE							5
+# define BLOCK_SPECIAL_TYPE								6
+# define CHARACTER_SPECIAL_TYPE							7
+# define EX_WITH_SETUID_BIT_SET_TYPE					8
+# define EX_WITH_SETGID_BIT_SET_TYPE					9
+# define DIR_WRITABLE_TO_OTHER_WITH_STICKY_BIT_TYPE		10
+# define DIR_WRITABLE_TO_OTHER_WITHOUT_STICKY_BIT_TYPE	11
 
 # include <unistd.h>
 /*
@@ -198,6 +232,7 @@ typedef struct s_fileinfo
 	char			path[3841 + 1];
 	char			filename[STRING_SIZE + 1];
 	unsigned int	type;
+	size_t 			color_type;
 	char			filemode[11 + 1];
 	char			nlinks[5 + 1];			/* because nlinks_t type is cast for unsigned short, maximum value is 65535 */
 	char			oname[STRING_SIZE + 1];	/* owner filename */
@@ -269,7 +304,7 @@ int 	openreaddir(char ***files, char *dirpath, int flag_a);
 //void	print_files_from_dirs(t_fileinfo **files, long long total, int flag_l);
 
 void	ispaces(t_spaces *spaces);
-void	set_spaces(char spaces[LONG_FORNAT_PARRERN_MAXS][254 + 1], t_fileinfo *finfo, t_spaces maxs);
+void	set_spaces(char spaces[COUNT_REGULAR_SPACES][254 + 1], t_fileinfo *finfo, t_spaces maxs);
 void	counter_of_spaces(t_fileinfo **info, t_spaces *spaces);
 
 

@@ -11,8 +11,8 @@
 ** ------------------------- B O N U S -------------------------
 ** -d      Directories are listed as plain files (not searched recursively).
 ** -f      Output is not sorted.  This option turns on the -a option.
-** -g      This option is only available for compatibility with POSIX; it is used to display the group name in the long (-l) format output (the owner name is suppressed). (not realize)
-** -u      Use time of last access, instead of last modification of the file for sorting (-t) or long printing (-l). (realize)
+** -g      This option is only available for compatibility with POSIX; it is used to display the group name in the long (-l) format output (the owner name is suppressed).
+** -u      Use time of last access, instead of last modification of the file for sorting (-t) or long printing (-l).
 ** -G      Enable colorized output.  This option is equivalent to defining CLICOLOR in the environment.  (See below.)
 */
 
