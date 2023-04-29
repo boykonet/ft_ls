@@ -5,7 +5,7 @@
 # define FILETYPES_SIZE					8
 # define MAX_REPL_PATTERNS				19
 # define MAX_ERROR_PATTERNS				2
-# define COUNT_REGULAR_SPACES		6
+# define COUNT_REGULAR_SPACES			6
 # define STRING_SIZE					255
 
 # define ERR_CODE_MALLOC_ERROR			(-1)
@@ -92,25 +92,24 @@
 
 # define COUNT_OF_COLOR		10
 
-# define BLACK_COLOR		"\033[0;30m"
-# define RED_COLOR			"\033[0;31m"
-# define GREEN_COLOR		"\033[0;32m"
-# define BROWN_COLOR		"\033[0;33m"
-# define BLUE_COLOR			"\033[0;34m"
-# define PURPLE_COLOR		"\033[0;35m"
-# define CYAN_COLOR			"\033[0;36m"
-# define LIGHT_GREY_COLOR	"\033[0;37m"
+# define COLOR_PATTERN		"\e[{{type_font}}{{semicolon}}{{f_code}}{{f_color}}{{semicolon}}{{b_code}}{{b_color}}m"
 
-# define BOLD_BLACK_COLOR	"\033[1;30m"
-# define BOLD_RED_COLOR		"\033[1;31m"
-# define BOLD_GREEN_COLOR	"\033[1;32m"
-# define BOLD_BROWN			"\033[1;33m"
-# define BOLD_BLUE			"\033[1;34m"
-# define BOLD_PURPLE		"\033[1;35m"
-# define BOLD_CYAN			"\033[1;36m"
-# define BOLD_LIGHT_GREY	"\033[1;37m"
+# define REGULAR_FONT		"0"
+# define BOLT_FONT			"1"
+# define SEMICOLON			";"
+# define FOREGROUND_CODE	"3"
+# define BACKGROUND_CODE	"4"
 
-# define RESET_COLOR		"\033[0m"
+# define F_BLACK		"0"
+# define F_RED			"1"
+# define F_GREEN		"2"
+# define F_BROWN		"3"
+# define F_BLUE			"4"
+# define F_PURPLE		"5"
+# define F_CYAN			"6"
+# define F_LIGHT_GREY	"7"
+
+# define RESET_COLOR	"\e[0m"
 
 # define DIR_TYPE										1
 # define SYMBOLIC_LINK_TYPE								2
