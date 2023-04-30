@@ -90,9 +90,16 @@
 
 # define HALF_OF_YEAR_SECONDS	(365.2422 * 0.5 * 24 * 60 * 60)
 
-# define COUNT_OF_COLOR		10
+# define DEFAULT_COLORS		"exfxcxdxbxegedabagacad"
 
-# define COLOR_PATTERN		"\e[{{type_font}}{{semicolon}}{{f_code}}{{f_color}}{{semicolon}}{{b_code}}{{b_color}}m"
+# define COLOR_PATTERN		"\e[{{type_font}}{{s1}}{{f_code}}{{f_color}}{{s2}}{{b_code}}{{b_color}}m"
+# define TYPE_FONT_PATTERN	"{{type_font}}"
+# define F_CODE_PATTERN		"{{f_code}}"
+# define F_COLOR_PATTERN	"{{f_color}}"
+# define B_CODE_PATTERN		"{{b_code}}"
+# define B_COLOR_PATTERN	"{{b_color}}"
+# define SEMICOLON1_PATTERN	"{{s1}}"
+# define SEMICOLON2_PATTERN	"{{s2}}"
 
 # define REGULAR_FONT		"0"
 # define BOLT_FONT			"1"
@@ -100,24 +107,24 @@
 # define FOREGROUND_CODE	"3"
 # define BACKGROUND_CODE	"4"
 
-# define F_BLACK		"0"
-# define F_RED			"1"
-# define F_GREEN		"2"
-# define F_BROWN		"3"
-# define F_BLUE			"4"
-# define F_PURPLE		"5"
-# define F_CYAN			"6"
-# define F_LIGHT_GREY	"7"
+# define BLACK		"0"
+# define RED		"1"
+# define GREEN		"2"
+# define BROWN		"3"
+# define BLUE		"4"
+# define PURPLE		"5"
+# define CYAN		"6"
+# define LIGHT_GREY	"7"
 
 # define RESET_COLOR	"\e[0m"
 
 # define DIR_TYPE										1
-# define SYMBOLIC_LINK_TYPE								2
+# define LINK_TYPE										2
 # define SOCKET_TYPE									3
 # define PIPE_TYPE										4
-# define EXECUTABLE_FILE_TYPE							5
-# define BLOCK_SPECIAL_TYPE								6
-# define CHARACTER_SPECIAL_TYPE							7
+# define EX_FILE_TYPE									5
+# define BLOCK_TYPE										6
+# define CHARACTER_TYPE									7
 # define EX_WITH_SETUID_BIT_SET_TYPE					8
 # define EX_WITH_SETGID_BIT_SET_TYPE					9
 # define DIR_WRITABLE_TO_OTHER_WITH_STICKY_BIT_TYPE		10
@@ -258,7 +265,9 @@ void 	init_ls(t_ls *ls);
 void	clear_ls(t_ls *ls);
 
 int		if_dir_or_file(char *filename);
+
 int		creadlink(const char *link, char *file);
+void	cstrmode(mode_t st_mode, char *filemode);
 
 int		len_2array(const void **darr);
 void	free_2array(void **arr);
@@ -299,8 +308,6 @@ t_fileinfo	*new_fileinfo(char *path, char *filename);
 
 void	sort_by_flags(t_fileinfo **files, unsigned short flags);
 int 	openreaddir(char ***files, char *dirpath, int flag_a);
-//void	print_files_from_files(t_fileinfo **files, int flag_l);
-//void	print_files_from_dirs(t_fileinfo **files, long long total, int flag_l);
 
 void	ispaces(t_spaces *spaces);
 void	set_spaces(char spaces[COUNT_REGULAR_SPACES][254 + 1], t_fileinfo *finfo, t_spaces maxs);
@@ -321,5 +328,7 @@ void	rec_itoa_ull(char *numstr, unsigned long long number, int base, char *base_
 void	putnbr(long long number, int base, char *base_str);
 
 void	handle_ecodes(int ecode, char *filename, t_pattern p[MAX_ERROR_PATTERNS]);
+
+int		set_color_type(mode_t mode);
 
 #endif

@@ -1,68 +1,83 @@
 #include "../ls.h"
 
-//typedef struct s_colors {
-//	char	key;
-//	char 	*value;
-//} t_colors;
-//
-//typedef struct s_tfiles {
-//	unsigned int	filetype;
-//	size_t 			iforeground;
-//	size_t 			ibackground;
-//} t_tfiles;
-//
-//void	set_color(char color[COUNT_OF_COLOR + 1])
-//{
-//	t_tfiles	tfiles[11 + 1] = {
-//			{.filetype = DIR_TYPE, .iforeground = 0, .ibackground = 1},
-//			{.filetype = SYMBOLIC_LINK_TYPE, .iforeground = 2, .ibackground = 3},
-//			{.filetype = SOCKET_TYPE, .iforeground = 4, .ibackground = 5},
-//			{.filetype = PIPE_TYPE, .iforeground = 6, .ibackground = 7},
-//			{.filetype = EXECUTABLE_FILE_TYPE, .iforeground = 8, .ibackground = 9},
-//			{.filetype = BLOCK_SPECIAL_TYPE, .iforeground = 10, .ibackground = 11},
-//			{.filetype = CHARACTER_SPECIAL_TYPE, .iforeground = 12, .ibackground = 13},
-//			{.filetype = EX_WITH_SETUID_BIT_SET_TYPE, .iforeground = 14, .ibackground = 15},
-//			{.filetype = EX_WITH_SETGID_BIT_SET_TYPE, .iforeground = 16, .ibackground = 17},
-//			{.filetype = DIR_WRITABLE_TO_OTHER_WITH_STICKY_BIT_TYPE, .iforeground = 18, .ibackground = 19},
-//			{.filetype = DIR_WRITABLE_TO_OTHER_WITHOUT_STICKY_BIT_TYPE, .iforeground = 20, .ibackground = 21}};
-//	t_colors	colors[17 + 1] = {
-//			{.key = 'a', .value = BLACK_COLOR},
-//			{.key = 'b', .value = RED_COLOR},
-//			{.key = 'c', .value = GREEN_COLOR},
-//			{.key = 'd', .value = BROWN_COLOR},
-//			{.key = 'e', .value = BLUE_COLOR},
-//			{.key = 'f', .value = PURPLE_COLOR},
-//			{.key = 'g', .value = CYAN_COLOR},
-//			{.key = 'h', .value = LIGHT_GREY_COLOR},
-//			{.key = 'A', .value = BOLD_BLACK_COLOR},
-//			{.key = 'B', .value = BOLD_RED_COLOR},
-//			{.key = 'C', .value = BOLD_GREEN_COLOR},
-//			{.key = 'D', .value = BOLD_BROWN},
-//			{.key = 'E', .value = BOLD_BLUE},
-//			{.key = 'F', .value = BOLD_PURPLE},
-//			{.key = 'G', .value = BOLD_CYAN},
-//			{.key = 'H', .value = BOLD_LIGHT_GREY},
-//			{.key = 'x', .value = ""}};
-//	char set_of_colors[] = "exfxcxdxbxegedabagacad";
-//}
+typedef struct s_colors {
+	char	key;
+	char 	*value;
+} t_colors;
 
-void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs, int g_flag/*, int color_flag*/)
+typedef struct s_tfiles {
+	unsigned int	filetype;
+	size_t 			findex;
+	size_t 			bindex;
+} t_tfiles;
+
+char	find_color()
+{
+
+}
+
+void	set_color(size_t filetype, char data[11 + 1])
+{
+	t_tfiles	tfiles[11 + 1] = {
+			{.filetype = DIR_TYPE, .findex = 0, .bindex = 1},
+			{.filetype = LINK_TYPE, .findex = 2, .bindex = 3},
+			{.filetype = SOCKET_TYPE, .findex = 4, .bindex = 5},
+			{.filetype = PIPE_TYPE, .findex = 6, .bindex = 7},
+			{.filetype = EX_FILE_TYPE, .findex = 8, .bindex = 9},
+			{.filetype = BLOCK_TYPE, .findex = 10, .bindex = 11},
+			{.filetype = CHARACTER_TYPE, .findex = 12, .bindex = 13},
+			{.filetype = EX_WITH_SETUID_BIT_SET_TYPE, .findex = 14, .bindex = 15},
+			{.filetype = EX_WITH_SETGID_BIT_SET_TYPE, .findex = 16, .bindex = 17},
+			{.filetype = DIR_WRITABLE_TO_OTHER_WITH_STICKY_BIT_TYPE, .findex = 18, .bindex = 19},
+			{.filetype = DIR_WRITABLE_TO_OTHER_WITHOUT_STICKY_BIT_TYPE, .findex = 20, .bindex = 21}};
+	t_colors	colors[17 + 1] = {
+			{.key = 'a', .value = BLACK},
+			{.key = 'b', .value = RED},
+			{.key = 'c', .value = GREEN},
+			{.key = 'd', .value = BROWN},
+			{.key = 'e', .value = BLUE},
+			{.key = 'f', .value = PURPLE},
+			{.key = 'g', .value = CYAN},
+			{.key = 'h', .value = LIGHT_GREY}};
+	const char dcolors[] = DEFAULT_COLORS;
+	char color[] = COLOR_PATTERN;
+	t_pattern patterns[7 + 1];
+
+	if (!(filetype >= 1 && filetype <= 11))
+		return ;
+
+	ft_bzero(patterns, sizeof(patterns));
+	size_t findex, bindex;
+
+	findex = tfiles[filetype - 1].findex;
+	bindex = tfiles[filetype - 1].bindex;
+
+	if (dcolors[findex] >= 'a' && dcolors[findex] <= 'z')
+		add_pattern(&patterns[0], TYPE_FONT_PATTERN, REGULAR_FONT);
+	else
+		add_pattern(&patterns[0], TYPE_FONT_PATTERN, BOLT_FONT);
+	add_pattern(&patterns[1], SEMICOLON1_PATTERN, SEMICOLON);
+
+	add_pattern(&patterns[2], F_CODE_PATTERN, FOREGROUND_CODE);
+
+}
+
+void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs, int g_flag, int color_flag)
 {
 	t_pattern	patterns[MAX_REPL_PATTERNS];
 	char		spaces[COUNT_REGULAR_SPACES][254 + 1];
 	char		pattern[1024] = {0};
-//	char 		color_foreground[COUNT_OF_COLOR + 1] = {0};
-//	char 		color_background[COUNT_OF_COLOR + 1] = {0};
+	char 		color[11 + 1] = {0};
+	char		reset_color[5 + 1] = {0};
 
 	ft_bzero(spaces, COUNT_REGULAR_SPACES * (254 + 1) * sizeof(char));
 	set_spaces(spaces, finfo, maxs);
 
-//	if (color_flag == 1)
-//	{
-//		set_color(color_foreground);
-//		set_color(color_background);
-//	}
-
+	if (color_flag == 1 && finfo->color_type != 0)
+	{
+		set_color(finfo->color_type, color);
+		ft_memcpy(reset_color, RESET_COLOR, ft_strlen(RESET_COLOR));
+	}
 
 	add_pattern(&patterns[0], "{{filemode}}", finfo->filemode);
 	add_pattern(&patterns[1], "{{s1}}", spaces[0]);
@@ -88,9 +103,9 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs, int g_flag/*, int color_fl
 	add_pattern(&patterns[12], "{{day}}", finfo->day_lm);
 	add_pattern(&patterns[13], "{{s6}}", spaces[5]);
 	add_pattern(&patterns[14], "{{time_year}}", finfo->time_year_lm);
-	add_pattern(&patterns[15], "{{color}}", "");
+	add_pattern(&patterns[15], "{{color}}", color);
 	add_pattern(&patterns[16], "{{filename}}", finfo->filename);
-	add_pattern(&patterns[17], "{{reset_color}}", "");
+	add_pattern(&patterns[17], "{{reset_color}}", reset_color);
 	add_pattern(&patterns[18], "{{link}}", finfo->link);
 
 	if (finfo->type == S_IFLNK)

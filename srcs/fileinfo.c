@@ -13,40 +13,6 @@ t_fileinfo	*new_fileinfo(char *path, char *filename)
 	return (f);
 }
 
-/*
-** 1.   directory
-** 2.   symbolic link
-** 3.   socket
-** 4.   pipe
-** 5.   executable
-** 6.   block special
-** 7.   character special
-** 8.   executable with setuid bit set
-** 9.   executable with setgid bit set
-** 10.  directory writable to others, with sticky bit
-** 11.  directory writable to others, without sticky bit
-*/
-
-int	set_color_type(mode_t mode)
-{
-	switch (mode & S_IFMT) {
-		case S_IFREG:
-			if (mode & S_IXUSR)
-				return (EXECUTABLE_FILE_TYPE);
-		case S_IFIFO:
-			return (PIPE_TYPE);
-		case S_IFSOCK:
-			return (SOCKET_TYPE);
-		case S_IFLNK:
-			return (SYMBOLIC_LINK_TYPE);
-		case S_IFCHR:
-			return (CHARACTER_SPECIAL_TYPE);
-		case S_IFBLK:
-			return (BLOCK_SPECIAL_TYPE);
-	}
-	return (0);
-}
-
 int	set_fileinfo(t_fileinfo *finfo, unsigned short flags, long long *total)
 {
 	struct stat		st;

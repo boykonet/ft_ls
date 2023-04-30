@@ -30,7 +30,8 @@ SRCS=	./main.c \
 		./utils/pattern.c \
 		./utils/printer.c \
 		./utils/rec_itoa.c \
-		./utils/rec_putnbr.c
+		./utils/rec_putnbr.c \
+		./utils/strmode.c
 
 OBJS= $(SRCS:%.c=%.o)
 
