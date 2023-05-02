@@ -1,5 +1,5 @@
 NAME=ft_ls
-CC=clang
+CC=gcc
 CFLAGS= -g -Wall -Wextra -Werror -fsanitize=address
 
 SRCS=	./main.c \
@@ -22,6 +22,7 @@ SRCS=	./main.c \
 		./srcs/sort.c \
 		./srcs/spaces.c \
 		./utils/calloca_to_2d.c \
+		./utils/color.c \
 		./utils/copy.c \
 		./utils/double_array_utils.c \
 		./utils/error.c \

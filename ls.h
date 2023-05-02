@@ -92,6 +92,8 @@
 
 # define DEFAULT_COLORS		"exfxcxdxbxegedabagacad"
 
+# define EMPTY				""
+
 # define COLOR_PATTERN		"\e[{{type_font}}{{s1}}{{f_code}}{{f_color}}{{s2}}{{b_code}}{{b_color}}m"
 # define TYPE_FONT_PATTERN	"{{type_font}}"
 # define F_CODE_PATTERN		"{{f_code}}"

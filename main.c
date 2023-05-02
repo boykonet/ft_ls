@@ -27,17 +27,5 @@ int main(int argc, char **argv)
 	execution(&ls);
 	ecode = ls.global_ecode;
 	clear_ls(&ls);
-
-//	printf("\x1b[31;42m");
-//	printf("some text\n");
-//	printf("\x1b[m");
-	printf("\e[1;31;42m");
-	printf("some text");
-	printf("\e[0m");
-	printf("\n");
-
-	printf("some another text\n");
-	printf("third text\n");
-
 	return (ecode);
 }

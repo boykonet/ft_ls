@@ -11,9 +11,27 @@ typedef struct s_tfiles {
 	size_t 			bindex;
 } t_tfiles;
 
-char	find_color()
+char	*find_color(char color)
 {
+	int			i;
+	t_colors	colors[8 + 1] = {
+			{.key = 'a', .value = BLACK},
+			{.key = 'b', .value = RED},
+			{.key = 'c', .value = GREEN},
+			{.key = 'd', .value = BROWN},
+			{.key = 'e', .value = BLUE},
+			{.key = 'f', .value = PURPLE},
+			{.key = 'g', .value = CYAN},
+			{.key = 'h', .value = LIGHT_GREY}};
 
+	i = 0;
+	while (i < 8)
+	{
+		if (colors[i].key == color)
+			return (colors[i].value);
+		i++;
+	}
+	return (NULL);
 }
 
 void	set_color(size_t filetype, char data[11 + 1])
@@ -30,15 +48,6 @@ void	set_color(size_t filetype, char data[11 + 1])
 			{.filetype = EX_WITH_SETGID_BIT_SET_TYPE, .findex = 16, .bindex = 17},
 			{.filetype = DIR_WRITABLE_TO_OTHER_WITH_STICKY_BIT_TYPE, .findex = 18, .bindex = 19},
 			{.filetype = DIR_WRITABLE_TO_OTHER_WITHOUT_STICKY_BIT_TYPE, .findex = 20, .bindex = 21}};
-	t_colors	colors[17 + 1] = {
-			{.key = 'a', .value = BLACK},
-			{.key = 'b', .value = RED},
-			{.key = 'c', .value = GREEN},
-			{.key = 'd', .value = BROWN},
-			{.key = 'e', .value = BLUE},
-			{.key = 'f', .value = PURPLE},
-			{.key = 'g', .value = CYAN},
-			{.key = 'h', .value = LIGHT_GREY}};
 	const char dcolors[] = DEFAULT_COLORS;
 	char color[] = COLOR_PATTERN;
 	t_pattern patterns[7 + 1];
@@ -52,14 +61,30 @@ void	set_color(size_t filetype, char data[11 + 1])
 	findex = tfiles[filetype - 1].findex;
 	bindex = tfiles[filetype - 1].bindex;
 
+
+	size_t	i = 0;
 	if (dcolors[findex] >= 'a' && dcolors[findex] <= 'z')
-		add_pattern(&patterns[0], TYPE_FONT_PATTERN, REGULAR_FONT);
+		add_pattern(&patterns[i++], TYPE_FONT_PATTERN, REGULAR_FONT);
 	else
-		add_pattern(&patterns[0], TYPE_FONT_PATTERN, BOLT_FONT);
-	add_pattern(&patterns[1], SEMICOLON1_PATTERN, SEMICOLON);
+		add_pattern(&patterns[i++], TYPE_FONT_PATTERN, BOLT_FONT);
+	add_pattern(&patterns[i++], SEMICOLON1_PATTERN, SEMICOLON);
 
-	add_pattern(&patterns[2], F_CODE_PATTERN, FOREGROUND_CODE);
-
+	add_pattern(&patterns[i++], F_CODE_PATTERN, FOREGROUND_CODE);
+	add_pattern(&patterns[i++], F_COLOR_PATTERN, find_color(dcolors[findex]));
+	if (dcolors[bindex] != 'x')
+	{
+		add_pattern(&patterns[i++], SEMICOLON2_PATTERN, SEMICOLON);
+		add_pattern(&patterns[i++], B_CODE_PATTERN, BACKGROUND_CODE);
+		add_pattern(&patterns[i], B_COLOR_PATTERN, find_color(dcolors[bindex]));
+	}
+	else
+	{
+		add_pattern(&patterns[i++], SEMICOLON2_PATTERN, EMPTY);
+		add_pattern(&patterns[i++], B_CODE_PATTERN, EMPTY);
+		add_pattern(&patterns[i], B_COLOR_PATTERN, EMPTY);
+	}
+	replace_pattern(color, COLOR_PATTERN, patterns, 7);
+	ft_memcpy(data, color, ft_strlen(color));
 }
 
 void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs, int g_flag, int color_flag)
@@ -150,7 +175,7 @@ void	print_files_from_dirs(t_fileinfo **files, long long total, unsigned short f
 	else
 	{
 		while (files[i])
-			print_fileinfo(files[i++], maxs, is_flag(flags, G_FLAG_SHIFT, G_FLAG_VALUE)/*, is_flag(flags, COLOR_FLAG_SHIFT, COLOR_FLAG_VALUE)*/);
+			print_fileinfo(files[i++], maxs, is_flag(flags, G_FLAG_SHIFT, G_FLAG_VALUE), is_flag(flags, COLOR_FLAG_SHIFT, COLOR_FLAG_VALUE));
 	}
 }
 
@@ -169,6 +194,6 @@ void	print_files_from_files(t_fileinfo **files, unsigned short flags)
 	else
 	{
 		while (files[i])
-			print_fileinfo(files[i++], maxs, is_flag(flags, G_FLAG_SHIFT, G_FLAG_VALUE)/*, is_flag(flags, COLOR_FLAG_SHIFT, COLOR_FLAG_VALUE)*/);
+			print_fileinfo(files[i++], maxs, is_flag(flags, G_FLAG_SHIFT, G_FLAG_VALUE), is_flag(flags, COLOR_FLAG_SHIFT, COLOR_FLAG_VALUE));
 	}
 }

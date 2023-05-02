@@ -33,7 +33,7 @@ int	set_color_type(mode_t mode)
 				return (EX_WITH_SETUID_BIT_SET_TYPE);
 			if (mode & (S_IXGRP | S_ISGID))
 				return (EX_WITH_SETGID_BIT_SET_TYPE);
-			break ;
+			return (0);
 		case S_IFDIR:
 			if (mode & S_IWOTH)
 			{
@@ -42,6 +42,7 @@ int	set_color_type(mode_t mode)
 				return (DIR_WRITABLE_TO_OTHER_WITHOUT_STICKY_BIT_TYPE);
 			}
 			return (DIR_TYPE);
+		default:
+			return (0);
 	}
-	return (0);
 }
