@@ -27,15 +27,16 @@
 # define STRERROR_MESSAGE				"{{message}}"
 # define PATTERN_STRERROR_MESSAGE		"{{message}}"
 
-# define FLAG_NOT_SUPPORT				"illegal option -- {{flag}}\nusage: ls [-Ralrt] [file ...]"
+# define FLAG_NOT_SUPPORT				"illegal option -- {{flag}}\nusage: ls [-GRadfglrtu] [file ...]"
 # define PATTERN_FLAG_NOT_SUPPORT		"{{flag}}"
 
 # define FILE_ERROR						"{{filename}}: {{message}}"
 # define PATTERN_FILE_ERROR_FILENAME	"{{filename}}"
 # define PATTERN_FILE_ERROR_MESSAGE		"{{message}}"
 
-# define PATTERN_WITHOUT_LINK			"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}{{two_spaces}}{{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{color}}{{filename}}{{reset_color}}\n"
-# define PATTERN_WITH_LINK				"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}{{two_spaces}}{{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{color}}{{filename}}{{reset_color}} -> {{link}}\n"
+# define WITHOUT_LINK					"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}{{two_spaces}}{{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{color}}{{filename}}{{reset_color}}"
+# define WITH_LINK						"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}{{two_spaces}}{{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{color}}{{filename}}{{reset_color}} -> {{link}}"
+# define SHORT_FILE_INFO				"{{color}}{{filename}}{{reset_color}}"
 
 /*                  fourth 4 bytes                 third 4 bytes            second 4 bytes        first 4 bytes
 ** bits    |     0 |     0 |    0 |    0  ||     0 |    0 |   0 |   1  ||   1 |  1 |  1 |  1  ||  1 | 1 | 1 | 1
@@ -43,7 +44,7 @@
 ** shift   |    15 |    14 |   13 |   12  ||    11 |   10 |   9 |   8  ||   7 |  6 |  5 |  4  ||  3 | 2 | 1 | 0
 ** value   | 32768 | 16384 | 8192 | 4096  ||  2048 | 1024 | 512 | 256  || 128 | 64 | 32 | 16  ||  8 | 4 | 2 | 1
 */
-# define MAX_FLAGS		10
+# define MAX_FLAGS			10
 
 # define COLOR_FLAG			'G'
 # define COLOR_FLAG_SHIFT	9
@@ -102,6 +103,7 @@
 # define B_COLOR_PATTERN	"{{b_color}}"
 # define SEMICOLON1_PATTERN	"{{s1}}"
 # define SEMICOLON2_PATTERN	"{{s2}}"
+# define COUNT_COLOR_PATTERNS	7
 
 # define REGULAR_FONT		"0"
 # define BOLT_FONT			"1"
@@ -131,6 +133,9 @@
 # define EX_WITH_SETGID_BIT_SET_TYPE					9
 # define DIR_WRITABLE_TO_OTHER_WITH_STICKY_BIT_TYPE		10
 # define DIR_WRITABLE_TO_OTHER_WITHOUT_STICKY_BIT_TYPE	11
+
+# define MIN_FILE_TYPES									1
+# define MAX_FILE_TYPES									11
 
 # include <unistd.h>
 /*
@@ -259,6 +264,11 @@ typedef struct s_filetypes
 	char			replacement;
 } t_filetypes;
 
+typedef struct s_colors {
+	char	key;
+	char 	*value;
+} t_colors;
+
 void	initialization(t_ls *ls);
 void	parsing(t_ls *ls, char **data);
 void	execution(t_ls *ls);
@@ -332,5 +342,6 @@ void	putnbr(long long number, int base, char *base_str);
 void	handle_ecodes(int ecode, char *filename, t_pattern p[MAX_ERROR_PATTERNS]);
 
 int		set_color_type(mode_t mode);
+void	set_color(size_t filetype, char data[11 + 1]);
 
 #endif
