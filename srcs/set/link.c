@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   link.c                                             :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: gkarina <gkarina@student.codam.nl>           +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2023/05/05 14:09:21 by gkarina       #+#    #+#                 */
+/*   Updated: 2023/05/05 14:09:21 by gkarina       ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../ls.h"
 
-int set_link(const char *filepath, char *link)
+int	set_link(const char *filepath, char *link)
 {
 	int	ecode;
 

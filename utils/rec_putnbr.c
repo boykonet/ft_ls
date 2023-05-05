@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   rec_putnbr.c                                       :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: gkarina <gkarina@student.codam.nl>           +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2023/05/05 14:23:38 by gkarina       #+#    #+#                 */
+/*   Updated: 2023/05/05 14:23:38 by gkarina       ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../libs/libft/libft.h"
 
 void	putnbr(long long number, int base, char *base_str)

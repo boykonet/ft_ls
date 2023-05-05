@@ -1,5 +1,17 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         ::::::::             #
+#    Makefile                                           :+:    :+:             #
+#                                                      +:+                     #
+#    By: gkarina <gkarina@student.codam.nl>           +#+                      #
+#                                                    +#+                       #
+#    Created: 2023/05/05 14:23:57 by gkarina       #+#    #+#                  #
+#    Updated: 2023/05/05 14:23:57 by gkarina       ########   odam.nl          #
+#                                                                              #
+# **************************************************************************** #
+
 NAME=ft_ls
-CC=gcc
+CC=clang
 CFLAGS= -g -Wall -Wextra -Werror -fsanitize=address
 
 SRCS=	./main.c \
@@ -27,6 +39,7 @@ SRCS=	./main.c \
 		./utils/double_array_utils.c \
 		./utils/error.c \
 		./utils/is_more_less.c \
+		./utils/isatty.c \
 		./utils/max.c \
 		./utils/pattern.c \
 		./utils/printer.c \

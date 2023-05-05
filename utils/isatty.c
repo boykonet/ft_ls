@@ -1,20 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   filetype.c                                         :+:    :+:            */
+/*   isatty.c                                           :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: gkarina <gkarina@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2023/05/05 14:09:10 by gkarina       #+#    #+#                 */
-/*   Updated: 2023/05/05 14:09:10 by gkarina       ########   odam.nl         */
+/*   Created: 2023/05/05 16:23:56 by gkarina       #+#    #+#                 */
+/*   Updated: 2023/05/05 16:23:56 by gkarina       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../ls.h"
+#include "../ls.h"
 
-void	set_type(unsigned int *type, mode_t st_mode)
+int	cisatty(int fd)
 {
-	if (type == NULL)
-		return ;
-	*type = (unsigned int)(st_mode & S_IFMT);
+	struct termios	term;
+
+	return (tcgetattr(fd, &term) == 0);
 }

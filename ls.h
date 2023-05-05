@@ -207,6 +207,11 @@
 ** errno
 */
 
+#include <sys/termios.h>
+/*
+** tcgetattr
+*/
+
 # include "libs/libft/libft.h"
 
 typedef struct s_pattern
@@ -280,6 +285,7 @@ int		if_dir_or_file(char *filename);
 
 int		creadlink(const char *link, char *file);
 void	cstrmode(mode_t st_mode, char *filemode);
+int		cisatty(int fd);
 
 int		len_2array(const void **darr);
 void	free_2array(void **arr);

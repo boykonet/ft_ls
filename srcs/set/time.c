@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   time.c                                             :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: gkarina <gkarina@student.codam.nl>           +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2023/05/05 14:09:34 by gkarina       #+#    #+#                 */
+/*   Updated: 2023/05/05 14:09:34 by gkarina       ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../ls.h"
 
 int	set_time(struct timespec st_time, char *amonth, char *day_lm, char *time_year_lm)

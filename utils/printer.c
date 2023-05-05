@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   printer.c                                          :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: gkarina <gkarina@student.codam.nl>           +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2023/05/05 14:23:23 by gkarina       #+#    #+#                 */
+/*   Updated: 2023/05/05 14:23:23 by gkarina       ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../ls.h"
 
 void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs, int g_flag, int color_flag)
@@ -5,15 +17,15 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs, int g_flag, int color_flag
 	t_pattern	patterns[MAX_REPL_PATTERNS];
 	char		spaces[COUNT_REGULAR_SPACES][254 + 1];
 	char		pattern[1024];
-	char 		color[11 + 1];
-	char		reset_color[5 + 1];
+	char 		color[11 + 1], reset_color[5 + 1];
 
 	ft_bzero(color, sizeof(color));
 	ft_bzero(reset_color, sizeof(reset_color));
 	ft_bzero(spaces, COUNT_REGULAR_SPACES * (254 + 1) * sizeof(char));
 	ft_bzero(patterns, sizeof(patterns));
+	ft_bzero(pattern, sizeof(pattern));
 	set_spaces(spaces, finfo, maxs);
-	if (color_flag == 1 && finfo->color_type != 0)
+	if (color_flag == 1 && finfo->color_type != 0 && cisatty(1) == 1)
 	{
 		set_color(finfo->color_type, color);
 		ft_memcpy(reset_color, RESET_COLOR, ft_strlen(RESET_COLOR));
@@ -56,8 +68,7 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs, int g_flag, int color_flag
 void	print_without_full_info(t_fileinfo **files, int color_flag)
 {
 	size_t		i;
-	char 		color[11 + 1];
-	char		reset_color[5 + 1];
+	char 		color[11 + 1], reset_color[5 + 1];
 	char		pattern[255 + 11 + 5 + 1];
 	t_pattern	p[3 + 1];
 
@@ -70,7 +81,7 @@ void	print_without_full_info(t_fileinfo **files, int color_flag)
 		ft_bzero(pattern, sizeof(pattern));
 		ft_bzero(color, sizeof(color));
 		ft_bzero(reset_color, sizeof(reset_color));
-		if (color_flag == 1 && files[i]->color_type != 0)
+		if (color_flag == 1 && files[i]->color_type != 0 && cisatty(1) == 1)
 		{
 			set_color(files[i]->color_type, color);
 			ft_memcpy(reset_color, RESET_COLOR, ft_strlen(RESET_COLOR));

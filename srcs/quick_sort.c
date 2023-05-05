@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   quick_sort.c                                       :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: gkarina <gkarina@student.codam.nl>           +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2023/05/05 14:19:05 by gkarina       #+#    #+#                 */
+/*   Updated: 2023/05/05 14:19:05 by gkarina       ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../ls.h"
 
 static void	swap(void **first, void **second)
@@ -9,7 +21,7 @@ static void	swap(void **first, void **second)
 	*second = tmp;
 }
 
-static int	partition(void **elems, size_t l, size_t r, int (*compare_func)(void*, void*, int), int is_inverted)
+static size_t	partition(void **elems, size_t l, size_t r, int (*compare_func)(void*, void*, int), int is_inverted)
 {
 	size_t 	pivot;
 	size_t	result;
@@ -29,9 +41,9 @@ static int	partition(void **elems, size_t l, size_t r, int (*compare_func)(void*
 	return (result);
 }
 
-static void	quick_sort_impl(void ***elems, int l, int r, int (*compare_func)(void*, void*, int), int is_inverted)
+static void	quick_sort_impl(void ***elems, size_t l, size_t r, int (*compare_func)(void*, void*, int), int is_inverted)
 {
-	int	q;
+	size_t	q;
 
 	if (l < r)
 	{

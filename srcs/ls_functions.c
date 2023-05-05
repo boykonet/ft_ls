@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   ls_functions.c                                     :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: gkarina <gkarina@student.codam.nl>           +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2023/05/05 14:18:45 by gkarina       #+#    #+#                 */
+/*   Updated: 2023/05/05 14:18:45 by gkarina       ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../ls.h"
 
 void	init_ls(t_ls *ls)
@@ -27,4 +39,3 @@ void	clear_ls(t_ls *ls)
 	ls->possible_files = 0;
 	ls->global_ecode = 0;
 }
-
