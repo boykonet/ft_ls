@@ -1,43 +1,88 @@
 'R' 'a' 'd' 'f' 'g' 'l' 'r' 't' 'u'
 
 R a d f g l r t u
-
+[R*]
 Ra Rd Rf Rg Rl Rr Rt Ru
+[a*]
 ad af ag al ar at au
+[d*]
 df dg dl dr dt du
+[f*]
 fg fl fr ft fu
+[g*]
 gl gr gt gu
+[l*]
 lr lt lu
+[r*]
 rt ru
+[t*]
 tu
+
+R a d f g l r t u
+[Ra*]
 Rad Raf Rag Ral Rar Rat Rau
+[Rd*]
 Rdf Rdg Rdl Rdr Rdt Rdu
+[Rf*]
 Rfg Rfl Rfr Rft Rfu
+[Rg*]
 Rgl Rgr Rgt Rgu
+[Rl*]
 Rlr Rlt Rlu
+[Rr*]
 Rrr Rru
+[Rt*]
 Rtu
+
+[ad*]
 adf adg adl adr adt adu
+[af*]
 afg afl afr aft afu
+[ag*]
 agl agr agt agu
+[al*]
 alr alt alu
+[ar*]
 art aru
+[at*]
 atu
+
+[df*]
 dfg dfl dfr dft dfu
+[dg*]
 dgl dgr dgt dgu
+[dl*]
 dlr dlt dlu
+[dr*]
 drt dru
+[dt*]
 dtu
+
+[fg*]
 fgl fgr fgt fgu
+[fl*]
 flr flt flu
+[fr*]
 frt fru
+[ft*]
 ftu
+
+[gl*]
 glr glt glu
+[gr*]
 grt gru
+[gt*]
 gtu
+
+[lr*]
 lrt lru
+[lt*]
 ltu
+
+[rt*]
 rtu
+
+-----------------------------------
 
 'R' 'a' 'd' 'f' 'g' 'l' 'r' 't' 'u'
 
