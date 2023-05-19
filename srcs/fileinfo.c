@@ -69,18 +69,21 @@ int	set_fileinfo(t_fileinfo *finfo, unsigned short flags, long long *total)
 
 	set_number_of_bytes(st.st_size, finfo->nbytes);
 
-	if (is_flag(flags, U_FLAG_SHIFT, U_FLAG_VALUE) == 0)
-	{ // time of last modified
-		finfo->filetime.tv_sec = st.st_mtimespec.tv_sec;
-		finfo->filetime.tv_nsec = st.st_mtimespec.tv_nsec;
+	finfo->atime.tv_sec = st.st_atimespec.tv_sec;
+	finfo->mtime.tv_sec = st.st_mtimespec.tv_sec;
+
+	if (is_flag(flags, U_FLAG_SHIFT, U_FLAG_VALUE) == 1)
+	{
+		if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_VALUE) == 1 \
+			&& is_flag(flags, L_FLAG_SHIFT, L_FLAG_VALUE) == 1)
+			ecode = set_time(finfo->atime, finfo->amonth, finfo->day_lm, finfo->time_year_lm);
+		else if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_VALUE) == 1)
+			ecode = set_time(finfo->atime, finfo->amonth, finfo->day_lm, finfo->time_year_lm);
+		else
+			ecode = set_time(finfo->mtime, finfo->amonth, finfo->day_lm, finfo->time_year_lm);
 	}
 	else
-	{ // time of last access
-		finfo->filetime.tv_sec = st.st_atimespec.tv_sec;
-		finfo->filetime.tv_nsec = st.st_atimespec.tv_nsec;
-	}
-
-	ecode = set_time(finfo->filetime, finfo->amonth, finfo->day_lm, finfo->time_year_lm);
+		ecode = set_time(finfo->mtime, finfo->amonth, finfo->day_lm, finfo->time_year_lm);
 	if (ecode != 0)
 	{
 		free(filepath);

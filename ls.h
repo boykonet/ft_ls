@@ -260,7 +260,8 @@ typedef struct s_fileinfo
 	char			day_lm[2 + 1];			/* day last modified ---> 31 */
 	char			time_year_lm[5 + 1];	/* time last modified or year if mote than 6 months or the date in the future ---> 12:23 */
 	char			link[STRING_SIZE + 1];	/* only if type == S_IFLNK */
-	struct timespec	filetime;				/* time of last modified or time of last access if -u flag is setting */
+	struct timespec	mtime;					/* time of last modified */
+	struct timespec	atime;					/* time of last access */
 } t_fileinfo;
 
 typedef struct s_filetypes
@@ -312,10 +313,10 @@ int 	set_fileinfo(t_fileinfo *finfo, unsigned short flags, long long *total);
 void	print_files_from_files(t_fileinfo **files, unsigned short flags);
 void	print_files_from_dirs(t_fileinfo **files, long long total, unsigned short flags);
 
-void	sort_fileinfo(t_fileinfo **array, size_t count_elems, int (*func)(void*, void*, int), int is_inverted);
-int		order_cmp_by_filename(void *first, void *second, int is_inverted);
-int		order_cmp_by_tlastmod(void *first, void *second, int is_inverted);
-void	quick_sort(void ***elems, size_t count, int (*compare_func)(void*, void*, int), int is_inverted);
+void	sort_fileinfo(t_fileinfo **array, size_t count_elems, int (*func)(void*, void*, unsigned short, int), int is_inverted, unsigned short flags);
+int		order_cmp_by_filename(void *first, void *second, unsigned short flags, int is_inverted);
+int		order_cmp_by_time(void *first, void *second, unsigned short flags, int is_inverted);
+void	quick_sort(void ***elems, size_t count, int (*compare_func)(void*, void*, unsigned short, int), int is_inverted, unsigned short flags);
 
 int		max(int first, int second);
 void	max_spaces(size_t *first, size_t second);
