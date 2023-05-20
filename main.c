@@ -24,18 +24,18 @@
 ** -d      Directories are listed as plain files (not searched recursively).
 ** -f      Output is not sorted.  This option turns on the -a option.
 ** -g      This option is only available for compatibility with POSIX; it is used to display the group name in the long (-l) format output (the owner name is suppressed).
-** -u      Use time of last access, instead of last modification of the file for sorting (-t) or long printing (-l).
+** -u      Use time of last access, instead of last modification of the file for sorting (-t) or long printing (-l). (NOT IMPLEMENTED)
 ** -G      Enable colorized output.  This option is equivalent to defining CLICOLOR in the environment.
 */
 
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **env)
 {
 	t_ls	ls;
 	int 	ecode;
 
 	(void)argc;
 	initialization(&ls);
-	parsing(&ls, argv + 1);
+	parsing(&ls, argv + 1, env);
 	execution(&ls);
 	ecode = ls.global_ecode;
 	clear_ls(&ls);

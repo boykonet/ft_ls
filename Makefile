@@ -26,6 +26,7 @@ SRCS=	./main.c \
 		./srcs/dir.c \
 		./srcs/execution.c \
 		./srcs/fileinfo.c \
+		./srcs/flag.c \
 		./srcs/initialization.c \
 		./srcs/ls_functions.c \
 		./srcs/parsing.c \

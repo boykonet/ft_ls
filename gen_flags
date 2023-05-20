@@ -1,189 +1,27 @@
-'R' 'a' 'd' 'f' 'g' 'l' 'r' 't' 'u'
-
-R a d f g l r t u
-[R*]
-Ra Rd Rf Rg Rl Rr Rt Ru
-[a*]
-ad af ag al ar at au
-[d*]
-df dg dl dr dt du
-[f*]
-fg fl fr ft fu
-[g*]
-gl gr gt gu
-[l*]
-lr lt lu
-[r*]
-rt ru
-[t*]
-tu
-
-R a d f g l r t u
-[Ra*]
-Rad Raf Rag Ral Rar Rat Rau
-[Rd*]
-Rdf Rdg Rdl Rdr Rdt Rdu
-[Rf*]
-Rfg Rfl Rfr Rft Rfu
-[Rg*]
-Rgl Rgr Rgt Rgu
-[Rl*]
-Rlr Rlt Rlu
-[Rr*]
-Rrr Rru
-[Rt*]
-Rtu
-
-[ad*]
-adf adg adl adr adt adu
-[af*]
-afg afl afr aft afu
-[ag*]
-agl agr agt agu
-[al*]
-alr alt alu
-[ar*]
-art aru
-[at*]
-atu
-
-[df*]
-dfg dfl dfr dft dfu
-[dg*]
-dgl dgr dgt dgu
-[dl*]
-dlr dlt dlu
-[dr*]
-drt dru
-[dt*]
-dtu
-
-[fg*]
-fgl fgr fgt fgu
-[fl*]
-flr flt flu
-[fr*]
-frt fru
-[ft*]
-ftu
-
-[gl*]
-glr glt glu
-[gr*]
-grt gru
-[gt*]
-gtu
-
-[lr*]
-lrt lru
-[lt*]
-ltu
-
-[rt*]
-rtu
-
------------------------------------
-
-'R' 'a' 'd' 'f' 'g' 'l' 'r' 't' 'u'
-
-Radf Radg Radl Radr Radt Radu
-Rafg Rafl Rafr Raft Rafu
-Ragl Ragr Ragt Ragu
-Ralr Ralt Ralu
-Rart Raru
-Ratu
-Rdfg Rdfl Rdfr Rdft Rdfu
-Rdgl Rdgr Rdgt Rdgu
-Rdlr Rdlt Rdlu
-Rdrt Rdru
-Rdtu
-Rfgl Rfgr Rfgt Rfgu
-Rflr Rflt Rflu
-Rfrt Rfru
-Rftu
-Rglr Rglt Rglu
-Rgrt Rgru
-Rgtu
-Rlrt Rlru
-Rltu
-Rrtu
-
-'a' 'd' 'f' 'g' 'l' 'r' 't' 'u'
-
-adfg adfl adfr adft adfu
-adgl adgr adgt adgu
-adlr adlt adlu
-adrt adru
-adtu
-afgl afgr afgt afgu
-aflr aflt aflu
-afrt afru
-aftu
-aglr aglt aglu
-agrt agru
-agtu
-alrt alru
-altu
-artu
-
-'d' 'f' 'g' 'l' 'r' 't' 'u'
-
-dfgl dfgr dfgt dfgu
-dflr dflt dflu
-dfrt dfru
-dftu
-dglr dglt dglu
-dgrt dgru
-dgtu
-dlrt dlru
-dltu
-drtu
-
-'f' 'g' 'l' 'r' 't' 'u'
-fglr fglt fglu
-fgrt fgru
-fgtu
-flrt flru
-fltu
-frtu
-
-'g' 'l' 'r' 't' 'u'
-glrt glru
-gltu
-grtu
-
-'l' 'r' 't' 'u'
-lrtu
-
-
----------------------------
-
-
-'R' 'a' 'd' 'f' 'g' 'l' 'r' 't' 'u'
-Radfg Radfl Radfr Radft Radfu
-Radgl Radgr Radgt Radgu
-Radlr Radlt Radlu
-Radrt Radru
-Radtu
-Rafgl Rafgr Rafgt Rafgu
-Raflr Raflt Raflu
-Rafrt Rafru
-Raftu
-Raglr Raglt Raglu
-Ragrt Ragru
-Ragtu
-Ralrt Ralru
-Raltu
-Rartu
-
-'a' 'd' 'f' 'g' 'l' 'r' 't' 'u'
-adfgl adfgr adfgt adfgu
-adflr adflt adflu
-adfrt adfru
-adftu
-adglr adglt adglu
-adgrt adgru
-adgtu
-adlrt adlru
-adltu
-adrtu
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rrlfgu-without-arguments/diff_out and /Users/gkarina/tests/bonus/Rrlfgu-without-arguments/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Ratfgu-without-arguments/diff_out and /Users/gkarina/tests/bonus/Ratfgu-without-arguments/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Ratu-dot/diff_out and /Users/gkarina/tests/bonus/Ratu-dot/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rratu-dot/diff_out and /Users/gkarina/tests/bonus/Rratu-dot/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rrfgu-dot/diff_out and /Users/gkarina/tests/bonus/Rrfgu-dot/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Ratgu-dot/diff_out and /Users/gkarina/tests/bonus/Ratgu-dot/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rraltu-dot/diff_out and /Users/gkarina/tests/bonus/Rraltu-dot/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rrlfgu-dot/diff_out and /Users/gkarina/tests/bonus/Rrlfgu-dot/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Raltgu-dot/diff_out and /Users/gkarina/tests/bonus/Raltgu-dot/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Ralu-dir/diff_out and /Users/gkarina/tests/bonus/Ralu-dir/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Ratu-dir/diff_out and /Users/gkarina/tests/bonus/Ratu-dir/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rratu-dir/diff_out and /Users/gkarina/tests/bonus/Rratu-dir/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rrtgu-dir/diff_out and /Users/gkarina/tests/bonus/Rrtgu-dir/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Raltu-dir/diff_out and /Users/gkarina/tests/bonus/Raltu-dir/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Raltgu-dir/diff_out and /Users/gkarina/tests/bonus/Raltgu-dir/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Raltfgu-dir/diff_out and /Users/gkarina/tests/bonus/Raltfgu-dir/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rltu-dir-file/diff_out and /Users/gkarina/tests/bonus/Rltu-dir-file/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rragu-dir-file/diff_out and /Users/gkarina/tests/bonus/Rragu-dir-file/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Ralfu-dir-file/diff_out and /Users/gkarina/tests/bonus/Ralfu-dir-file/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Ralgu-dir-file/diff_out and /Users/gkarina/tests/bonus/Ralgu-dir-file/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Ratgu-dir-file/diff_out and /Users/gkarina/tests/bonus/Ratgu-dir-file/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rltfu-dir-file/diff_out and /Users/gkarina/tests/bonus/Rltfu-dir-file/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rltgu-dir-file/diff_out and /Users/gkarina/tests/bonus/Rltgu-dir-file/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rraltu-dir-file/diff_out and /Users/gkarina/tests/bonus/Rraltu-dir-file/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Raltgu-dir-file/diff_out and /Users/gkarina/tests/bonus/Raltgu-dir-file/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rraltfu-dir-file/diff_out and /Users/gkarina/tests/bonus/Rraltfu-dir-file/diff_err
+Incorrect output. Find information in /Users/gkarina/tests/bonus/Rraltgu-dir-file/diff_out and /Users/gkarina/tests/bonus/Rraltgu-dir-file/diff_err

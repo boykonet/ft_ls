@@ -32,6 +32,7 @@ int	set_fileinfo(t_fileinfo *finfo, unsigned short flags, long long *total)
 	size_t			flen;
 	int 			ecode;
 
+	(void)flags;
 	filepath = NULL;
 	flen = ft_strlen(finfo->path) + 1 + ft_strlen(finfo->filename) + 1;
 	filepath = ft_calloc(flen, sizeof(char));
@@ -72,18 +73,10 @@ int	set_fileinfo(t_fileinfo *finfo, unsigned short flags, long long *total)
 	finfo->atime.tv_sec = st.st_atimespec.tv_sec;
 	finfo->mtime.tv_sec = st.st_mtimespec.tv_sec;
 
-	if (is_flag(flags, U_FLAG_SHIFT, U_FLAG_VALUE) == 1)
-	{
-		if (is_flag(flags, T_FLAG_SHIFT, T_FLAG_VALUE) == 1 \
-			&& is_flag(flags, L_FLAG_SHIFT, L_FLAG_VALUE) == 1)
-			ecode = set_time(finfo->atime, finfo->amonth, finfo->day_lm, finfo->time_year_lm);
-		else if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_VALUE) == 1)
-			ecode = set_time(finfo->atime, finfo->amonth, finfo->day_lm, finfo->time_year_lm);
-		else
-			ecode = set_time(finfo->mtime, finfo->amonth, finfo->day_lm, finfo->time_year_lm);
-	}
-	else
-		ecode = set_time(finfo->mtime, finfo->amonth, finfo->day_lm, finfo->time_year_lm);
+//	if (is_flag(flags, U_FLAG) == 1)
+//		ecode = set_time(finfo->atime, finfo->amonth, finfo->day_lm, finfo->time_year_lm);
+//	else
+	ecode = set_time(finfo->mtime, finfo->amonth, finfo->day_lm, finfo->time_year_lm);
 	if (ecode != 0)
 	{
 		free(filepath);

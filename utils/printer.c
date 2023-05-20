@@ -12,7 +12,7 @@
 
 #include "../ls.h"
 
-void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs, int g_flag, int color_flag)
+void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs, int g_flag, int color_flag, char colors[23])
 {
 	t_pattern	patterns[MAX_REPL_PATTERNS];
 	char		spaces[COUNT_REGULAR_SPACES][254 + 1];
@@ -27,7 +27,7 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs, int g_flag, int color_flag
 	set_spaces(spaces, finfo, maxs);
 	if (color_flag == 1 && finfo->color_type != 0 && cisatty(1) == 1)
 	{
-		set_color(finfo->color_type, color);
+		set_color(finfo->color_type, color, colors);
 		ft_memcpy(reset_color, RESET_COLOR, ft_strlen(RESET_COLOR));
 	}
 	add_pattern(&patterns[0], "{{filemode}}", finfo->filemode);
@@ -65,7 +65,7 @@ void	print_fileinfo(t_fileinfo *finfo, t_spaces maxs, int g_flag, int color_flag
 	ft_putendl_fd(pattern, 1);
 }
 
-void	print_without_full_info(t_fileinfo **files, int color_flag)
+void	print_without_full_info(t_fileinfo **files, int color_flag, char colors[23])
 {
 	size_t		i;
 	char 		color[11 + 1], reset_color[5 + 1];
@@ -83,7 +83,7 @@ void	print_without_full_info(t_fileinfo **files, int color_flag)
 		ft_bzero(reset_color, sizeof(reset_color));
 		if (color_flag == 1 && files[i]->color_type != 0 && cisatty(1) == 1)
 		{
-			set_color(files[i]->color_type, color);
+			set_color(files[i]->color_type, color, colors);
 			ft_memcpy(reset_color, RESET_COLOR, ft_strlen(RESET_COLOR));
 		}
 		add_pattern(&p[0], "{{color}}", color);
@@ -102,7 +102,7 @@ void	print_total(long long total)
 	ft_putchar_fd('\n', 1);
 }
 
-void	print_files_from_dirs(t_fileinfo **files, long long total, unsigned short flags)
+void	print_files_from_dirs(t_fileinfo **files, long long total, unsigned short flags, char colors[23])
 {
 	t_spaces	maxs;
 	size_t		i;
@@ -113,19 +113,19 @@ void	print_files_from_dirs(t_fileinfo **files, long long total, unsigned short f
 	ispaces(&maxs);
 	counter_of_spaces(files, &maxs);
 
-	if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_VALUE) == 1 && len_2array((const void**)files) > 0)
+	if (is_flag(flags, L_FLAG) == 1 && len_2array((const void**)files) > 0)
 		print_total(total);
 
-	if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_VALUE) == 0)
-		print_without_full_info(files, is_flag(flags, COLOR_FLAG_SHIFT, COLOR_FLAG_VALUE));
+	if (is_flag(flags, L_FLAG) == 0)
+		print_without_full_info(files, is_flag(flags, COLOR_FLAG), colors);
 	else
 	{
 		while (files[i])
-			print_fileinfo(files[i++], maxs, is_flag(flags, G_FLAG_SHIFT, G_FLAG_VALUE), is_flag(flags, COLOR_FLAG_SHIFT, COLOR_FLAG_VALUE));
+			print_fileinfo(files[i++], maxs, is_flag(flags, G_FLAG), is_flag(flags, COLOR_FLAG), colors);
 	}
 }
 
-void	print_files_from_files(t_fileinfo **files, unsigned short flags)
+void	print_files_from_files(t_fileinfo **files, unsigned short flags, char colors[23])
 {
 	t_spaces	maxs;
 	size_t	i;
@@ -135,11 +135,11 @@ void	print_files_from_files(t_fileinfo **files, unsigned short flags)
 		return ;
 	ispaces(&maxs);
 	counter_of_spaces(files, &maxs);
-	if (is_flag(flags, L_FLAG_SHIFT, L_FLAG_VALUE) == 0)
-		print_without_full_info(files, is_flag(flags, COLOR_FLAG_SHIFT, COLOR_FLAG_VALUE));
+	if (is_flag(flags, L_FLAG) == 0)
+		print_without_full_info(files, is_flag(flags, COLOR_FLAG), colors);
 	else
 	{
 		while (files[i])
-			print_fileinfo(files[i++], maxs, is_flag(flags, G_FLAG_SHIFT, G_FLAG_VALUE), is_flag(flags, COLOR_FLAG_SHIFT, COLOR_FLAG_VALUE));
+			print_fileinfo(files[i++], maxs, is_flag(flags, G_FLAG), is_flag(flags, COLOR_FLAG), colors);
 	}
 }

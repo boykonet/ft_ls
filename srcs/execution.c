@@ -17,7 +17,7 @@ int	rec_checks(char *dir, unsigned short flags)
 	size_t	ldname;
 
 	ldname = ft_strlen(dir);
-	if (is_flag(flags, A_FLAG_SHIFT, A_FLAG_VALUE) == 0 && ft_strncmp(dir, ".", 1) == 0)
+	if (is_flag(flags, A_FLAG) == 0 && ft_strncmp(dir, ".", 1) == 0)
 		return (1);
 	if (ft_strncmp(dir, ".", ldname > 1 ? ldname : 1) == 0 || ft_strncmp(dir, "..", ldname > 2 ? ldname : 2) == 0)
 		return (1);
@@ -93,7 +93,7 @@ static int	set_to_fileinfo(t_fileinfo ***files, char **filenames, char *path, un
 	return (0);
 }
 
-static int handle_dirs(char *path, unsigned short flags, int counter, int possible_files)
+static int handle_dirs(char *path, unsigned short flags, int counter, int possible_files, char colors[23])
 {
 	t_fileinfo 		**files;
 	char 			**filenames;
@@ -104,7 +104,7 @@ static int handle_dirs(char *path, unsigned short flags, int counter, int possib
 	size_t			i, flen;
 
 	files = NULL;
-	ecode = openreaddir(&filenames, path, is_flag(flags, A_FLAG_SHIFT, A_FLAG_VALUE));
+	ecode = openreaddir(&filenames, path, is_flag(flags, A_FLAG));
 	if (ecode != 0)
 		return (ecode);
 
@@ -140,7 +140,7 @@ static int handle_dirs(char *path, unsigned short flags, int counter, int possib
 	}
 	sort_by_flags(files, flags);
 
-	print_files_from_dirs(files, total, flags);
+	print_files_from_dirs(files, total, flags, colors);
 
 	dirs = copy_dirs(files);
 	free_2array((void**)files);
@@ -148,7 +148,7 @@ static int handle_dirs(char *path, unsigned short flags, int counter, int possib
 	if (dirs == NULL)
 		return (ERR_CODE_MALLOC_ERROR);
 
-	if (is_flag(flags, REC_FLAG_SHIFT, REC_FLAG_VALUE) == 1)
+	if (is_flag(flags, REC_FLAG) == 1)
 	{
 		i = 0;
 		while (dirs[i])
@@ -160,7 +160,7 @@ static int handle_dirs(char *path, unsigned short flags, int counter, int possib
 			}
 			set_path(path, dirs[i], newdir);
 			ft_putchar_fd('\n', 1);
-			handle_dirs(newdir, flags, counter + 1, possible_files);
+			handle_dirs(newdir, flags, counter + 1, possible_files, colors);
 			i++;
 		}
 	}
@@ -169,7 +169,7 @@ static int handle_dirs(char *path, unsigned short flags, int counter, int possib
 	return (0);
 }
 
-static int handle_files(char **filenames, unsigned short flags)
+static int handle_files(char **filenames, unsigned short flags, char colors[23])
 {
 	t_fileinfo 		**files;
 	int				ecode;
@@ -179,19 +179,19 @@ static int handle_files(char **filenames, unsigned short flags)
 	ecode = set_to_fileinfo(&files, filenames, "", flags);
 	if (ecode != 0)
 		return (ecode);
-	print_files_from_files(files, flags);
+	print_files_from_files(files, flags, colors);
 	free_2array((void**)files);
 	files = NULL;
 	return (0);
 }
 
-static int	execute_files(char **files, unsigned short flags, t_pattern p[MAX_ERROR_PATTERNS])
+static int	execute_files(char **files, unsigned short flags, char colors[23], t_pattern p[MAX_ERROR_PATTERNS])
 {
 	int		ecode;
 
 	if (files == NULL)
 		return (ERR_CODE_NULL_PARAMETER);
-	ecode = handle_files(files, flags);
+	ecode = handle_files(files, flags, colors);
 	if (ecode != 0)
 	{
 		handle_ecodes(ecode, NULL, p);
@@ -200,7 +200,7 @@ static int	execute_files(char **files, unsigned short flags, t_pattern p[MAX_ERR
 	return (0);
 }
 
-static int	execute_dirs(char **dirs, unsigned short flags, int possible_files, t_pattern p[MAX_ERROR_PATTERNS])
+static int	execute_dirs(char **dirs, unsigned short flags, char colors[23], int possible_files, t_pattern p[MAX_ERROR_PATTERNS])
 {
 	t_fileinfo	**dirinfo;
 	char 		**sorted_dirs;
@@ -227,7 +227,7 @@ static int	execute_dirs(char **dirs, unsigned short flags, int possible_files, t
 	}
 	while (sorted_dirs[i])
 	{
-		ecode = handle_dirs(sorted_dirs[i], flags, 0, possible_files);
+		ecode = handle_dirs(sorted_dirs[i], flags, 0, possible_files, colors);
 		if (ecode != 0)
 		{
 			free_2array((void**)sorted_dirs);
@@ -253,14 +253,14 @@ void	execution(t_ls *ls)
 	dlen = len_2array((const void**)ls->dirs);
 	if (flen > 0)
 	{
-		ecode = execute_files(ls->files, ls->flags, ls->epatterns);
+		ecode = execute_files(ls->files, ls->flags, ls->color, ls->epatterns);
 		handle_error(ecode, ls->epatterns, &ls->global_ecode);
 	}
 	if (dlen > 0 && flen > 0)
 		ft_putchar_fd('\n', 1);
 	if (dlen > 0)
 	{
-		ecode = execute_dirs(ls->dirs, ls->flags, ls->possible_files, ls->epatterns);
+		ecode = execute_dirs(ls->dirs, ls->flags, ls->color, ls->possible_files, ls->epatterns);
 		handle_error(ecode, ls->epatterns, &ls->global_ecode);
 	}
 }

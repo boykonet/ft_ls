@@ -27,7 +27,7 @@
 # define STRERROR_MESSAGE				"{{message}}"
 # define PATTERN_STRERROR_MESSAGE		"{{message}}"
 
-# define FLAG_NOT_SUPPORT				"illegal option -- {{flag}}\nusage: ls [-GRadfglrtu] [file ...]"
+# define FLAG_NOT_SUPPORT				"illegal option -- {{flag}}\nusage: ls [-GRadfglrt] [file ...]"
 # define PATTERN_FLAG_NOT_SUPPORT		"{{flag}}"
 
 # define FILE_ERROR						"{{filename}}: {{message}}"
@@ -39,12 +39,12 @@
 # define SHORT_FILE_INFO				"{{color}}{{filename}}{{reset_color}}"
 
 /*                  fourth 4 bytes                 third 4 bytes            second 4 bytes        first 4 bytes
-** bits    |     0 |     0 |    0 |    0  ||     0 |    0 |   0 |   1  ||   1 |  1 |  1 |  1  ||  1 | 1 | 1 | 1
-** flag    |     - |     - |    - |    -  ||     - |    - |   G |   g  ||   R |  a |  l |  r  ||  t | d | f | u
+** bits    |     0 |     0 |    0 |    0  ||     0 |    0 |   0 |   1  ||   1 |  1 |  1 |  1  ||  1 | 1 | 1 | 0
+** flag    |     - |     - |    - |    -  ||     - |    - |   G |   g  ||   R |  a |  l |  r  ||  t | d | f | -
 ** shift   |    15 |    14 |   13 |   12  ||    11 |   10 |   9 |   8  ||   7 |  6 |  5 |  4  ||  3 | 2 | 1 | 0
 ** value   | 32768 | 16384 | 8192 | 4096  ||  2048 | 1024 | 512 | 256  || 128 | 64 | 32 | 16  ||  8 | 4 | 2 | 1
 */
-# define MAX_FLAGS			10
+# define MAX_FLAGS			9
 
 # define COLOR_FLAG			'G'
 # define COLOR_FLAG_SHIFT	9
@@ -82,9 +82,9 @@
 # define F_FLAG_SHIFT		1
 # define F_FLAG_VALUE		2
 
-# define U_FLAG				'u'
-# define U_FLAG_SHIFT		0
-# define U_FLAG_VALUE		1
+//# define U_FLAG				'u'
+//# define U_FLAG_SHIFT		0
+//# define U_FLAG_VALUE		1
 
 
 # define FLAG_INVERTED_NO	0
@@ -92,17 +92,18 @@
 # define HALF_OF_YEAR_SECONDS	(365.2422 * 0.5 * 24 * 60 * 60)
 
 # define DEFAULT_COLORS		"exfxcxdxbxegedabagacad"
+# define ENV_COLOR_KEY		"LSCOLORS"
 
-# define EMPTY				""
+# define EMPTY	""
 
-# define COLOR_PATTERN		"\e[{{type_font}}{{s1}}{{f_code}}{{f_color}}{{s2}}{{b_code}}{{b_color}}m"
-# define TYPE_FONT_PATTERN	"{{type_font}}"
-# define F_CODE_PATTERN		"{{f_code}}"
-# define F_COLOR_PATTERN	"{{f_color}}"
-# define B_CODE_PATTERN		"{{b_code}}"
-# define B_COLOR_PATTERN	"{{b_color}}"
-# define SEMICOLON1_PATTERN	"{{s1}}"
-# define SEMICOLON2_PATTERN	"{{s2}}"
+# define COLOR_PATTERN			"\e[{{type_font}}{{s1}}{{f_code}}{{f_color}}{{s2}}{{b_code}}{{b_color}}m"
+# define TYPE_FONT_PATTERN		"{{type_font}}"
+# define F_CODE_PATTERN			"{{f_code}}"
+# define F_COLOR_PATTERN		"{{f_color}}"
+# define B_CODE_PATTERN			"{{b_code}}"
+# define B_COLOR_PATTERN		"{{b_color}}"
+# define SEMICOLON1_PATTERN		"{{s1}}"
+# define SEMICOLON2_PATTERN		"{{s2}}"
 # define COUNT_COLOR_PATTERNS	7
 
 # define REGULAR_FONT		"0"
@@ -228,6 +229,7 @@ typedef struct	s_ls
 	t_pattern 		epatterns[MAX_ERROR_PATTERNS];
 	int 			possible_files;
 	int 			global_ecode;
+	char			color[23];
 } t_ls;
 
 typedef struct s_flags {
@@ -276,7 +278,7 @@ typedef struct s_colors {
 } t_colors;
 
 void	initialization(t_ls *ls);
-void	parsing(t_ls *ls, char **data);
+void	parsing(t_ls *ls, char **data, char **env);
 void	execution(t_ls *ls);
 
 void 	init_ls(t_ls *ls);
@@ -306,17 +308,18 @@ void	replace_pattern(char *dest, const char *src, t_pattern patterns[MAX_REPL_PA
 
 int 	handle_error(int ecode, t_pattern p[MAX_ERROR_PATTERNS], int *gcode);
 
-int		is_flag(unsigned short flags, int shift, int value);
+int		is_flag(unsigned short flags, char flag);
+int		add_flag(unsigned short *flags, char nf);
 
 int 	set_fileinfo(t_fileinfo *finfo, unsigned short flags, long long *total);
 
-void	print_files_from_files(t_fileinfo **files, unsigned short flags);
-void	print_files_from_dirs(t_fileinfo **files, long long total, unsigned short flags);
+void	print_files_from_files(t_fileinfo **files, unsigned short flags, char colors[23]);
+void	print_files_from_dirs(t_fileinfo **files, long long total, unsigned short flags, char colors[23]);
 
-void	sort_fileinfo(t_fileinfo **array, size_t count_elems, int (*func)(void*, void*, unsigned short, int), int is_inverted, unsigned short flags);
-int		order_cmp_by_filename(void *first, void *second, unsigned short flags, int is_inverted);
-int		order_cmp_by_time(void *first, void *second, unsigned short flags, int is_inverted);
-void	quick_sort(void ***elems, size_t count, int (*compare_func)(void*, void*, unsigned short, int), int is_inverted, unsigned short flags);
+void	sort_fileinfo(t_fileinfo **array, size_t count_elems, int (*func)(void*, void*, unsigned short), unsigned short flags);
+int		order_cmp_by_filename(void *first, void *second, unsigned short flags);
+int		order_cmp_by_time(void *first, void *second, unsigned short flags);
+void	quick_sort(void ***elems, size_t count, int (*compare_func)(void*, void*, unsigned short), unsigned short flags);
 
 int		max(int first, int second);
 void	max_spaces(size_t *first, size_t second);
@@ -349,6 +352,6 @@ void	putnbr(long long number, int base, char *base_str);
 void	handle_ecodes(int ecode, char *filename, t_pattern p[MAX_ERROR_PATTERNS]);
 
 int		set_color_type(mode_t mode);
-void	set_color(size_t filetype, char data[11 + 1]);
+void	set_color(size_t filetype, char data[11 + 1], const char *colors);
 
 #endif

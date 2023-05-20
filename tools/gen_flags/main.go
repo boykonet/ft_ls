@@ -18,6 +18,40 @@ func main() {
 	var farr, sarr []string
 	var vars []string
 
+	//m := map[string]bool{
+	//	"R":     true,
+	//	"r":     true,
+	//	"a":     true,
+	//	"l":     true,
+	//	"t":     true,
+	//	"Rr":    true,
+	//	"Ra":    true,
+	//	"Rl":    true,
+	//	"Rt":    true,
+	//	"ra":    true,
+	//	"rl":    true,
+	//	"rt":    true,
+	//	"al":    true,
+	//	"at":    true,
+	//	"lt":    true,
+	//	"Rra":   true,
+	//	"Rrl":   true,
+	//	"Rrt":   true,
+	//	"Ral":   true,
+	//	"Rat":   true,
+	//	"Rlt":   true,
+	//	"ral":   true,
+	//	"rat":   true,
+	//	"rlt":   true,
+	//	"alt":   true,
+	//	"Rral":  true,
+	//	"Rrat":  true,
+	//	"Rrlt":  true,
+	//	"Ralt":  true,
+	//	"ralt":  true,
+	//	"Rralt": true,
+	//}
+
 	vars = os.Args[1:]
 	if len(vars) == 1 {
 		return
@@ -34,14 +68,10 @@ func main() {
 	for i := 1; i < len(vars); i++ {
 
 		sarr = nil
-
-		//fmt.Println(farr)
-
 		for _, farrvalue := range farr {
 			index := FindNextIndex(farrvalue[len(farrvalue)-1:], vars)
 
 			if index == -1 || index >= len(vars) {
-				//fmt.Printf("Something went wrong [%v]\n", index)
 				continue
 			}
 			for _, fv := range vars[index:] {
@@ -50,14 +80,22 @@ func main() {
 		}
 
 		for _, v := range farr {
-			fmt.Printf("\"%v\"", v)
+			//_, ok := m[v]
+			//if ok == true {
+			//	continue
+			//}
+			fmt.Printf("\"G%v\"", v)
 			fmt.Print("  ")
 		}
 		farr = append([]string{}, sarr...)
 	}
 
 	for index, v := range farr {
-		fmt.Printf("\"%v\"", v)
+		//_, ok := m[v]
+		//if ok == true {
+		//	continue
+		//}
+		fmt.Printf("\"G%v\"", v)
 		if (index + 1) < len(farr) {
 			fmt.Print("  ")
 		}

@@ -25,47 +25,6 @@ static char	**copy_filenames(char **data)
 	return (filenames);
 }
 
-static void	set_flag(unsigned short *flags, int shift, int value)
-{
-	if (((*flags) & (1 << shift)) != value)
-		(*flags) |= (1 << shift);
-}
-
-int		is_flag(unsigned short flags, int shift, int value)
-{
-	if ((flags & (1 << shift)) == value)
-		return (1);
-	return (0);
-}
-
-static int	add_flag(unsigned short *flags, char nf)
-{
-	size_t	i;
-	t_flags f[MAX_FLAGS + 1] = {
-			{.flag = COLOR_FLAG, .shift = COLOR_FLAG_SHIFT, .value = COLOR_FLAG_VALUE},
-			{.flag = REC_FLAG, .shift = REC_FLAG_SHIFT, .value = REC_FLAG_VALUE},
-			{.flag = A_FLAG, .shift = A_FLAG_SHIFT, .value = A_FLAG_VALUE},
-			{.flag = L_FLAG, .shift = L_FLAG_SHIFT, .value = L_FLAG_VALUE},
-			{.flag = R_FLAG, .shift = R_FLAG_SHIFT, .value = R_FLAG_VALUE},
-			{.flag = T_FLAG, .shift = T_FLAG_SHIFT, .value = T_FLAG_VALUE},
-			{.flag = D_FLAG, .shift = D_FLAG_SHIFT, .value = D_FLAG_VALUE},
-			{.flag = F_FLAG, .shift = F_FLAG_SHIFT, .value = F_FLAG_VALUE},
-			{.flag = U_FLAG, .shift = U_FLAG_SHIFT, .value = U_FLAG_VALUE},
-			{.flag = G_FLAG, .shift = G_FLAG_SHIFT, .value = G_FLAG_VALUE}};
-
-	i = 0;
-	while (i < MAX_FLAGS)
-	{
-		if (f[i].flag == nf)
-		{
-			set_flag(flags, f[i].shift, f[i].value);
-			return (0);
-		}
-		i++;
-	}
-	return (-1);
-}
-
 static int	parse_flags(char ***data, unsigned short *flags, t_pattern p[MAX_ERROR_PATTERNS])
 {
 	char	*param;
@@ -150,7 +109,7 @@ static int	separate_filenames(char ***filenames, char ***files, char ***dirs, in
 	while (*filenames && **filenames)
 	{
 		*count_possible_files_and_dirs += 1;
-		a2ecode = sort_by_dir_or_file(dirs, files, *(*filenames), is_flag(flags, D_FLAG_SHIFT, D_FLAG_VALUE));
+		a2ecode = sort_by_dir_or_file(dirs, files, *(*filenames), is_flag(flags, D_FLAG));
 		if (a2ecode != 0)
 		{
 			handle_ecodes(a2ecode, **filenames, p);
@@ -178,19 +137,49 @@ void	ehandler_filenames(char **filenames, t_ls *ls, int (*func)(char***, char***
 	}
 }
 
-void	parsing(t_ls *ls, char **data)
+void	find_env_value(char **env, char *key, char value[23])
+{
+	char	*p;
+	size_t 	i;
+
+	p = NULL;
+	if (env == NULL || key == NULL)
+		return ;
+	i = 0;
+	while (env[i])
+	{
+		if (ft_strnstr(env[i], ENV_COLOR_KEY, ft_strlen(ENV_COLOR_KEY)) != NULL)
+		{
+			p = ft_strchr(env[i], '=');
+			ft_memcpy(value, p + 1, ft_strlen(p + 1));
+			return ;
+		}
+		i++;
+	}
+}
+
+void	parsing(t_ls *ls, char **data, char **env)
 {
 	char	**filenames;
+	char	cvalue[23];
 	int 	ecode;
 
+	ft_bzero(cvalue, sizeof(cvalue));
 	ecode = parse_flags(&data, &ls->flags, ls->epatterns);
 	if (handle_error(ecode, ls->epatterns, NULL) == -1)
 		cleaner(ls, 1);
 
-	if (is_flag(ls->flags, F_FLAG_SHIFT, F_FLAG_VALUE) == 1)
+	if (is_flag(ls->flags, F_FLAG) == 1)
 		add_flag(&ls->flags, A_FLAG);
-	if (is_flag(ls->flags, G_FLAG_SHIFT, G_FLAG_VALUE) == 1)
+	if (is_flag(ls->flags, G_FLAG) == 1)
 		add_flag(&ls->flags, L_FLAG);
+	if (is_flag(ls->flags, COLOR_FLAG) == 1)
+	{
+		ft_memcpy(ls->color, DEFAULT_COLORS, ft_strlen(DEFAULT_COLORS));
+		find_env_value(env, ENV_COLOR_KEY, cvalue);
+		if (ft_strlen(cvalue) > 0)
+			ft_memcpy(ls->color, cvalue, ft_strlen(cvalue));
+	}
 
 	ecode = parse_filenames(data, &filenames, ls->epatterns);
 	if (handle_error(ecode, ls->epatterns, NULL) == -1)

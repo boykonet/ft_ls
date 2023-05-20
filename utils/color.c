@@ -35,9 +35,8 @@ char	*find_color(char color)
 	return (colors[0].value);
 }
 
-void	set_color(size_t filetype, char data[11 + 1])
+void	set_color(size_t filetype, char data[11 + 1], const char *dcolors)
 {
-	const char	dcolors[] = DEFAULT_COLORS;
 	char		color_pattern[] = COLOR_PATTERN;
 	t_pattern	p[COUNT_COLOR_PATTERNS + 1];
 	size_t	i, findex, bindex;
