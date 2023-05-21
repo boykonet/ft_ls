@@ -14,12 +14,17 @@ F6="${PTF}file6"
 F7="${PTF}file7"
 NF="../new_file"
 EX="ex"
+FIRST_DIR="${HOME}/Desktop"
+SECOND_DIR="ex"
+THIRD_DIR="${HOME}/Desktop/codam"
+FOURTH_DIR="${HOME}/Desktop/boykonet/ft_ls"
+FIFTH_DIR="${HOME}/Desktop/boykonet"
 
-touch ${F1} ${F2}
-touch ${F3}
-touch ${F4}
-touch ${F5} ${F6} ${F7}
-touch ${NF}
+#touch ${F1} ${F2}
+#touch ${F3}
+#touch ${F4}
+#touch ${F5} ${F6} ${F7}
+#touch ${NF}
 mkdir -p ${EX}
 mkdir -p ${EX}/dir1 ${EX}/dir1/dir3 ${EX}/dir4 ${EX}/file1 ${EX}/file2 ${EX}/file3 ${EX}/dir2 ${EX}/file
 ln -s ${EX}/file ${EX}/link
@@ -119,11 +124,11 @@ for i in `seq $sz`; do
   DIR_PATH=${TEST_DIRECTORY_PATH}${dirs[$i]}${DIR_SUFFIX}
   mkdir -p ${DIR_PATH}
   if [ -z "${flags[$i]}" ]; then
-    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${HOME}"/Desktop" "ex" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
-    ls ${HOME}"/Desktop" "ex" "../ft_ping" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
+    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${FIRST_DIR} ${SECOND_DIR} ${THIRD_DIR} ${FOURTH_DIR} ${FIFTH_DIR} > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+    ls ${FIRST_DIR} ${SECOND_DIR} ${THIRD_DIR} ${FOURTH_DIR} ${FIFTH_DIR} > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
   else
-    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${flags[$i]} ${HOME}"/Desktop" "ex" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
-    ls ${flags[$i]} ${HOME}"/Desktop" "ex" "../ft_ping" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
+    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${flags[$i]} ${FIRST_DIR} ${SECOND_DIR} ${THIRD_DIR} ${FOURTH_DIR} ${FIFTH_DIR} > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+    ls ${flags[$i]} ${FIRST_DIR} ${SECOND_DIR} ${THIRD_DIR} ${FOURTH_DIR} ${FIFTH_DIR} > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
   fi
 
   DIFF_OUTPUT=$(diff ${DIR_PATH}/${FT_LS_OUT} ${DIR_PATH}/${LS_OUT})
@@ -175,11 +180,11 @@ for i in `seq $sz`; do
   DIR_PATH=${TEST_DIRECTORY_PATH}${dirs[$i]}${FILES_AND_DIRS_SUFFIX}
   mkdir -p ${DIR_PATH}
   if [ -z "${flags[$i]}" ]; then
-    ASAN_OPTIONS=detect_leaks=1 ./ft_ls "ex" ${F3} ${F2} ${F4} ${F1} ${F7} ${HOME}"/Desktop" ${F6} ${F5} "main.c" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
-    ls "ex" ${F3} ${F2} ${F4} ${F1} ${F7} ${HOME}"/Desktop" ${F6} ${F5} "main.c" "../ft_ping" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
+    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${SECOND_DIR} ${F3} ${F2} ${FIFTH_DIR} ${F4} ${FOURTH_DIR} ${F1} ${F7} ${FIRST_DIR} ${F6} ${F5} "main.c" ${THIRD_DIR} > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+    ls ${SECOND_DIR} ${F3} ${F2} ${FIFTH_DIR} ${F4} ${FOURTH_DIR} ${F1} ${F7} ${FIRST_DIR} ${F6} ${F5} "main.c" ${THIRD_DIR} > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
   else
-    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${flags[$i]} "ex" ${F3} ${F2} ${F4} ${F1} ${F7} ${HOME}"/Desktop" ${F6} ${F5} "main.c" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
-    ls ${flags[$i]} "ex" ${F3} ${F2} ${F4} ${F1} ${F7} ${HOME}"/Desktop" ${F6} ${F5} "main.c" "../ft_ping" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
+    ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${flags[$i]} ${SECOND_DIR} ${F3} ${F2} ${FIFTH_DIR} ${F4} ${FOURTH_DIR} ${F1} ${F7} ${FIRST_DIR} ${F6} ${F5} "main.c" ${THIRD_DIR} > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+    ls ${flags[$i]} ${SECOND_DIR} ${F3} ${F2} ${FIFTH_DIR} ${F4} ${FOURTH_DIR} ${F1} ${F7} ${FIRST_DIR} ${F6} ${F5} "main.c" ${THIRD_DIR} > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
   fi
 
   DIFF_OUTPUT=$(diff ${DIR_PATH}/${FT_LS_OUT} ${DIR_PATH}/${LS_OUT})
@@ -310,8 +315,8 @@ sz=${#dirs_bonus[@]}
 for i in `seq $sz`; do
   DIR_PATH=${TEST_DIRECTORY_PATH_BONUS}${dirs_bonus[$i]}${DIR_SUFFIX}
   mkdir -p ${DIR_PATH}
-  ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${flags_bonus[$i]} ${HOME}"/Desktop" "ex" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
-  ls ${flags_bonus[$i]} ${HOME}"/Desktop" "ex" "../ft_ping" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
+  ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${flags_bonus[$i]} ${FIRST_DIR} ${SECOND_DIR} ${THIRD_DIR} ${FOURTH_DIR} ${FIFTH_DIR} > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+  ls ${flags_bonus[$i]} ${FIRST_DIR} ${SECOND_DIR} ${THIRD_DIR} ${FOURTH_DIR} ${FIFTH_DIR} > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
 
   DIFF_OUTPUT=$(diff ${DIR_PATH}/${FT_LS_OUT} ${DIR_PATH}/${LS_OUT})
   echo ${DIFF_OUTPUT} > ${DIR_PATH}/${DIFF_OUT}
@@ -356,8 +361,8 @@ sz=${#dirs_bonus[@]}
 for i in `seq $sz`; do
   DIR_PATH=${TEST_DIRECTORY_PATH_BONUS}${dirs_bonus[$i]}${FILES_AND_DIRS_SUFFIX}
   mkdir -p ${DIR_PATH}
-  ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${flags_bonus[$i]} "ex" ${F3} ${F2} ${F4} ${F1} ${F7} ${HOME}"/Desktop" ${F6} ${F5} "main.c" "../ft_ping" > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
-  ls ${flags_bonus[$i]} "ex" ${F3} ${F2} ${F4} ${F1} ${F7} ${HOME}"/Desktop" ${F6} ${F5} "main.c" "../ft_ping" > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
+  ASAN_OPTIONS=detect_leaks=1 ./ft_ls ${flags_bonus[$i]} ${SECOND_DIR} ${F3} ${F2} ${FIFTH_DIR} ${F4} ${FOURTH_DIR} ${F1} ${F7} ${FIRST_DIR} ${F6} ${F5} "main.c" ${THIRD_DIR} > ${DIR_PATH}/${FT_LS_OUT} 2>${DIR_PATH}/${FT_LS_ERR}
+  ls ${flags_bonus[$i]} ${SECOND_DIR} ${F3} ${F2} ${FIFTH_DIR} ${F4} ${FOURTH_DIR} ${F1} ${F7} ${FIRST_DIR} ${F6} ${F5} "main.c" ${THIRD_DIR} > ${DIR_PATH}/${LS_OUT} 2>${DIR_PATH}/${LS_ERR}
 
   DIFF_OUTPUT=$(diff ${DIR_PATH}/${FT_LS_OUT} ${DIR_PATH}/${LS_OUT})
   echo ${DIFF_OUTPUT} > ${DIR_PATH}/${DIFF_OUT}
