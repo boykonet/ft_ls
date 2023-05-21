@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   parsing.c                                          :+:    :+:            */
+/*   parse.c                                            :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: gkarina <gkarina@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2023/05/05 14:18:59 by gkarina       #+#    #+#                 */
-/*   Updated: 2023/05/05 14:18:59 by gkarina       ########   odam.nl         */
+/*   Created: 2023/05/21 16:08:28 by gkarina       #+#    #+#                 */
+/*   Updated: 2023/05/21 16:08:28 by gkarina       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ void	ehandler_filenames(char **filenames, t_ls *ls, int (*func)(char***, char***
 	}
 }
 
-void	find_env_value(char **env, char *key, char value[23])
+void	find_env_value(char **env, char *key, char value[255 + 1])
 {
 	char	*p;
 	size_t 	i;
@@ -145,6 +145,7 @@ void	find_env_value(char **env, char *key, char value[23])
 	p = NULL;
 	if (env == NULL || key == NULL)
 		return ;
+	ft_bzero(value, 255 + 1);
 	i = 0;
 	while (env[i])
 	{
@@ -158,13 +159,22 @@ void	find_env_value(char **env, char *key, char value[23])
 	}
 }
 
-void	parsing(t_ls *ls, char **data, char **env)
+static void	set_default_color(char color[22 + 1], char **env)
 {
-	char	**filenames;
-	char	cvalue[23];
-	int 	ecode;
+	char	cvalue[255 + 1];
 
 	ft_bzero(cvalue, sizeof(cvalue));
+	ft_memcpy(color, DEFAULT_COLORS, ft_strlen(DEFAULT_COLORS));
+	find_env_value(env, ENV_COLOR_KEY, cvalue);
+	if (ft_strlen(cvalue) > 0)
+		ft_memcpy(color, cvalue, 22);
+}
+
+void	parse(t_ls *ls, char **data, char **env)
+{
+	char	**filenames;
+	int 	ecode;
+
 	ecode = parse_flags(&data, &ls->flags, ls->epatterns);
 	if (handle_error(ecode, ls->epatterns, NULL) == -1)
 		cleaner(ls, 1);
@@ -174,12 +184,7 @@ void	parsing(t_ls *ls, char **data, char **env)
 	if (is_flag(ls->flags, G_FLAG) == 1)
 		add_flag(&ls->flags, L_FLAG);
 	if (is_flag(ls->flags, COLOR_FLAG) == 1)
-	{
-		ft_memcpy(ls->color, DEFAULT_COLORS, ft_strlen(DEFAULT_COLORS));
-		find_env_value(env, ENV_COLOR_KEY, cvalue);
-		if (ft_strlen(cvalue) > 0)
-			ft_memcpy(ls->color, cvalue, ft_strlen(cvalue));
-	}
+		set_default_color(ls->color, env);
 
 	ecode = parse_filenames(data, &filenames, ls->epatterns);
 	if (handle_error(ecode, ls->epatterns, NULL) == -1)

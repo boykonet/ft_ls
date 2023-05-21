@@ -34,9 +34,14 @@
 # define PATTERN_FILE_ERROR_FILENAME	"{{filename}}"
 # define PATTERN_FILE_ERROR_MESSAGE		"{{message}}"
 
-# define WITHOUT_LINK					"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}{{two_spaces}}{{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{color}}{{filename}}{{reset_color}}"
-# define WITH_LINK						"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}{{two_spaces}}{{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{color}}{{filename}}{{reset_color}} -> {{link}}"
-# define SHORT_FILE_INFO				"{{color}}{{filename}}{{reset_color}}"
+# define WITHOUT_LINK_COLOR				"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}{{two_spaces}}{{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{color}}{{filename}}{{reset_color}}"
+# define WITH_LINK_COLOR				"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}{{two_spaces}}{{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{color}}{{filename}}{{reset_color}} -> {{link}}"
+# define WITHOUT_LINK					"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}{{two_spaces}}{{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}}"
+# define WITH_LINK						"{{filemode}} {{s1}}{{nlinks}} {{s2}}{{oname}}{{two_spaces}}{{s3}}{{gname}}  {{s4}}{{nbytes}} {{amonth}} {{s5}}{{day}} {{s6}}{{time_year}} {{filename}} -> {{link}}"
+
+
+# define SHORT_FILE_INFO_COLOR			"{{color}}{{filename}}{{reset_color}}"
+# define SHORT_FILE_INFO				"{{filename}}"
 
 /*                  fourth 4 bytes                 third 4 bytes            second 4 bytes        first 4 bytes
 ** bits    |     0 |     0 |    0 |    0  ||     0 |    0 |   0 |   1  ||   1 |  1 |  1 |  1  ||  1 | 1 | 1 | 0
@@ -277,9 +282,8 @@ typedef struct s_colors {
 	char 	*value;
 } t_colors;
 
-void	initialization(t_ls *ls);
-void	parsing(t_ls *ls, char **data, char **env);
-void	execution(t_ls *ls);
+void	parse(t_ls *ls, char **data, char **env);
+void	execute(t_ls *ls);
 
 void 	init_ls(t_ls *ls);
 void	clear_ls(t_ls *ls);
@@ -353,5 +357,6 @@ void	handle_ecodes(int ecode, char *filename, t_pattern p[MAX_ERROR_PATTERNS]);
 
 int		set_color_type(mode_t mode);
 void	set_color(size_t filetype, char data[11 + 1], const char *colors);
+void	find_env_value(char **env, char *key, char value[255 + 1]);
 
 #endif

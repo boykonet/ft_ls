@@ -13,14 +13,19 @@ F5="${PTF}file5"
 F6="${PTF}file6"
 F7="${PTF}file7"
 NF="../new_file"
+EX="ex"
+
+touch ${F1} ${F2}
+touch ${F3}
+touch ${F4}
+touch ${F5} ${F6} ${F7}
+touch ${NF}
+mkdir -p ${EX}
+mkdir -p ${EX}/dir1 ${EX}/dir1/dir3 ${EX}/dir4 ${EX}/file1 ${EX}/file2 ${EX}/file3 ${EX}/dir2 ${EX}/file
+ln -s ${EX}/file ${EX}/link
+mknod myfifo ${EX}/myfifo
 
 make
-
-#touch ${F1} ${F2}
-#touch ${F3}
-#touch ${F4}
-#touch ${F5} ${F6} ${F7}
-touch ${NF}
 
 dirs=("regular" "R"   "r"  "a"  "l"  "t"  "Rr"  "Ra"  "Rl"  "Rt"  "ra"  "rl"  "rt"  "al"  "at"  "lt"  "Rra"  "Rrl"  "Rrt"  "Ral"  "Rat"  "Rlt"  "ral"  "rat"  "rlt"  "alt"  "Rral"  "Rrat"  "Rrlt"  "Ralt"  "ralt"  "Rralt")
 flags=(""      "-R"  "-r" "-a" "-l" "-t" "-Rr" "-Ra" "-Rl" "-Rt" "-ra" "-rl" "-rt" "-al" "-at" "-lt" "-Rra" "-Rrl" "-Rrt" "-Ral" "-Rat" "-Rlt" "-ral" "-rat" "-rlt" "-alt" "-Rral" "-Rrat" "-Rrlt" "-Ralt" "-ralt" "-Rralt")

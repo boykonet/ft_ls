@@ -24,12 +24,12 @@ SRCS=	./main.c \
 		./srcs/set/owner.c \
 		./srcs/set/time.c \
 		./srcs/dir.c \
-		./srcs/execution.c \
+		./srcs/execute.c \
 		./srcs/fileinfo.c \
 		./srcs/flag.c \
-		./srcs/initialization.c \
-		./srcs/ls_functions.c \
-		./srcs/parsing.c \
+		./srcs/ls_func.c \
+		./srcs/parse.c \
+		./srcs/print.c \
 		./srcs/quick_sort.c \
 		./srcs/readlink.c \
 		./srcs/sort.c \
@@ -43,7 +43,6 @@ SRCS=	./main.c \
 		./utils/isatty.c \
 		./utils/max.c \
 		./utils/pattern.c \
-		./utils/printer.c \
 		./utils/rec_itoa.c \
 		./utils/rec_putnbr.c \
 		./utils/strmode.c

@@ -34,9 +34,9 @@ int main(int argc, char **argv, char **env)
 	int 	ecode;
 
 	(void)argc;
-	initialization(&ls);
-	parsing(&ls, argv + 1, env);
-	execution(&ls);
+	init_ls(&ls);
+	parse(&ls, argv + 1, env);
+	execute(&ls);
 	ecode = ls.global_ecode;
 	clear_ls(&ls);
 	return (ecode);

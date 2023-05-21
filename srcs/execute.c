@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   execution.c                                        :+:    :+:            */
+/*   execute.c                                          :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: gkarina <gkarina@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2023/05/05 14:17:39 by gkarina       #+#    #+#                 */
-/*   Updated: 2023/05/05 14:17:39 by gkarina       ########   odam.nl         */
+/*   Created: 2023/05/21 16:10:57 by gkarina       #+#    #+#                 */
+/*   Updated: 2023/05/21 16:10:57 by gkarina       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,7 +244,7 @@ static int	execute_dirs(char **dirs, unsigned short flags, char colors[23], int 
 	return (0);
 }
 
-void	execution(t_ls *ls)
+void	execute(t_ls *ls)
 {
 	size_t	flen, dlen;
 	int 	ecode;
