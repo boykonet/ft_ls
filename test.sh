@@ -20,15 +20,11 @@ THIRD_DIR="${HOME}/Desktop/codam"
 FOURTH_DIR="${HOME}/Desktop/boykonet/ft_ls"
 FIFTH_DIR="${HOME}/Desktop/boykonet"
 
-#touch ${F1} ${F2}
-#touch ${F3}
-#touch ${F4}
-#touch ${F5} ${F6} ${F7}
-#touch ${NF}
 mkdir -p ${EX}
-mkdir -p ${EX}/dir1 ${EX}/dir1/dir3 ${EX}/dir4 ${EX}/file1 ${EX}/file2 ${EX}/file3 ${EX}/dir2 ${EX}/file
+mkdir -p ${EX}/dir1 ${EX}/dir1/dir3 ${EX}/dir4 ${EX}/dir2
+touch ${EX}/file1 ${EX}/file2 ${EX}/file3 ${EX}/file
 ln -s ${EX}/file ${EX}/link
-mknod myfifo ${EX}/myfifo
+mkfifo ${EX}/myfifo
 
 make
 
