@@ -1,5 +1,4 @@
 # ft_ls
-
-Simple reimplementation of bash `ls` command
+Implementation of `ls` command (subset of functionality)
 
 42 project
